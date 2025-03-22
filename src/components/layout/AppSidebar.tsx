@@ -13,7 +13,6 @@ import {
 	UserCircleIcon,
 } from 'lucide-react'
 
-
 type NavItem = {
 	name: string
 	icon: React.ReactNode
@@ -55,7 +54,7 @@ const navItems: NavItem[] = [
 			{ name: 'Line Chart', path: '/line-chart', pro: false },
 			{ name: 'Bar Chart', path: '/bar-chart', pro: false },
 		],
-	}
+	},
 ]
 
 const othersItems: NavItem[] = [

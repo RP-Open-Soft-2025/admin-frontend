@@ -6,7 +6,6 @@ import AppSidebar from '@/components/layout/AppSidebar'
 import AppHeader from '@/components/layout/AppHeader'
 import React from 'react'
 
-
 export default function AdminLayout({
 	children,
 }: {

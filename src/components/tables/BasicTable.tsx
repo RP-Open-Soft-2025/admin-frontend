@@ -7,14 +7,14 @@ import { User } from 'lucide-react'
 
 export interface Order {
 	id: number
-    name: string
-    email: string
-    emp_id: string
-    role: string
+	name: string
+	email: string
+	emp_id: string
+	role: string
 	is_blocked: boolean
 }
 
-export default function BasicTableOne({tableData}:{tableData: Order[]}) {
+export default function BasicTableOne({ tableData }: { tableData: Order[] }) {
 	return (
 		<div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
 			<div className="max-w-full overflow-x-auto">
@@ -85,24 +85,22 @@ export default function BasicTableOne({tableData}:{tableData: Order[]}) {
 										<Badge
 											size="sm"
 											color={
-												order.role === "HR"
+												order.role === 'HR'
 													? 'primary'
-													: order.role === "Admin" ? "info" : "warning"
+													: order.role === 'Admin'
+														? 'info'
+														: 'warning'
 											}
 										>
 											{order.role}
 										</Badge>
 									</TableCell>
 									<TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                                    <Badge
+										<Badge
 											size="sm"
-											color={
-												order.is_blocked === true
-													? 'error'
-													: 'success'
-											}
+											color={order.is_blocked === true ? 'error' : 'success'}
 										>
-											{order.is_blocked ? "Blocked" : "Active"}
+											{order.is_blocked ? 'Blocked' : 'Active'}
 										</Badge>
 									</TableCell>
 								</TableRow>
