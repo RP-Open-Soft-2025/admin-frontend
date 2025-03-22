@@ -75,7 +75,7 @@ function Page() {
 	return (
 		<div>
 			<BasicTableOne tableData={paginatedData} />
-			<div className="mt-6">
+			<div className="mt-6 w-full flex justify-center items-center">
 				<Pagination
 					totalPages={totalPages}
 					currentPage={currPage}
