@@ -1,8 +1,8 @@
 'use client'
-import BasicTableOne from '@/components/tables/BasicTable'
+import BasicTableOne from '@/components/tables/EmployeeTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
-import { type Order } from '@/components/tables/BasicTable'
+import { type Order } from '@/components/tables/EmployeeTable'
 import { MAX_PER_PAGE } from '@/constatnts'
 
 export const orders: Order[] = [

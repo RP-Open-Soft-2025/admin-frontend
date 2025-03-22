@@ -45,9 +45,10 @@ const navItems: NavItem[] = [
 	{
 		name: 'Tables',
 		icon: <TableIcon />,
-		subItems: [{name: 'All Users', path: '/users', pro: false},
-			{ name: 'All Sessions', path: '/sessions', pro: false},
-			{ name: 'All Meets', path: '/meets', pro: false}
+		subItems: [
+			{ name: 'All Users', path: '/users', pro: false },
+			{ name: 'All Sessions', path: '/sessions', pro: false },
+			{ name: 'All Meets', path: '/meets', pro: false },
 		],
 	},
 	{
