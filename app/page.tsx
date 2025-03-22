@@ -1,6 +1,9 @@
+import topbar from "@/components/ui/topbar";
 
 export default function Home() {
   return (
-    <div>We will start from here.</div>
+    <div className="mt-6 mx-auto  rounded-lg">
+      
+    </div>
   );
 }
