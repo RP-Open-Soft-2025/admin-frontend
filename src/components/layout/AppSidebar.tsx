@@ -40,12 +40,15 @@ const navItems: NavItem[] = [
 	{
 		name: 'Forms',
 		icon: <ListIcon />,
-		subItems: [{ name: 'Form Elements', path: '/form-elements', pro: false }],
+		subItems: [{ name: 'Add User', path: '/form-layout', pro: false }],
 	},
 	{
 		name: 'Tables',
 		icon: <TableIcon />,
-		subItems: [{ name: 'Basic Tables', path: '/basic-tables', pro: false }],
+		subItems: [{name: 'All Users', path: '/users', pro: false},
+			{ name: 'All Sessions', path: '/sessions', pro: false},
+			{ name: 'All Meets', path: '/meets', pro: false}
+		],
 	},
 	{
 		icon: <PieChartIcon />,
