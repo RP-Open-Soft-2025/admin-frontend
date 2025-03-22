@@ -81,7 +81,7 @@ export default function MonthlyTarget() {
 							Monthly Target
 						</h3>
 						<p className="mt-1 font-normal text-gray-500 text-theme-sm dark:text-gray-400">
-							Target you've set for each month
+							Target you&apos;ve set for each month
 						</p>
 					</div>
 					<div className="relative inline-block">

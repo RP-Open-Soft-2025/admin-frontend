@@ -22,8 +22,8 @@ export default function BasicForm() {
 		{ label: 'Employee', value: 'employee' },
 	]
 
-	const handleSelChange = (e: any) => {
-		console.log(e)
+	const handleSelChange = (value: string) => {
+		console.log(value)
 	}
 	return (
 		<ComponentCard title="Add New User">
@@ -45,7 +45,7 @@ export default function BasicForm() {
 						<Select
 							options={opts}
 							placeholder="Select an option"
-							onChange={val => handleSelChange}
+							onChange={handleSelChange}
 							defaultValue="employee"
 						/>
 					</div>
