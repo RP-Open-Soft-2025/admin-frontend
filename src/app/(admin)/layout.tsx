@@ -5,13 +5,7 @@ import Backdrop from '@/components/layout/Backdrop'
 import AppSidebar from '@/components/layout/AppSidebar'
 import AppHeader from '@/components/layout/AppHeader'
 import React from 'react'
-import type { Metadata } from 'next'
-import { EcommerceMetrics } from '@/components/ecommerce/EcommerceMetrics'
-import MonthlyTarget from '@/components/ecommerce/MonthlyTarget'
-import MonthlySalesChart from '@/components/ecommerce/MonthlySalesChart'
-import StatisticsChart from '@/components/ecommerce/StatisticsChart'
-import RecentOrders from '@/components/ecommerce/RecentOrders'
-import DemographicCard from '@/components/ecommerce/DemographicCard'
+
 
 export default function AdminLayout({
 	children,
