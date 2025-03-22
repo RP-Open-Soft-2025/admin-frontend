@@ -1,11 +1,4 @@
-'use client'
-
-import { useSidebar } from '@/components/context/SidebarContext'
-import Backdrop from '@/components/layout/Backdrop'
-import AppSidebar from '@/components/layout/AppSidebar'
-import AppHeader from '@/components/layout/AppHeader'
 import React from 'react'
-import type { Metadata } from 'next'
 import { EcommerceMetrics } from '@/components/ecommerce/EcommerceMetrics'
 import MonthlyTarget from '@/components/ecommerce/MonthlyTarget'
 import MonthlySalesChart from '@/components/ecommerce/MonthlySalesChart'
@@ -40,3 +33,5 @@ export function Ecommerce() {
 		</div>
 	)
 }
+
+export default Ecommerce
