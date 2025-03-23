@@ -5,13 +5,13 @@ import React, { useEffect, useState } from 'react'
 import { type all_order } from '@/components/tables/MeetsTable'
 import { MAX_PER_PAGE } from '@/constatnts'
 
-const orders: all_order[] = [
+const orders: all_order[] = [ 
 	{
 		employee_id: 201,
 		start_time: '2025-03-25T10:00:00Z',
 		end_time: '2025-03-25T11:00:00Z',
 		location: 'Conference Room A',
-	},
+	}, 
 	{
 		employee_id: 202,
 		start_time: '2025-03-26T14:30:00Z',
@@ -35,6 +35,12 @@ const orders: all_order[] = [
 		start_time: '2025-03-29T11:45:00Z',
 		end_time: '2025-03-29T13:45:00Z',
 		location: "Client's Office",
+	},
+	{
+		employee_id: 206,
+		start_time: '2025-03-30T13:00:00Z',
+		end_time: '2025-03-30T14:00:00Z',
+		location: 'Virtual',
 	},
 	{
 		employee_id: 206,
