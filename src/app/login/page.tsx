@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 import Image from 'next/image';
 import deloitteLogo from './deloitte-logo.svg';
 
@@ -36,9 +35,9 @@ const LoginPage: React.FC = () => {
                 throw new Error(data.message || 'Login failed');
             }
 
-            // Set cookie with the token
-            Cookies.set('authToken', data.token, { expires: 7 }); // Cookie expires in 7 days
-            
+            // Store token in local storage instead of cookies
+            localStorage.setItem('authToken', data.token);
+
             // Redirect to dashboard or home page
             router.push('/');
         } catch (err) {
@@ -84,7 +83,7 @@ const LoginPage: React.FC = () => {
                                 onChange={(e) => setEmployeeId(e.target.value)}
                             />
                         </div>
-                        <br/>
+                        <br />
                         <div>
                             <label htmlFor="password" className="sr-only">Password</label>
                             <input
