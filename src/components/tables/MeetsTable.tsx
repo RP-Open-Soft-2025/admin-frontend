@@ -13,11 +13,11 @@ export interface Order {
 	status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'no_show'
 }
 
-export interface all_order{
-	employee_id:number
-	start_time:string
-	end_time:string
-	location:string
+export interface all_order {
+	employee_id: number
+	start_time: string
+	end_time: string
+	location: string
 }
 type BadgeColor =
 	| 'primary'
@@ -27,7 +27,11 @@ type BadgeColor =
 	| 'info'
 	| 'light'
 	| 'dark'
-export function BasicTableOne({ tableData }: { tableData: Order[]|all_order[] }) {
+export function BasicTableOne({
+	tableData,
+}: {
+	tableData: Order[] | all_order[]
+}) {
 	const statusMapping: Record<Order['status'], BadgeColor> = {
 		scheduled: 'primary',
 		in_progress: 'warning',
@@ -35,6 +39,12 @@ export function BasicTableOne({ tableData }: { tableData: Order[]|all_order[] })
 		cancelled: 'warning',
 		no_show: 'error',
 	}
+
+	// Type guard function to check if an item is of type Order
+	const isOrder = (item: Order | all_order): item is Order => {
+		return 'meet_id' in item
+	}
+
 	return (
 		<div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
 			<div className="max-w-full overflow-x-auto">
@@ -72,7 +82,7 @@ export function BasicTableOne({ tableData }: { tableData: Order[]|all_order[] })
 
 						{/* Table Body */}
 						<TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-							{tableData.map(order => (
+							{tableData.filter(isOrder).map(order => (
 								<TableRow key={order.meet_id}>
 									<TableCell className="px-5 py-4 sm:px-6 text-start">
 										<div className="flex items-center gap-3">
@@ -109,8 +119,6 @@ export function BasicTableOne({ tableData }: { tableData: Order[]|all_order[] })
 		</div>
 	)
 }
-
-
 
 export function BasicTableOneAll({ tableData }: { tableData: all_order[] }) {
 	return (
