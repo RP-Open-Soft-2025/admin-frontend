@@ -3,17 +3,14 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 
 import Badge from '../ui/badge/Badge'
 import { User } from 'lucide-react'
+import Link from 'next/link'
+import { Employee, Role } from '@/types/employee'
 
-export interface Order {
-	id: number
-	name: string
-	email: string
-	emp_id: string
-	role: string
-	is_blocked: boolean
-}
-
-export default function BasicTableOne({ tableData }: { tableData: Order[] }) {
+export default function BasicTableOne({
+	tableData,
+}: {
+	tableData: Employee[]
+}) {
 	return (
 		<div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
 			<div className="max-w-full overflow-x-auto">
@@ -58,11 +55,13 @@ export default function BasicTableOne({ tableData }: { tableData: Order[] }) {
 						{/* Table Body */}
 						<TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
 							{tableData.map(order => (
-								<TableRow key={order.id}>
+								<TableRow key={order.userId}>
 									<TableCell className="px-5 py-4 sm:px-6 text-start">
 										<div className="flex items-center gap-3">
 											<div className="w-10 h-10 overflow-hidden rounded-full">
-												<User />
+												<Link href={`/profile/${order.userId}`}>
+													<User />
+												</Link>
 											</div>
 											<div>
 												<span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
@@ -84,22 +83,22 @@ export default function BasicTableOne({ tableData }: { tableData: Order[] }) {
 										<Badge
 											size="sm"
 											color={
-												order.role === 'HR'
+												order.role === Role.HR
 													? 'primary'
-													: order.role === 'Admin'
+													: order.role === Role.ADMIN
 														? 'info'
 														: 'warning'
 											}
 										>
-											{order.role}
+											{order.role.toUpperCase()}
 										</Badge>
 									</TableCell>
 									<TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
 										<Badge
 											size="sm"
-											color={order.is_blocked === true ? 'error' : 'success'}
+											color={order.isBlocked === true ? 'error' : 'success'}
 										>
-											{order.is_blocked ? 'Blocked' : 'Active'}
+											{order.isBlocked ? 'Blocked' : 'Active'}
 										</Badge>
 									</TableCell>
 								</TableRow>
