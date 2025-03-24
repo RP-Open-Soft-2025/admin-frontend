@@ -3,7 +3,6 @@ import BasicTableOne from '@/components/tables/EmployeeTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
 import { API_URL, MAX_PER_PAGE } from '@/constatnts'
-import { orders } from '@/data/orders'
 import store from '@/redux/store'
 import { Employee } from '@/types/employee'
 
