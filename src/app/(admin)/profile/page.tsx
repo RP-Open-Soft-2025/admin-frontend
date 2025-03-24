@@ -1,6 +1,12 @@
 import UserAddressCard from '@/components/user-profile/UserAddressCard'
 import UserInfoCard from '@/components/user-profile/UserInfoCard'
 import UserMetaCard from '@/components/user-profile/UserMetaCard'
+import UserActivityCard from '@/components/user-profile/UserActivityCard'
+import UserLeaveCard from '@/components/user-profile/UserLeaveCard'
+import UserRewardsCard from '@/components/user-profile/UserRewardsCard'
+import UserPerformanceCard from '@/components/user-profile/UserPerformanceCard'
+import UserOnboardingCard from '@/components/user-profile/UserOnboardingCard'
+import UserVibeMeterCard from '@/components/user-profile/UserVibeMeterCard'
 import { Metadata } from 'next'
 import React from 'react'
 
@@ -21,6 +27,14 @@ export default function Profile() {
 					<UserMetaCard />
 					<UserInfoCard />
 					<UserAddressCard />
+					<UserOnboardingCard />
+					<UserActivityCard />
+					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+						<UserPerformanceCard />
+						<UserRewardsCard />
+					</div>
+					<UserLeaveCard />
+					<UserVibeMeterCard />
 				</div>
 			</div>
 		</div>

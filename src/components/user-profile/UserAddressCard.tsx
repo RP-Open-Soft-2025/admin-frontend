@@ -6,6 +6,15 @@ import Button from '../ui/button/Button'
 import Input from '../form/input/InputField'
 import Label from '../form/Label'
 
+// Dummy data for development
+const dummyAddressData = {
+	country: 'United States',
+	city: 'Phoenix',
+	state: 'Arizona',
+	postalCode: 'ERT 2489',
+	taxId: 'AS4568384'
+}
+
 export default function UserAddressCard() {
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
@@ -28,7 +37,7 @@ export default function UserAddressCard() {
 									Country
 								</p>
 								<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-									United States
+									{dummyAddressData.country}
 								</p>
 							</div>
 
@@ -37,7 +46,7 @@ export default function UserAddressCard() {
 									City/State
 								</p>
 								<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-									Phoenix, Arizona, United States.
+									{dummyAddressData.city}, {dummyAddressData.state}, {dummyAddressData.country}
 								</p>
 							</div>
 
@@ -46,7 +55,7 @@ export default function UserAddressCard() {
 									Postal Code
 								</p>
 								<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-									ERT 2489
+									{dummyAddressData.postalCode}
 								</p>
 							</div>
 
@@ -55,7 +64,7 @@ export default function UserAddressCard() {
 									TAX ID
 								</p>
 								<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-									AS4568384
+									{dummyAddressData.taxId}
 								</p>
 							</div>
 						</div>
@@ -99,22 +108,22 @@ export default function UserAddressCard() {
 							<div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
 								<div>
 									<Label>Country</Label>
-									<Input type="text" defaultValue="United States" />
+									<Input type="text" defaultValue={dummyAddressData.country} />
 								</div>
 
 								<div>
 									<Label>City/State</Label>
-									<Input type="text" defaultValue="Arizona, United States." />
+									<Input type="text" defaultValue={`${dummyAddressData.city}, ${dummyAddressData.state}`} />
 								</div>
 
 								<div>
 									<Label>Postal Code</Label>
-									<Input type="text" defaultValue="ERT 2489" />
+									<Input type="text" defaultValue={dummyAddressData.postalCode} />
 								</div>
 
 								<div>
 									<Label>TAX ID</Label>
-									<Input type="text" defaultValue="AS4568384" />
+									<Input type="text" defaultValue={dummyAddressData.taxId} />
 								</div>
 							</div>
 						</div>
