@@ -1,5 +1,5 @@
 'use client'
-import {BasicTableOneAll} from '@/components/tables/MeetsTable'
+import { BasicTableOneAll } from '@/components/tables/MeetsTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
 import { type all_order } from '@/components/tables/MeetsTable'

@@ -2,22 +2,43 @@
 import BasicTableOne from '@/components/tables/EmployeeTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
-import { type Order } from '@/components/tables/EmployeeTable'
-import { MAX_PER_PAGE } from '@/constatnts'
-import { orders } from '@/data/orders'
+import { API_URL, MAX_PER_PAGE } from '@/constatnts'
+import store from '@/redux/store'
+import { Employee } from '@/types/employee'
+
+type Response = {
+	users: Employee[]
+}
 
 function Page() {
-	const [currData, setCurrData] = useState<Order[]>([])
-	const [paginatedData, setPaginatedData] = useState<Order[]>([])
+	const [currData, setCurrData] = useState<Employee[]>([])
+	const [paginatedData, setPaginatedData] = useState<Employee[]>([])
 	const [currPage, setCurrentPage] = useState<number>(1)
 	const [totalPages, setTotalPages] = useState<number>(1)
 
 	useEffect(() => {
-		setCurrData(orders)
-		// Calculate total pages, making sure to round up
-		const pages = Math.ceil(orders.length / MAX_PER_PAGE)
-		setTotalPages(pages)
-		setCurrentPage(1)
+		const { auth } = store.getState()
+		const route =
+			auth.user?.userRole == 'admin'
+				? '/admin/list-users'
+				: '/hr/list-assigned-users'
+		fetch(API_URL + route, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${auth.user?.accessToken}`,
+				'Content-type': 'application/json',
+			},
+		}).then(resp => {
+			if (resp.ok) {
+				resp.json().then((res: Response) => {
+					setCurrData(res.users)
+					const pages = Math.ceil(res.users.length / MAX_PER_PAGE)
+					console.log(pages)
+					setTotalPages(pages)
+					setCurrentPage(1)
+				})
+			}
+		})
 	}, [])
 
 	useEffect(() => {
