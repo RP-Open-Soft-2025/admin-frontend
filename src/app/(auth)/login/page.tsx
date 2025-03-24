@@ -72,19 +72,27 @@ export default function Page() {
 
 			if (response.ok) {
 				if (result.access_token) {
-					const accessToken = result.access_token.access_token
-					const refreshToken = result.refresh_token
-					const role = result.role
-					dispatch(
-						loginSuccess({
-							role,
-							employee_id: data.employee_id,
-							accessToken,
-							refreshToken,
+					if (result.role == 'admin' || result.role == 'hr') {
+						const accessToken = result.access_token.access_token
+						const refreshToken = result.refresh_token
+						const role = result.role
+						dispatch(
+							loginSuccess({
+								role,
+								employee_id: data.employee_id,
+								accessToken,
+								refreshToken,
+							})
+						)
+						console.log('Logged in successfully')
+						setIsSuccessful(true)
+					} else {
+						toast({
+							type: 'error',
+							description: "User dosen't have access to website!",
 						})
-					)
-					console.log('Logged in successfully')
-					setIsSuccessful(true)
+						dispatch(loginFailure({ error: 'Invalid login' }))
+					}
 					// The isAuthenticated effect will handle redirecting
 				} else {
 					console.error('Login failed: No access token received')
