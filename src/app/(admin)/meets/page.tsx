@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react'
 import { MAX_PER_PAGE } from '@/constatnts'
 import { SessionType } from '@/types/sessions'
 
-
 function Page() {
 	const [currData, setCurrData] = useState<SessionType[]>([])
 	const [paginatedData, setPaginatedData] = useState<SessionType[]>([])
