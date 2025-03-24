@@ -2,6 +2,11 @@
 import React from 'react'
 import { VibeMeter, EmotionZone } from '@/types/employee'
 
+// Props interface
+interface UserVibeMeterCardProps {
+  vibeMeterData?: VibeMeter[];
+}
+
 // Dummy data for development
 const dummyVibeMeterData: VibeMeter[] = [
   {
@@ -51,9 +56,6 @@ const dummyVibeMeterData: VibeMeter[] = [
   }
 ]
 
-// Get most recent vibe data
-const latestVibe = dummyVibeMeterData[dummyVibeMeterData.length - 1]
-
 // Helper function to get emotion color
 const getEmotionColor = (emotionZone: EmotionZone) => {
   switch(emotionZone) {
@@ -98,7 +100,13 @@ const getEmotionBgColor = (emotionZone: EmotionZone) => {
   }
 }
 
-export default function UserVibeMeterCard() {
+export default function UserVibeMeterCard({ vibeMeterData }: UserVibeMeterCardProps) {
+  // Use provided data or fall back to dummy data
+  const displayData = vibeMeterData || dummyVibeMeterData;
+  
+  // Get most recent vibe data
+  const latestVibe = displayData[displayData.length - 1];
+  
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-6">
@@ -135,10 +143,10 @@ export default function UserVibeMeterCard() {
             <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
               <p className="text-sm text-gray-500 dark:text-gray-400">Mood Trend</p>
               <p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-                {latestVibe.vibeScore > dummyVibeMeterData[dummyVibeMeterData.length - 2].vibeScore ? 'Improving' : 'Declining'}
+                {latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore ? 'Improving' : 'Declining'}
               </p>
               <div className="mt-2 flex items-center">
-                {latestVibe.vibeScore > dummyVibeMeterData[dummyVibeMeterData.length - 2].vibeScore ? (
+                {latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore ? (
                   <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M12 7a1 1 0 01-1 1H9a1 1 0 01-1-1V6a1 1 0 011-1h2a1 1 0 011 1v1zm-6 6a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1zm-8-4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z" clipRule="evenodd" />
                   </svg>
@@ -148,11 +156,11 @@ export default function UserVibeMeterCard() {
                   </svg>
                 )}
                 <span className={`ml-1 text-sm ${
-                  latestVibe.vibeScore > dummyVibeMeterData[dummyVibeMeterData.length - 2].vibeScore 
+                  latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore 
                     ? 'text-green-600 dark:text-green-400' 
                     : 'text-red-600 dark:text-red-400'
                 }`}>
-                  {Math.abs(latestVibe.vibeScore - dummyVibeMeterData[dummyVibeMeterData.length - 2].vibeScore)}%
+                  {Math.abs(latestVibe.vibeScore - displayData[displayData.length - 2].vibeScore)}%
                 </span>
               </div>
             </div>
@@ -163,7 +171,7 @@ export default function UserVibeMeterCard() {
               Mood History
             </h5>
             <div className="mt-4 flex h-40 items-end space-x-2">
-              {dummyVibeMeterData.map((vibe, index) => (
+              {displayData.map((vibe, index) => (
                 <div key={index} className="flex flex-1 flex-col items-center">
                   <div 
                     className={`w-full rounded-t-sm ${getEmotionBgColor(vibe.emotionZone)}`}

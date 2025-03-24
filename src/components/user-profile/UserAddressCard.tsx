@@ -6,6 +6,17 @@ import Button from '../ui/button/Button'
 import Input from '../form/input/InputField'
 import Label from '../form/Label'
 
+// Props interface
+interface UserAddressCardProps {
+	addressData?: {
+		country: string;
+		city: string;
+		state: string;
+		postalCode: string;
+		taxId: string;
+	}
+}
+
 // Dummy data for development
 const dummyAddressData = {
 	country: 'United States',
@@ -15,7 +26,9 @@ const dummyAddressData = {
 	taxId: 'AS4568384'
 }
 
-export default function UserAddressCard() {
+export default function UserAddressCard({ addressData }: UserAddressCardProps) {
+	// Use provided data or fall back to dummy data
+	const displayData = addressData || dummyAddressData;
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
 		// Handle save logic here
@@ -37,7 +50,7 @@ export default function UserAddressCard() {
 									Country
 								</p>
 								<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-									{dummyAddressData.country}
+									{displayData.country}
 								</p>
 							</div>
 
@@ -46,7 +59,7 @@ export default function UserAddressCard() {
 									City/State
 								</p>
 								<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-									{dummyAddressData.city}, {dummyAddressData.state}, {dummyAddressData.country}
+									{displayData.city}, {displayData.state}, {displayData.country}
 								</p>
 							</div>
 
@@ -55,7 +68,7 @@ export default function UserAddressCard() {
 									Postal Code
 								</p>
 								<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-									{dummyAddressData.postalCode}
+									{displayData.postalCode}
 								</p>
 							</div>
 
@@ -64,7 +77,7 @@ export default function UserAddressCard() {
 									TAX ID
 								</p>
 								<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-									{dummyAddressData.taxId}
+									{displayData.taxId}
 								</p>
 							</div>
 						</div>
@@ -108,22 +121,22 @@ export default function UserAddressCard() {
 							<div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
 								<div>
 									<Label>Country</Label>
-									<Input type="text" defaultValue={dummyAddressData.country} />
+									<Input type="text" defaultValue={displayData.country} />
 								</div>
 
 								<div>
 									<Label>City/State</Label>
-									<Input type="text" defaultValue={`${dummyAddressData.city}, ${dummyAddressData.state}`} />
+									<Input type="text" defaultValue={`${displayData.city}, ${displayData.state}`} />
 								</div>
 
 								<div>
 									<Label>Postal Code</Label>
-									<Input type="text" defaultValue={dummyAddressData.postalCode} />
+									<Input type="text" defaultValue={displayData.postalCode} />
 								</div>
 
 								<div>
 									<Label>TAX ID</Label>
-									<Input type="text" defaultValue={dummyAddressData.taxId} />
+									<Input type="text" defaultValue={displayData.taxId} />
 								</div>
 							</div>
 						</div>

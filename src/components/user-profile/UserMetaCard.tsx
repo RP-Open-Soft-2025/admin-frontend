@@ -7,6 +7,25 @@ import Input from '../form/input/InputField'
 import Label from '../form/Label'
 import Image from 'next/image'
 
+// Props interface
+interface UserMetaCardProps {
+	userData?: {
+		name: string;
+		bio: string;
+		location: {
+			city: string;
+			country: string;
+		};
+		socialLinks: {
+			facebook: string;
+			twitter: string;
+			linkedin: string;
+			instagram: string;
+		};
+		profileImage?: string;
+	}
+}
+
 // Dummy data for development
 const dummyUserData = {
 	name: 'Musharof Chowdhury',
@@ -23,7 +42,9 @@ const dummyUserData = {
 	}
 }
 
-export default function UserMetaCard() {
+export default function UserMetaCard({ userData }: UserMetaCardProps) {
+	// Use provided data or fall back to dummy data
+	const displayData = userData || dummyUserData;
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
 		// Handle save logic here
@@ -40,20 +61,20 @@ export default function UserMetaCard() {
 								width={80}
 								height={80}
 								src="/images/user/owner.jpg"
-								alt={dummyUserData.name}
+								alt={displayData.name}
 							/>
 						</div>
 						<div className="order-3 xl:order-2">
 							<h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
-								{dummyUserData.name}
+								{displayData.name}
 							</h4>
 							<div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
 								<p className="text-sm text-gray-500 dark:text-gray-400">
-									{dummyUserData.bio}
+									{displayData.bio}
 								</p>
 								<div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
 								<p className="text-sm text-gray-500 dark:text-gray-400">
-									{dummyUserData.location.city}, {dummyUserData.location.country}
+									{displayData.location.city}, {displayData.location.country}
 								</p>
 							</div>
 						</div>
@@ -61,7 +82,7 @@ export default function UserMetaCard() {
 							<a
 								target="_blank"
 								rel="noreferrer"
-								href={dummyUserData.socialLinks.facebook}
+								href={displayData.socialLinks.facebook}
 								className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
 							>
 								<svg
@@ -80,7 +101,7 @@ export default function UserMetaCard() {
 							</a>
 
 							<a
-								href={dummyUserData.socialLinks.twitter}
+								href={displayData.socialLinks.twitter}
 								target="_blank"
 								rel="noreferrer"
 								className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -101,7 +122,7 @@ export default function UserMetaCard() {
 							</a>
 
 							<a
-								href={dummyUserData.socialLinks.linkedin}
+								href={displayData.socialLinks.linkedin}
 								target="_blank"
 								rel="noreferrer"
 								className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -122,7 +143,7 @@ export default function UserMetaCard() {
 							</a>
 
 							<a
-								href={dummyUserData.socialLinks.instagram}
+								href={displayData.socialLinks.instagram}
 								target="_blank"
 								rel="noreferrer"
 								className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -188,20 +209,20 @@ export default function UserMetaCard() {
 										<Label>Facebook</Label>
 										<Input
 											type="text"
-											defaultValue={dummyUserData.socialLinks.facebook}
+											defaultValue={displayData.socialLinks.facebook}
 										/>
 									</div>
 
 									<div>
 										<Label>X.com</Label>
-										<Input type="text" defaultValue={dummyUserData.socialLinks.twitter} />
+										<Input type="text" defaultValue={displayData.socialLinks.twitter} />
 									</div>
 
 									<div>
 										<Label>Linkedin</Label>
 										<Input
 											type="text"
-											defaultValue={dummyUserData.socialLinks.linkedin}
+											defaultValue={displayData.socialLinks.linkedin}
 										/>
 									</div>
 
@@ -209,7 +230,7 @@ export default function UserMetaCard() {
 										<Label>Instagram</Label>
 										<Input
 											type="text"
-											defaultValue={dummyUserData.socialLinks.instagram}
+											defaultValue={displayData.socialLinks.instagram}
 										/>
 									</div>
 								</div>
@@ -242,7 +263,7 @@ export default function UserMetaCard() {
 
 									<div className="col-span-2">
 										<Label>Bio</Label>
-										<Input type="text" defaultValue={dummyUserData.bio} />
+										<Input type="text" defaultValue={displayData.bio} />
 									</div>
 								</div>
 							</div>
