@@ -41,4 +41,4 @@ export const orders: Order[] = [
 		role: 'Employee',
 		is_blocked: true,
 	},
-] 
+]
