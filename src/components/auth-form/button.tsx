@@ -1,6 +1,6 @@
 'use client'
 
-import { ComponentProps, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { useFormStatus } from 'react-dom'
 
 import { LoaderIcon } from 'lucide-react'
