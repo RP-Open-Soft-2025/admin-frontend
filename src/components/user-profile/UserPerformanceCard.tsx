@@ -2,6 +2,11 @@
 import React from 'react'
 import { Performance, ManagerFeedback } from '@/types/employee'
 
+// Props interface
+interface UserPerformanceCardProps {
+  performanceData?: Performance[];
+}
+
 // Dummy data for development
 const dummyPerformanceData: Performance[] = [
   {
@@ -30,12 +35,6 @@ const dummyPerformanceData: Performance[] = [
   }
 ]
 
-// Get most recent performance review
-const latestPerformance = dummyPerformanceData[dummyPerformanceData.length - 1]
-
-// Calculate average rating
-const averageRating = dummyPerformanceData.reduce((total, perf) => total + perf.performanceRating, 0) / dummyPerformanceData.length
-
 // Get feedback color based on feedback type
 const getFeedbackColor = (feedback: ManagerFeedback) => {
   switch (feedback) {
@@ -50,7 +49,16 @@ const getFeedbackColor = (feedback: ManagerFeedback) => {
   }
 }
 
-export default function UserPerformanceCard() {
+export default function UserPerformanceCard({ performanceData }: UserPerformanceCardProps) {
+  // Use provided data or fall back to dummy data
+  const displayData = performanceData || dummyPerformanceData;
+
+  // Get most recent performance review
+  const latestPerformance = displayData[displayData.length - 1];
+
+  // Calculate average rating
+  const averageRating = displayData.reduce((total, perf) => total + perf.performanceRating, 0) / displayData.length;
+  
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-6">
@@ -109,7 +117,7 @@ export default function UserPerformanceCard() {
               Performance History
             </h5>
             <div className="mt-4 flex items-end space-x-2 h-32">
-              {dummyPerformanceData.map((performance, index) => (
+              {displayData.map((performance, index) => (
                 <div key={index} className="relative flex flex-col items-center flex-1">
                   <div className="relative w-full">
                     <div 

@@ -3,6 +3,11 @@ import React from 'react'
 import { Reward, AwardType } from '@/types/employee'
 import Image from 'next/image'
 
+// Props interface
+interface UserRewardsCardProps {
+  rewardsData?: Reward[];
+}
+
 // Dummy data for development
 const dummyRewardsData: Reward[] = [
   {
@@ -35,10 +40,13 @@ const awardIcons = {
   [AwardType.LEADERSHIP]: '/images/icons/leadership.svg'
 }
 
-// Get total reward points
-const totalRewardPoints = dummyRewardsData.reduce((total, reward) => total + reward.rewardPoints, 0)
-
-export default function UserRewardsCard() {
+export default function UserRewardsCard({ rewardsData }: UserRewardsCardProps) {
+  // Use provided data or fall back to dummy data
+  const displayData = rewardsData || dummyRewardsData;
+  
+  // Get total reward points
+  const totalRewardPoints = displayData.reduce((total, reward) => total + reward.rewardPoints, 0);
+  
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-6">
@@ -54,7 +62,7 @@ export default function UserRewardsCard() {
           </div>
           
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {dummyRewardsData.map((reward, index) => (
+            {displayData.map((reward, index) => (
               <div key={index} className="flex flex-col items-center rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
                 <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
                   {/* Using a fallback icon display since we don't have actual icons */}

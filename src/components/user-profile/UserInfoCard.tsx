@@ -6,6 +6,23 @@ import Button from '../ui/button/Button'
 import Input from '../form/input/InputField'
 import Label from '../form/Label'
 
+// Props interface
+interface UserInfoCardProps {
+	userData?: {
+		firstName: string;
+		lastName: string;
+		email: string;
+		phone: string;
+		bio: string;
+		socialLinks?: {
+			facebook: string;
+			twitter: string;
+			linkedin: string;
+			instagram: string;
+		};
+	}
+}
+
 // Dummy data for development
 const dummyUserData = {
 	firstName: 'Musharof',
@@ -21,7 +38,9 @@ const dummyUserData = {
 	}
 }
 
-export default function UserInfoCard() {
+export default function UserInfoCard({ userData }: UserInfoCardProps) {
+	// Use provided data or fall back to dummy data
+	const displayData = userData || dummyUserData;
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
 		// Handle save logic here
@@ -42,7 +61,7 @@ export default function UserInfoCard() {
 								First Name
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								{dummyUserData.firstName}
+								{displayData.firstName}
 							</p>
 						</div>
 
@@ -51,7 +70,7 @@ export default function UserInfoCard() {
 								Last Name
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								{dummyUserData.lastName}
+								{displayData.lastName}
 							</p>
 						</div>
 
@@ -60,7 +79,7 @@ export default function UserInfoCard() {
 								Email address
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								{dummyUserData.email}
+								{displayData.email}
 							</p>
 						</div>
 
@@ -69,7 +88,7 @@ export default function UserInfoCard() {
 								Phone
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								{dummyUserData.phone}
+								{displayData.phone}
 							</p>
 						</div>
 
@@ -78,7 +97,7 @@ export default function UserInfoCard() {
 								Bio
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								{dummyUserData.bio}
+								{displayData.bio}
 							</p>
 						</div>
 					</div>
@@ -129,20 +148,20 @@ export default function UserInfoCard() {
 										<Label>Facebook</Label>
 										<Input
 											type="text"
-											defaultValue={dummyUserData.socialLinks.facebook}
+											defaultValue={displayData.socialLinks?.facebook}
 										/>
 									</div>
 
 									<div>
 										<Label>X.com</Label>
-										<Input type="text" defaultValue={dummyUserData.socialLinks.twitter} />
+										<Input type="text" defaultValue={displayData.socialLinks?.twitter} />
 									</div>
 
 									<div>
 										<Label>Linkedin</Label>
 										<Input
 											type="text"
-											defaultValue={dummyUserData.socialLinks.linkedin}
+											defaultValue={displayData.socialLinks?.linkedin}
 										/>
 									</div>
 
@@ -150,7 +169,7 @@ export default function UserInfoCard() {
 										<Label>Instagram</Label>
 										<Input
 											type="text"
-											defaultValue={dummyUserData.socialLinks.instagram}
+											defaultValue={displayData.socialLinks?.instagram}
 										/>
 									</div>
 								</div>
@@ -163,27 +182,27 @@ export default function UserInfoCard() {
 								<div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
 									<div className="col-span-2 lg:col-span-1">
 										<Label>First Name</Label>
-										<Input type="text" defaultValue={dummyUserData.firstName} />
+										<Input type="text" defaultValue={displayData.firstName} />
 									</div>
 
 									<div className="col-span-2 lg:col-span-1">
 										<Label>Last Name</Label>
-										<Input type="text" defaultValue={dummyUserData.lastName} />
+										<Input type="text" defaultValue={displayData.lastName} />
 									</div>
 
 									<div className="col-span-2 lg:col-span-1">
 										<Label>Email Address</Label>
-										<Input type="text" defaultValue={dummyUserData.email} />
+										<Input type="text" defaultValue={displayData.email} />
 									</div>
 
 									<div className="col-span-2 lg:col-span-1">
 										<Label>Phone</Label>
-										<Input type="text" defaultValue={dummyUserData.phone} />
+										<Input type="text" defaultValue={displayData.phone} />
 									</div>
 
 									<div className="col-span-2">
 										<Label>Bio</Label>
-										<Input type="text" defaultValue={dummyUserData.bio} />
+										<Input type="text" defaultValue={displayData.bio} />
 									</div>
 								</div>
 							</div>

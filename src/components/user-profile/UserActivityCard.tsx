@@ -2,6 +2,11 @@
 import React from 'react'
 import { Activity } from '@/types/employee'
 
+// Props interface
+interface UserActivityCardProps {
+  activityData?: Activity[];
+}
+
 // Dummy data for development
 const dummyActivityData: Activity[] = [
   {
@@ -41,7 +46,10 @@ const dummyActivityData: Activity[] = [
   }
 ]
 
-export default function UserActivityCard() {
+export default function UserActivityCard({ activityData }: UserActivityCardProps) {
+  // Use provided data or fall back to dummy data
+  const displayData = activityData || dummyActivityData;
+  
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
       <div className="flex flex-col gap-6">
@@ -72,7 +80,7 @@ export default function UserActivityCard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                {dummyActivityData.map((activity, index) => (
+                {displayData.map((activity, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
                       {new Date(activity.date).toLocaleDateString()}
@@ -100,7 +108,7 @@ export default function UserActivityCard() {
               Activity Overview
             </h5>
             <div className="flex h-10 items-end space-x-2">
-              {dummyActivityData.map((activity, index) => (
+              {displayData.map((activity, index) => (
                 <div key={index} className="relative flex flex-col items-center">
                   <div 
                     className="w-8 bg-blue-500 dark:bg-blue-600 rounded-t-sm"

@@ -2,6 +2,11 @@
 import React from 'react'
 import { Onboarding, OnboardingFeedback } from '@/types/employee'
 
+// Props interface
+interface UserOnboardingCardProps {
+  onboardingData?: Onboarding;
+}
+
 // Dummy data for development
 const dummyOnboardingData: Onboarding = {
   joiningDate: '2023-01-10',
@@ -10,26 +15,29 @@ const dummyOnboardingData: Onboarding = {
   initialTrainingCompleted: true
 }
 
-// Calculate days since joining
-const daysSinceJoining = () => {
-  const joiningDate = new Date(dummyOnboardingData.joiningDate)
-  const today = new Date()
-  const diffTime = Math.abs(today.getTime() - joiningDate.getTime())
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays
-}
-
-// Additional onboarding steps for display
-const onboardingSteps = [
-  { label: 'Documentation Completed', completed: true },
-  { label: 'Access Granted', completed: true },
-  { label: 'Mentor Assigned', completed: dummyOnboardingData.mentorAssigned },
-  { label: 'Initial Training', completed: dummyOnboardingData.initialTrainingCompleted },
-  { label: 'Team Introduction', completed: true },
-  { label: '30-Day Review', completed: daysSinceJoining() > 30 }
-]
-
-export default function UserOnboardingCard() {
+export default function UserOnboardingCard({ onboardingData }: UserOnboardingCardProps) {
+  // Use provided data or fall back to dummy data
+  const displayData = onboardingData || dummyOnboardingData;
+  
+  // Calculate days since joining
+  const daysSinceJoining = () => {
+    const joiningDate = new Date(displayData.joiningDate)
+    const today = new Date()
+    const diffTime = Math.abs(today.getTime() - joiningDate.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+  
+  // Additional onboarding steps for display
+  const onboardingSteps = [
+    { label: 'Documentation Completed', completed: true },
+    { label: 'Access Granted', completed: true },
+    { label: 'Mentor Assigned', completed: displayData.mentorAssigned },
+    { label: 'Initial Training', completed: displayData.initialTrainingCompleted },
+    { label: 'Team Introduction', completed: true },
+    { label: '30-Day Review', completed: daysSinceJoining() > 30 }
+  ]
+  
   const completedSteps = onboardingSteps.filter(step => step.completed).length
   const progress = Math.round((completedSteps / onboardingSteps.length) * 100)
   
@@ -61,7 +69,7 @@ export default function UserOnboardingCard() {
             <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
               <p className="text-sm text-gray-500 dark:text-gray-400">Joining Date</p>
               <p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-                {new Date(dummyOnboardingData.joiningDate).toLocaleDateString()}
+                {new Date(displayData.joiningDate).toLocaleDateString()}
               </p>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 {daysSinceJoining()} days ago
@@ -71,9 +79,9 @@ export default function UserOnboardingCard() {
             <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
               <p className="text-sm text-gray-500 dark:text-gray-400">Onboarding Feedback</p>
               <div className="mt-2 flex items-center">
-                <div className={`h-3 w-3 rounded-full ${getFeedbackColor(dummyOnboardingData.onboardingFeedback)}`}></div>
+                <div className={`h-3 w-3 rounded-full ${getFeedbackColor(displayData.onboardingFeedback)}`}></div>
                 <p className="ml-2 text-base font-medium text-gray-800 dark:text-white/90">
-                  {dummyOnboardingData.onboardingFeedback}
+                  {displayData.onboardingFeedback}
                 </p>
               </div>
             </div>
