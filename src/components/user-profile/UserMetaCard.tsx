@@ -7,6 +7,22 @@ import Input from '../form/input/InputField'
 import Label from '../form/Label'
 import Image from 'next/image'
 
+// Dummy data for development
+const dummyUserData = {
+	name: 'Musharof Chowdhury',
+	bio: 'Team Manager',
+	location: {
+		city: 'Arizona',
+		country: 'United States'
+	},
+	socialLinks: {
+		facebook: 'https://www.facebook.com/PimjoHQ',
+		twitter: 'https://x.com/PimjoHQ',
+		linkedin: 'https://www.linkedin.com/company/pimjo',
+		instagram: 'https://instagram.com/PimjoHQ'
+	}
+}
+
 export default function UserMetaCard() {
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
@@ -24,20 +40,20 @@ export default function UserMetaCard() {
 								width={80}
 								height={80}
 								src="/images/user/owner.jpg"
-								alt="user"
+								alt={dummyUserData.name}
 							/>
 						</div>
 						<div className="order-3 xl:order-2">
 							<h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
-								Musharof Chowdhury
+								{dummyUserData.name}
 							</h4>
 							<div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
 								<p className="text-sm text-gray-500 dark:text-gray-400">
-									Team Manager
+									{dummyUserData.bio}
 								</p>
 								<div className="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block"></div>
 								<p className="text-sm text-gray-500 dark:text-gray-400">
-									Arizona, United States
+									{dummyUserData.location.city}, {dummyUserData.location.country}
 								</p>
 							</div>
 						</div>
@@ -45,7 +61,7 @@ export default function UserMetaCard() {
 							<a
 								target="_blank"
 								rel="noreferrer"
-								href="https://www.facebook.com/PimjoHQ"
+								href={dummyUserData.socialLinks.facebook}
 								className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
 							>
 								<svg
@@ -64,7 +80,7 @@ export default function UserMetaCard() {
 							</a>
 
 							<a
-								href="https://x.com/PimjoHQ"
+								href={dummyUserData.socialLinks.twitter}
 								target="_blank"
 								rel="noreferrer"
 								className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -85,7 +101,7 @@ export default function UserMetaCard() {
 							</a>
 
 							<a
-								href="https://www.linkedin.com/company/pimjo"
+								href={dummyUserData.socialLinks.linkedin}
 								target="_blank"
 								rel="noreferrer"
 								className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -106,7 +122,7 @@ export default function UserMetaCard() {
 							</a>
 
 							<a
-								href="https://instagram.com/PimjoHQ"
+								href={dummyUserData.socialLinks.instagram}
 								target="_blank"
 								rel="noreferrer"
 								className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -172,20 +188,20 @@ export default function UserMetaCard() {
 										<Label>Facebook</Label>
 										<Input
 											type="text"
-											defaultValue="https://www.facebook.com/PimjoHQ"
+											defaultValue={dummyUserData.socialLinks.facebook}
 										/>
 									</div>
 
 									<div>
 										<Label>X.com</Label>
-										<Input type="text" defaultValue="https://x.com/PimjoHQ" />
+										<Input type="text" defaultValue={dummyUserData.socialLinks.twitter} />
 									</div>
 
 									<div>
 										<Label>Linkedin</Label>
 										<Input
 											type="text"
-											defaultValue="https://www.linkedin.com/company/pimjo"
+											defaultValue={dummyUserData.socialLinks.linkedin}
 										/>
 									</div>
 
@@ -193,7 +209,7 @@ export default function UserMetaCard() {
 										<Label>Instagram</Label>
 										<Input
 											type="text"
-											defaultValue="https://instagram.com/PimjoHQ"
+											defaultValue={dummyUserData.socialLinks.instagram}
 										/>
 									</div>
 								</div>
@@ -226,7 +242,7 @@ export default function UserMetaCard() {
 
 									<div className="col-span-2">
 										<Label>Bio</Label>
-										<Input type="text" defaultValue="Team Manager" />
+										<Input type="text" defaultValue={dummyUserData.bio} />
 									</div>
 								</div>
 							</div>
