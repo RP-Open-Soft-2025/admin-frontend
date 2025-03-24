@@ -3,12 +3,11 @@ import UserAddressCard from '@/components/user-profile/UserAddressCard'
 import UserInfoCard from '@/components/user-profile/UserInfoCard'
 import UserMetaCard from '@/components/user-profile/UserMetaCard'
 import React, { useEffect } from 'react'
+import {  useParams } from 'next/navigation'
 
-export default function Profile({
-	params: { id },
-}: {
-	params: { id: string }
-}) {
+export default function Profile() {
+	const params = useParams()
+	const id = params.id as string
 	useEffect(() => {}, [])
 	return (
 		<div>
