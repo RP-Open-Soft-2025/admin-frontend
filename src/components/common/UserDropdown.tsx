@@ -9,9 +9,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useDispatch } from 'react-redux'
 import { User, Settings, Info, LogOut } from 'lucide-react'
+import { logout } from '@/redux/features/auth'
 
 export default function UserDropdown() {
+	const dispatch = useDispatch()
+	
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger className="flex items-center text-gray-700 dark:text-gray-400 focus:outline-none">
@@ -44,7 +48,7 @@ export default function UserDropdown() {
 				</svg>
 			</DropdownMenuTrigger>
 
-			<DropdownMenuContent className="w-[260px] p-3 rounded-2xl">
+			<DropdownMenuContent className="w-[260px] p-3 rounded-2xl bg-white">
 				<div className="px-1 py-1">
 					<span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
 						Musharof Chowdhury
@@ -90,7 +94,8 @@ export default function UserDropdown() {
 
 				<DropdownMenuItem asChild className="py-2 cursor-pointer">
 					<Link
-						href="/signin"
+						onClick={(e) => dispatch(logout())}
+						href="/login"
 						className="flex items-center gap-3 px-1 font-medium"
 					>
 						<LogOut className="w-5 h-5 text-gray-500" />
