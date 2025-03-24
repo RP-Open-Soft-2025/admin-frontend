@@ -4,6 +4,7 @@ import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
 import { API_URL, MAX_PER_PAGE } from '@/constatnts'
 import { SessionType } from '@/types/sessions'
+import store from '@/redux/store'
 
 type State = 'pending' | 'completed' | 'active'
 
@@ -12,49 +13,63 @@ const TableSession = ({ state }: { state: State }) => {
 	const [paginatedData, setPaginatedData] = useState<SessionType[]>([])
 	const [currPage, setCurrentPage] = useState<number>(1)
 	const [totalPages, setTotalPages] = useState<number>(1)
+	const { auth } = store.getState()
 
 	useEffect(() => {
-		fetch(API_URL + `/hr/sessions/${state}`, {
-			method: 'GET',
-		})
-		setCurrData([])
-		// Calculate total pages, making sure to round up
-		const pages = Math.ceil(MAX_PER_PAGE / MAX_PER_PAGE)
-		setTotalPages(pages)
-		setCurrentPage(1)
-	}, [])
+		const fetchSessions = async () => {
+			try {
+				fetch(`${API_URL}/${auth.user!.userRole}/sessions/${state}`, {
+					method: 'GET',
+					headers: {
+						'Authorization': `Bearer ${auth.user?.accessToken}`
+					}
+				}).then((resp) => {
+					if(resp.ok){
+						resp.json().then((result: SessionType[]) => {
+							setCurrData(result);
+							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE));
+						})
+					}
+				})
+			} catch (error) {
+				console.error('Error fetching sessions:', error)
+			}
+		}
+
+		fetchSessions()
+	}, [state])
 
 	useEffect(() => {
-		// Only run this effect if currData has items
 		if (currData.length > 0) {
 			const start = (currPage - 1) * MAX_PER_PAGE
 			const end = start + MAX_PER_PAGE
-			// Make sure to use the correct end index (not subtracting 1)
 			setPaginatedData(currData.slice(start, end))
 		}
-	}, [currPage, currData]) // Also run when currData changes
+	}, [currPage, currData])
 
 	return (
 		<div>
-			<div>{state}</div>
+			<h2 className="text-lg font-semibold mb-4">{state.toUpperCase()}</h2>
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">
 				<Pagination
 					totalPages={totalPages}
 					currentPage={currPage}
-					onPageChange={(num: number) => setCurrentPage(num)}
+					onPageChange={setCurrentPage}
 				/>
 			</div>
 		</div>
 	)
 }
 
-function Page() {
-	;<>
-		<TableSession state="active" />
-		<TableSession state="completed" />
-		<TableSession state="pending" />
-	</>
+const Page = () => {
+	return (
+		<>
+			<TableSession state="active" />
+			<TableSession state="completed" />
+			<TableSession state="pending" />
+		</>
+	)
 }
 
 export default Page
