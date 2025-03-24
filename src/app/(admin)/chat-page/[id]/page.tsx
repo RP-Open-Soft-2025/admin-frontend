@@ -5,9 +5,9 @@ import { useParams } from 'next/navigation'
 const ChatPage = () => {
 	const params = useParams()
 	const id = params.id as string
-	const [messages, setMessages] = useState([])
-	const [newMessage, setNewMessage] = useState('')
-	const [socket, setSocket] = useState(null)
+	const [messages, setMessages] = useState([]) // eslint-disable-line @typescript-eslint/no-unused-vars
+	const [newMessage, setNewMessage] = useState('') 
+	const [socket, setSocket] = useState(null) // eslint-disable-line @typescript-eslint/no-unused-vars
 
 	useEffect(() => {}, [id])
 
