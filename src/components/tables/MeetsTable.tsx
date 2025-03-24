@@ -78,7 +78,7 @@ export function BasicTableOne({
 													{order.session_id}
 												</span>
 												<span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-													{(new Date(order.created_at)).toLocaleDateString()}
+													{new Date(order.created_at).toLocaleDateString()}
 												</span>
 											</div>
 										</div>

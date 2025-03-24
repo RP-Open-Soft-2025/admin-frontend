@@ -7,7 +7,7 @@ import { SessionType } from '@/types/sessions'
 
 type State = 'pending' | 'completed' | 'active'
 
-const TableSession = ({state}:{state : State}) => {
+const TableSession = ({ state }: { state: State }) => {
 	const [currData, setCurrData] = useState<SessionType[]>([])
 	const [paginatedData, setPaginatedData] = useState<SessionType[]>([])
 	const [currPage, setCurrentPage] = useState<number>(1)
@@ -15,8 +15,7 @@ const TableSession = ({state}:{state : State}) => {
 
 	useEffect(() => {
 		fetch(API_URL + `/hr/sessions/${state}`, {
-			method: "GET",
-
+			method: 'GET',
 		})
 		setCurrData([])
 		// Calculate total pages, making sure to round up
@@ -51,10 +50,10 @@ const TableSession = ({state}:{state : State}) => {
 }
 
 function Page() {
-	<>
-		<TableSession state='active'/>
-		<TableSession state='completed' />
-		<TableSession state='pending' />
+	;<>
+		<TableSession state="active" />
+		<TableSession state="completed" />
+		<TableSession state="pending" />
 	</>
 }
 
