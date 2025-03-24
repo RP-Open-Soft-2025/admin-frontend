@@ -49,7 +49,7 @@ const TableSession = ({ state }: { state: State }) => {
 
 	return (
 		<div>
-			<h2 className="text-lg font-semibold mb-4">{state.toUpperCase()}</h2>
+			<h2 className="text-lg font-semibold mb-4 dark:text-white">{state.toUpperCase()}</h2>
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">
 				<Pagination
