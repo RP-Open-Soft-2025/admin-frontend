@@ -94,7 +94,7 @@ export default function UserDropdown() {
 
 				<DropdownMenuItem asChild className="py-2 cursor-pointer">
 					<Link
-						onClick={(e) => dispatch(logout())}
+						onClick={() => dispatch(logout())}
 						href="/login"
 						className="flex items-center gap-3 px-1 font-medium"
 					>
