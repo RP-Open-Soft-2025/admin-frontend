@@ -2,7 +2,7 @@
 import BasicTableOne from '@/components/tables/EmployeeTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
-import { API_URL, MAX_PER_PAGE } from '@/constatnts'
+import { API_URL, MAX_PER_PAGE_USER } from '@/constatnts'
 import store from '@/redux/store'
 import { Employee } from '@/types/employee'
 
@@ -32,7 +32,7 @@ function Page() {
 			if (resp.ok) {
 				resp.json().then((res: Response) => {
 					setCurrData(res.users)
-					const pages = Math.ceil(res.users.length / MAX_PER_PAGE)
+					const pages = Math.ceil(res.users.length / MAX_PER_PAGE_USER)
 					console.log(pages)
 					setTotalPages(pages)
 					setCurrentPage(1)
@@ -44,8 +44,8 @@ function Page() {
 	useEffect(() => {
 		// Only run this effect if currData has items
 		if (currData.length > 0) {
-			const start = (currPage - 1) * MAX_PER_PAGE
-			const end = start + MAX_PER_PAGE
+			const start = (currPage - 1) * MAX_PER_PAGE_USER
+			const end = start + MAX_PER_PAGE_USER
 			// Make sure to use the correct end index (not subtracting 1)
 			setPaginatedData(currData.slice(start, end))
 		}

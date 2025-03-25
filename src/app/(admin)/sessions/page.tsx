@@ -2,7 +2,7 @@
 import { BasicTableOne } from '@/components/tables/MeetsTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
-import { API_URL, MAX_PER_PAGE } from '@/constatnts'
+import { API_URL, MAX_PER_PAGE_SESSION } from '@/constatnts'
 import { SessionType } from '@/types/sessions'
 import store from '@/redux/store'
 
@@ -27,7 +27,7 @@ const TableSession = ({ state }: { state: State }) => {
 					if(resp.ok){
 						resp.json().then((result: SessionType[]) => {
 							setCurrData(result);
-							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE));
+							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE_SESSION));
 						})
 					}
 				})
@@ -41,8 +41,8 @@ const TableSession = ({ state }: { state: State }) => {
 
 	useEffect(() => {
 		if (currData.length > 0) {
-			const start = (currPage - 1) * MAX_PER_PAGE
-			const end = start + MAX_PER_PAGE
+			const start = (currPage - 1) * MAX_PER_PAGE_SESSION
+			const end = start + MAX_PER_PAGE_SESSION
 			setPaginatedData(currData.slice(start, end))
 		}
 	}, [currPage, currData])
@@ -52,11 +52,11 @@ const TableSession = ({ state }: { state: State }) => {
 			<h2 className="text-lg font-semibold mb-4 dark:text-white">{state.toUpperCase()}</h2>
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">
-				<Pagination
+				{state != 'active' && (<Pagination
 					totalPages={totalPages}
 					currentPage={currPage}
 					onPageChange={setCurrentPage}
-				/>
+				/>)}
 			</div>
 		</div>
 	)
