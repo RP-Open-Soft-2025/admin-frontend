@@ -6,7 +6,41 @@ import Button from '../ui/button/Button'
 import Input from '../form/input/InputField'
 import Label from '../form/Label'
 
-export default function UserInfoCard() {
+// Props interface
+interface UserInfoCardProps {
+	userData?: {
+		firstName: string;
+		lastName: string;
+		email: string;
+		phone: string;
+		bio: string;
+		socialLinks?: {
+			facebook: string;
+			twitter: string;
+			linkedin: string;
+			instagram: string;
+		};
+	}
+}
+
+// Dummy data for development
+const dummyUserData = {
+	firstName: 'Musharof',
+	lastName: 'Chowdhury',
+	email: 'randomuser@pimjo.com',
+	phone: '+09 363 398 46',
+	bio: 'Team Manager',
+	socialLinks: {
+		facebook: 'https://www.facebook.com/PimjoHQ',
+		twitter: 'https://x.com/PimjoHQ',
+		linkedin: 'https://www.linkedin.com/company/pimjo',
+		instagram: 'https://instagram.com/PimjoHQ'
+	}
+}
+
+export default function UserInfoCard({ userData }: UserInfoCardProps) {
+	// Use provided data or fall back to dummy data
+	const displayData = userData || dummyUserData;
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
 		// Handle save logic here
@@ -27,7 +61,7 @@ export default function UserInfoCard() {
 								First Name
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								Musharof
+								{displayData.firstName}
 							</p>
 						</div>
 
@@ -36,7 +70,7 @@ export default function UserInfoCard() {
 								Last Name
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								Chowdhury
+								{displayData.lastName}
 							</p>
 						</div>
 
@@ -45,7 +79,7 @@ export default function UserInfoCard() {
 								Email address
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								randomuser@pimjo.com
+								{displayData.email}
 							</p>
 						</div>
 
@@ -54,7 +88,7 @@ export default function UserInfoCard() {
 								Phone
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								+09 363 398 46
+								{displayData.phone}
 							</p>
 						</div>
 
@@ -63,7 +97,7 @@ export default function UserInfoCard() {
 								Bio
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
-								Team Manager
+								{displayData.bio}
 							</p>
 						</div>
 					</div>
@@ -114,20 +148,20 @@ export default function UserInfoCard() {
 										<Label>Facebook</Label>
 										<Input
 											type="text"
-											defaultValue="https://www.facebook.com/PimjoHQ"
+											defaultValue={displayData.socialLinks?.facebook}
 										/>
 									</div>
 
 									<div>
 										<Label>X.com</Label>
-										<Input type="text" defaultValue="https://x.com/PimjoHQ" />
+										<Input type="text" defaultValue={displayData.socialLinks?.twitter} />
 									</div>
 
 									<div>
 										<Label>Linkedin</Label>
 										<Input
 											type="text"
-											defaultValue="https://www.linkedin.com/company/pimjo"
+											defaultValue={displayData.socialLinks?.linkedin}
 										/>
 									</div>
 
@@ -135,7 +169,7 @@ export default function UserInfoCard() {
 										<Label>Instagram</Label>
 										<Input
 											type="text"
-											defaultValue="https://instagram.com/PimjoHQ"
+											defaultValue={displayData.socialLinks?.instagram}
 										/>
 									</div>
 								</div>
@@ -148,27 +182,27 @@ export default function UserInfoCard() {
 								<div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
 									<div className="col-span-2 lg:col-span-1">
 										<Label>First Name</Label>
-										<Input type="text" defaultValue="Musharof" />
+										<Input type="text" defaultValue={displayData.firstName} />
 									</div>
 
 									<div className="col-span-2 lg:col-span-1">
 										<Label>Last Name</Label>
-										<Input type="text" defaultValue="Chowdhury" />
+										<Input type="text" defaultValue={displayData.lastName} />
 									</div>
 
 									<div className="col-span-2 lg:col-span-1">
 										<Label>Email Address</Label>
-										<Input type="text" defaultValue="randomuser@pimjo.com" />
+										<Input type="text" defaultValue={displayData.email} />
 									</div>
 
 									<div className="col-span-2 lg:col-span-1">
 										<Label>Phone</Label>
-										<Input type="text" defaultValue="+09 363 398 46" />
+										<Input type="text" defaultValue={displayData.phone} />
 									</div>
 
 									<div className="col-span-2">
 										<Label>Bio</Label>
-										<Input type="text" defaultValue="Team Manager" />
+										<Input type="text" defaultValue={displayData.bio} />
 									</div>
 								</div>
 							</div>
