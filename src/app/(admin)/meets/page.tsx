@@ -2,7 +2,7 @@
 import { BasicTableOne } from '@/components/tables/MeetsTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
-import { MAX_PER_PAGE } from '@/constatnts'
+import { MAX_PER_PAGE_SESSION } from '@/constants'
 import { SessionType } from '@/types/sessions'
 
 function Page() {
@@ -14,7 +14,7 @@ function Page() {
 	useEffect(() => {
 		setCurrData([])
 		// Calculate total pages, making sure to round up
-		const pages = Math.ceil(MAX_PER_PAGE / MAX_PER_PAGE)
+		const pages = Math.ceil(MAX_PER_PAGE_SESSION / MAX_PER_PAGE_SESSION)
 		setTotalPages(pages)
 		setCurrentPage(1)
 	}, [])
@@ -22,8 +22,8 @@ function Page() {
 	useEffect(() => {
 		// Only run this effect if currData has items
 		if (currData.length > 0) {
-			const start = (currPage - 1) * MAX_PER_PAGE
-			const end = start + MAX_PER_PAGE
+			const start = (currPage - 1) * MAX_PER_PAGE_SESSION
+			const end = start + MAX_PER_PAGE_SESSION
 			// Make sure to use the correct end index (not subtracting 1)
 			setPaginatedData(currData.slice(start, end))
 		}

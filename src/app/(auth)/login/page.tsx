@@ -11,7 +11,7 @@ import type { RootState } from '@/redux/store'
 import { AuthForm } from '@/components/auth-form/form'
 import { SubmitButton } from '@/components/auth-form/button'
 import DeloitteLogo from './deloitte-logo.svg' // Update the path to the actual logo location
-import { API_URL } from '@/constatnts'
+import { API_URL } from '@/constants'
 
 // Use environment variable for API URL with fallback
 export default function Page() {

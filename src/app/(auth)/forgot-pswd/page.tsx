@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { toast } from '@/components/ui/sonner'
 import { SubmitButton } from '@/components/auth-form/button'
 import DeloitteLogo from '../login/deloitte-logo.svg' // Reuse the logo from login page
-import { API_URL } from '@/constatnts'
+import { API_URL } from '@/constants'
 // Use environment variable for API URL with fallback
 
 export default function ForgotPasswordPage() {
