@@ -1,5 +1,5 @@
 'use client'
-import { BasicTableOne } from '@/components/tables/MeetsTable'
+import { BasicTableOne } from '@/components/tables/SessionsTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
 import { API_URL, MAX_PER_PAGE_SESSION } from '@/constatnts'

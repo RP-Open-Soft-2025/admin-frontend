@@ -2,21 +2,40 @@
 import { BasicTableOne } from '@/components/tables/MeetsTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
-import { MAX_PER_PAGE } from '@/constatnts'
-import { SessionType } from '@/types/sessions'
+import { MAX_PER_PAGE_USER } from '@/constatnts'
+import { SessionType } from '@/types/meets'
+import store from '@/redux/store'
 
 function Page() {
+	var MAX_PER_PAGE = MAX_PER_PAGE_USER;
+	const { auth } = store.getState()
+	
 	const [currData, setCurrData] = useState<SessionType[]>([])
 	const [paginatedData, setPaginatedData] = useState<SessionType[]>([])
 	const [currPage, setCurrentPage] = useState<number>(1)
 	const [totalPages, setTotalPages] = useState<number>(1)
 
 	useEffect(() => {
-		setCurrData([])
-		// Calculate total pages, making sure to round up
-		const pages = Math.ceil(MAX_PER_PAGE / MAX_PER_PAGE)
-		setTotalPages(pages)
-		setCurrentPage(1)
+		const fetchMeets = async () => {
+			try {
+				const response = await fetch('https://backend-deployment-792.as.r.appspot.com/admin/meets', {
+					method: 'GET',
+					headers: {
+						'Authorization': `Bearer ${auth.user?.accessToken}`
+					}
+				});
+				const data = await response.json();
+				
+				setCurrData(data);
+				// Calculate total pages, making sure to round up
+				const pages = Math.ceil(data.length / MAX_PER_PAGE);
+				setTotalPages(pages);
+			} catch (error) {
+				console.error('Error fetching meets:', error);
+			}
+		};
+
+		fetchMeets();
 	}, [])
 
 	useEffect(() => {

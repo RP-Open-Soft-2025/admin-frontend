@@ -2,7 +2,7 @@ import React from 'react'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 import Badge from '../ui/badge/Badge'
 import { Video } from 'lucide-react'
-import { SessionType } from '@/types/meets'
+import { SessionType } from '@/types/sessions'
 
 type BadgeColor =
 	| 'primary'
@@ -14,19 +14,11 @@ type BadgeColor =
 	| 'dark'
 
 export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
-	const getStatusColor = (status: string): BadgeColor => {
-		switch (status.toLowerCase()) {
-			case 'scheduled':
-				return 'info'
-			case 'completed':
-				return 'success'
-			case 'cancelled':
-				return 'error'
-			case 'active':
-				return 'primary'
-			default:
-				return 'warning'
-		}
+	const statusMapping: Record<SessionType['status'], BadgeColor> = {
+		pending: 'info',
+		active: 'primary',
+		completed: 'success',
+		cancelled: 'warning',
 	}
 
 	return (
@@ -60,27 +52,29 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 
 						{/* Table Body */}
 						<TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-							{tableData.map(meet => (
-								<TableRow key={meet.meet_id}>
+							{tableData.map(session => (
+								<TableRow key={session.session_id}>
 									<TableCell className="px-5 py-4 sm:px-6 text-start">
 										<div className="flex items-center gap-3">
 											<Video className="w-6 h-6 text-gray-500 dark:text-gray-400" />
 											<div>
 												<span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-													{meet.meet_id}
+													{session.session_id}
 												</span>
 												<span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-													{meet.location}
+													{session.created_at
+														? new Date(session.created_at).toLocaleDateString()
+														: new Date(session.scheduled_at).toLocaleDateString()}
 												</span>
 											</div>
 										</div>
 									</TableCell>
 									<TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-										{new Date(meet.scheduled_at).toLocaleString()}
+										{new Date(session.scheduled_at).toLocaleString()}
 									</TableCell>
 									<TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-										<Badge color={getStatusColor(meet.status)}>
-											{meet.status}
+										<Badge color={statusMapping[session.status]}>
+											{session.status.replace('_', ' ').toUpperCase()}
 										</Badge>
 									</TableCell>
 								</TableRow>
