@@ -1,7 +1,6 @@
 'use client'
 import React from 'react'
 import { Reward, AwardType } from '@/types/employee'
-import Image from 'next/image'
 
 // Props interface
 interface UserRewardsCardProps {
@@ -31,14 +30,6 @@ const dummyRewardsData: Reward[] = [
     rewardPoints: 400
   }
 ]
-
-// Map award types to icons (dummy paths, would need real icons)
-const awardIcons = {
-  [AwardType.STAR_PERFORMER]: '/images/icons/star.svg',
-  [AwardType.BEST_TEAM_PLAYER]: '/images/icons/team.svg',
-  [AwardType.INNOVATION]: '/images/icons/innovation.svg',
-  [AwardType.LEADERSHIP]: '/images/icons/leadership.svg'
-}
 
 export default function UserRewardsCard({ rewardsData }: UserRewardsCardProps) {
   // Use provided data or fall back to dummy data

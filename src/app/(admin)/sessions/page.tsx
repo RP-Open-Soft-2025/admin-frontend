@@ -2,7 +2,7 @@
 import { BasicTableOne } from '@/components/tables/MeetsTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
-import { API_URL, MAX_PER_PAGE_SESSION } from '@/constatnts'
+import { API_URL, MAX_PER_PAGE_SESSION } from '@/constants'
 import { SessionType } from '@/types/sessions'
 import store from '@/redux/store'
 
@@ -37,7 +37,7 @@ const TableSession = ({ state }: { state: State }) => {
 		}
 
 		fetchSessions()
-	}, [state])
+	}, [state, auth.user])
 
 	useEffect(() => {
 		if (currData.length > 0) {
