@@ -105,3 +105,12 @@ export interface Employee {
 	companyData: CompanyData
 	accountActivated: boolean
 }
+
+export interface LeaveRequest {
+	id: string;
+	type: string;
+	startDate: string;
+	endDate: string;
+	status: 'Approved' | 'Pending' | 'Rejected';
+	requestDate: string;
+}
