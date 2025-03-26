@@ -21,13 +21,13 @@ const TableSession = ({ state }: { state: State }) => {
 				fetch(`${API_URL}/${auth.user!.userRole}/sessions/${state}`, {
 					method: 'GET',
 					headers: {
-						'Authorization': `Bearer ${auth.user?.accessToken}`
-					}
-				}).then((resp) => {
-					if(resp.ok){
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+					},
+				}).then(resp => {
+					if (resp.ok) {
 						resp.json().then((result: SessionType[]) => {
-							setCurrData(result);
-							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE_SESSION));
+							setCurrData(result)
+							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE_SESSION))
 						})
 					}
 				})
@@ -49,14 +49,18 @@ const TableSession = ({ state }: { state: State }) => {
 
 	return (
 		<div>
-			<h2 className="text-lg font-semibold mb-4 dark:text-white">{state.toUpperCase()}</h2>
+			<h2 className="text-lg font-semibold mb-4 dark:text-white">
+				{state.toUpperCase()}
+			</h2>
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">
-				{state != 'active' && (<Pagination
-					totalPages={totalPages}
-					currentPage={currPage}
-					onPageChange={setCurrentPage}
-				/>)}
+				{state != 'active' && (
+					<Pagination
+						totalPages={totalPages}
+						currentPage={currPage}
+						onPageChange={setCurrentPage}
+					/>
+				)}
 			</div>
 		</div>
 	)

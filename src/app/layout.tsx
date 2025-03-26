@@ -18,10 +18,10 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode
 }>) {
-	const router = useRouter();
+	const router = useRouter()
 	useEffect(() => {
-		const { auth } = store.getState();
-		if(!auth.isAuthenticated) router.push("./login");
+		const { auth } = store.getState()
+		if (!auth.isAuthenticated) router.push('./login')
 	})
 	return (
 		<html lang="en">

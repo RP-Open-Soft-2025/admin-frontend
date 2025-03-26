@@ -9,11 +9,11 @@ import Label from '../form/Label'
 // Props interface
 interface UserAddressCardProps {
 	addressData?: {
-		country: string;
-		city: string;
-		state: string;
-		postalCode: string;
-		taxId: string;
+		country: string
+		city: string
+		state: string
+		postalCode: string
+		taxId: string
 	}
 }
 
@@ -23,12 +23,12 @@ const dummyAddressData = {
 	city: 'Phoenix',
 	state: 'Arizona',
 	postalCode: 'ERT 2489',
-	taxId: 'AS4568384'
+	taxId: 'AS4568384',
 }
 
 export default function UserAddressCard({ addressData }: UserAddressCardProps) {
 	// Use provided data or fall back to dummy data
-	const displayData = addressData || dummyAddressData;
+	const displayData = addressData || dummyAddressData
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
 		// Handle save logic here
@@ -126,7 +126,10 @@ export default function UserAddressCard({ addressData }: UserAddressCardProps) {
 
 								<div>
 									<Label>City/State</Label>
-									<Input type="text" defaultValue={`${displayData.city}, ${displayData.state}`} />
+									<Input
+										type="text"
+										defaultValue={`${displayData.city}, ${displayData.state}`}
+									/>
 								</div>
 
 								<div>
