@@ -4,7 +4,7 @@ import {
 	calculateOverallMetrics,
 	engagementHistory,
 } from '@/data/wellbeingData'
-import { Bar } from 'react-chartjs-2'
+//import { Bar } from 'react-chartjs-2'
 import dynamic from 'next/dynamic'
 import { ApexOptions } from 'apexcharts'
 import { ArrowUpIcon } from '@heroicons/react/24/solid'

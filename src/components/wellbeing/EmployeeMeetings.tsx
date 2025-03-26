@@ -4,7 +4,6 @@ import { meetingsData } from '@/data/wellbeingData'
 import {
 	CalendarIcon,
 	UserGroupIcon,
-	ClockIcon,
 	CheckCircleIcon,
 } from '@heroicons/react/24/outline'
 

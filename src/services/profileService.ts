@@ -1,6 +1,6 @@
-import { Employee } from '@/types/employee'
 import store from '@/redux/store'
 import { API_URL } from '@/constants'
+import { CompanyData } from '@/types/employee'
 
 // Define the API response type based on the backend structure
 export interface ProfileApiResponse {
@@ -33,14 +33,7 @@ export interface ProfileApiResponse {
 	}
 	upcoming_meets: number
 	upcoming_sessions: number
-	company_data: {
-		activity: any[]
-		leave: any[]
-		onboarding: any[]
-		performance: any[]
-		rewards: any[]
-		vibemeter: any[]
-	}
+	company_data: CompanyData
 }
 
 // Fetch profile data from the API
@@ -59,7 +52,7 @@ export async function getProfileData(): Promise<ProfileApiResponse> {
 			})
 		) // Debug log - avoiding logging the actual token for security
 
-		const token = authState.user?.accessToken
+		const token = authState.user?.accessToken;
 
 		if (!token) {
 			throw new Error('Authentication token not found. Please log in.')

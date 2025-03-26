@@ -32,12 +32,12 @@ const dummyRewardsData: Reward[] = [
 ]
 
 // Map award types to icons (dummy paths, would need real icons)
-const awardIcons = {
-	[AwardType.STAR_PERFORMER]: '/images/icons/star.svg',
-	[AwardType.BEST_TEAM_PLAYER]: '/images/icons/team.svg',
-	[AwardType.INNOVATION]: '/images/icons/innovation.svg',
-	[AwardType.LEADERSHIP]: '/images/icons/leadership.svg',
-}
+// const awardIcons = {
+// 	[AwardType.STAR_PERFORMER]: '/images/icons/star.svg',
+// 	[AwardType.BEST_TEAM_PLAYER]: '/images/icons/team.svg',
+// 	[AwardType.INNOVATION]: '/images/icons/innovation.svg',
+// 	[AwardType.LEADERSHIP]: '/images/icons/leadership.svg',
+// }
 
 // Helper function to format dates consistently
 const formatDate = (dateString: string) => {

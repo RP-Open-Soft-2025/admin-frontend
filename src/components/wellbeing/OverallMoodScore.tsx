@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { ApexOptions } from 'apexcharts'
 import { calculateOverallMetrics } from '@/data/wellbeingData'
@@ -12,6 +12,7 @@ const ReactApexChart = dynamic(() => import('react-apexcharts'), {
 
 const OverallMoodScore: React.FC = () => {
 	const metrics = calculateOverallMetrics()
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [prevScore, setPrevScore] = useState(metrics.avgMoodScore - 2) // For demo purposes
 
 	// Gauge chart options
@@ -76,12 +77,12 @@ const OverallMoodScore: React.FC = () => {
 	}
 
 	// Determine the color based on the score
-	const getScoreColor = (score: number) => {
-		if (score >= 75) return 'text-green-500'
-		if (score >= 50) return 'text-yellow-500'
-		if (score >= 25) return 'text-orange-500'
-		return 'text-red-500'
-	}
+	// const getScoreColor = (score: number) => {
+	// 	if (score >= 75) return 'text-green-500'
+	// 	if (score >= 50) return 'text-yellow-500'
+	// 	if (score >= 25) return 'text-orange-500'
+	// 	return 'text-red-500'
+	// }
 
 	// Series data
 	const series = [metrics.avgMoodScore]
