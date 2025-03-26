@@ -15,7 +15,7 @@ import { logout } from '@/redux/features/auth'
 
 export default function UserDropdown() {
 	const dispatch = useDispatch()
-	
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger className="flex items-center text-gray-700 dark:text-gray-400 focus:outline-none">
