@@ -1,37 +1,40 @@
 import React from 'react'
-import { EcommerceMetrics } from '@/components/ecommerce/EcommerceMetrics'
-import MonthlyTarget from '@/components/ecommerce/MonthlyTarget'
-import MonthlySalesChart from '@/components/ecommerce/MonthlySalesChart'
-import StatisticsChart from '@/components/ecommerce/StatisticsChart'
-import RecentOrders from '@/components/ecommerce/RecentOrders'
-import DemographicCard from '@/components/ecommerce/DemographicCard'
+import OverallMoodScore from '@/components/wellbeing/OverallMoodScore'
+import EngagementRate from '@/components/wellbeing/EngagementRate'
+import RiskAssessment from '@/components/wellbeing/RiskAssessment'
+import PriorityEmployees from '@/components/wellbeing/PriorityEmployees'
+import DepartmentHeatmap from '@/components/wellbeing/DepartmentHeatmap'
+import EmployeeMeetings from '@/components/wellbeing/EmployeeMeetings'
+import WellbeingTrends from '@/components/wellbeing/WellbeingTrends'
 
-function Ecommerce() {
+function EmployeeWellbeing() {
 	return (
 		<div className="grid grid-cols-12 gap-4 md:gap-6">
-			<div className="col-span-12 space-y-6 xl:col-span-7">
-				<EcommerceMetrics />
-
-				<MonthlySalesChart />
+			<div className="col-span-12 space-y-6 xl:col-span-8">
+				<OverallMoodScore />
+				<WellbeingTrends />
 			</div>
 
-			<div className="col-span-12 xl:col-span-5">
-				<MonthlyTarget />
+			<div className="col-span-12 xl:col-span-4">
+				<EngagementRate />
+				<div className="mt-6">
+					<RiskAssessment />
+				</div>
+			</div>
+
+			<div className="col-span-12 xl:col-span-6">
+				<PriorityEmployees />
+			</div>
+
+			<div className="col-span-12 xl:col-span-6">
+				<DepartmentHeatmap />
 			</div>
 
 			<div className="col-span-12">
-				<StatisticsChart />
-			</div>
-
-			<div className="col-span-12 xl:col-span-5">
-				<DemographicCard />
-			</div>
-
-			<div className="col-span-12 xl:col-span-7">
-				<RecentOrders />
+				<EmployeeMeetings />
 			</div>
 		</div>
 	)
 }
 
-export default Ecommerce
+export default EmployeeWellbeing
