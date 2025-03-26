@@ -51,9 +51,8 @@ const WellbeingTrends: React.FC = () => {
 				vertical: 0,
 			},
 			markers: {
-				width: 12,
-				height: 12,
-				radius: 12,
+				size: 12,
+				strokeWidth: 12,
 				offsetX: -3,
 			},
 		},

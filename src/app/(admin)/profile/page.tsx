@@ -9,7 +9,6 @@ import UserRewardsCard from '@/components/user-profile/UserRewardsCard'
 import UserPerformanceCard from '@/components/user-profile/UserPerformanceCard'
 import UserOnboardingCard from '@/components/user-profile/UserOnboardingCard'
 import UserVibeMeterCard from '@/components/user-profile/UserVibeMeterCard'
-import { Metadata } from 'next'
 import React, { useEffect, useState } from 'react'
 import {
 	getProfileData,
@@ -28,13 +27,6 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 
-// Use a separate metadata file or export metadata from another file
-// since we're converting this to a client component
-const metadata = {
-	title: 'Next.js Profile | TailAdmin - Next.js Dashboard Template',
-	description:
-		'This is Next.js Profile page for TailAdmin - Next.js Tailwind CSS Admin Dashboard Template',
-}
 
 export default function Profile() {
 	const [profileData, setProfileData] = useState<ProfileApiResponse | null>(
@@ -76,6 +68,7 @@ export default function Profile() {
 					rewards: getRewardsData(data),
 					vibemeter: getVibeMeterData(data),
 				})
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} catch (err: any) {
 				const errorMessage =
 					err?.message || 'Failed to load profile data. Please try again later.'

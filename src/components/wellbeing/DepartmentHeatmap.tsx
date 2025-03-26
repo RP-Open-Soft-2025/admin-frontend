@@ -18,7 +18,7 @@ const DepartmentHeatmap: React.FC = () => {
 	// Get department names and scores for the heatmap
 	const departments = sortedDepartments.map(dept => dept.department)
 	const scores = sortedDepartments.map(dept => dept.averageScore)
-	const employeeCounts = sortedDepartments.map(dept => dept.employeeCount)
+	//const employeeCounts = sortedDepartments.map(dept => dept.employeeCount)
 
 	// Heatmap chart options
 	const options: ApexOptions = {

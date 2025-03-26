@@ -252,7 +252,7 @@ export const meetingsData: MeetingData[] = [
 		attendees: ['Benjamin Lopez'],
 		dateTime: '2023-04-02T14:30:00',
 		purpose: 'Personalized wellbeing support',
-		priority: 'Critical',
+		priority: 'High',
 	},
 	{
 		id: 3,
@@ -279,7 +279,7 @@ export const meetingsData: MeetingData[] = [
 		attendees: ['Abigail King', 'Emma Johnson'],
 		dateTime: '2023-04-01T11:00:00',
 		purpose: 'Emergency support for at-risk employee',
-		priority: 'Critical',
+		priority: 'High',
 	},
 ]
 

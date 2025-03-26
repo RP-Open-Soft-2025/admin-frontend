@@ -45,8 +45,8 @@ const dummyLeaveData = {
 
 // Helper function to format dates consistently
 const formatDate = (dateString: string) => {
-	const date = new Date(dateString)
-	return date.toLocaleDateString('en-GB') // Use consistent locale (DD/MM/YYYY)
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB'); // Use consistent locale (DD/MM/YYYY)
 }
 
 export default function UserLeaveCard({ leaveData }: UserLeaveCardProps) {
@@ -54,10 +54,6 @@ export default function UserLeaveCard({ leaveData }: UserLeaveCardProps) {
 	const displayData = leaveData || dummyLeaveData
 
 	// Calculate leave percentages
-	const usedPercentage = Math.round(
-		(displayData.usedLeave / displayData.totalLeave) * 100
-	)
-	const remainingPercentage = 100 - usedPercentage
 
 	return (
 		<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -67,67 +63,55 @@ export default function UserLeaveCard({ leaveData }: UserLeaveCardProps) {
 						Leave Management
 					</h4>
 
-					{displayData.requests.length > 0 && (
-						<div>
-							<h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-								Recent Leave Requests
-							</h5>
-							<div className="overflow-x-auto">
-								<table className="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-									<thead className="bg-gray-50 dark:bg-gray-800">
-										<tr>
-											<th
-												scope="col"
-												className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-											>
-												Type
-											</th>
-											<th
-												scope="col"
-												className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-											>
-												Duration
-											</th>
-											<th
-												scope="col"
-												className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-											>
-												Status
-											</th>
-										</tr>
-									</thead>
-									<tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-										{displayData.requests.map(request => (
-											<tr key={request.id}>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-													{request.type}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-													{formatDate(request.startDate)} -{' '}
-													{formatDate(request.endDate)}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm">
-													<span
-														className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-															request.status === 'Approved'
-																? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-																: request.status === 'Pending'
-																	? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-																	: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-														}`}
-													>
-														{request.status}
-													</span>
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							</div>
-						</div>
-					)}
-				</div>
-			</div>
-		</div>
-	)
-}
+            {displayData.requests.length > 0 && (
+              <div>
+                <h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Recent Leave Requests
+                </h5>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                          Type
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                          Duration
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                      {displayData.requests.map((request) => (
+                        <tr key={request.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+                            {request.type}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+                            {formatDate(request.startDate)} - {formatDate(request.endDate)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              request.status === 'Approved' 
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+                                : request.status === 'Pending'
+                                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                            }`}>
+                              {request.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+  )
+} 

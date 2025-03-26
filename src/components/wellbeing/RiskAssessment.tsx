@@ -68,7 +68,7 @@ const RiskAssessment: React.FC = () => {
 			horizontalAlign: 'center',
 			fontSize: '14px',
 			markers: {
-				radius: 12,
+				strokeWidth: 12,
 			},
 			itemMargin: {
 				horizontal: 8,
