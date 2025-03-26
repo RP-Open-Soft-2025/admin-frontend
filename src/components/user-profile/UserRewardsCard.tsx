@@ -31,6 +31,20 @@ const dummyRewardsData: Reward[] = [
   }
 ]
 
+// Map award types to icons (dummy paths, would need real icons)
+const awardIcons = {
+  [AwardType.STAR_PERFORMER]: '/images/icons/star.svg',
+  [AwardType.BEST_TEAM_PLAYER]: '/images/icons/team.svg',
+  [AwardType.INNOVATION]: '/images/icons/innovation.svg',
+  [AwardType.LEADERSHIP]: '/images/icons/leadership.svg'
+}
+
+// Helper function to format dates consistently
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB'); // Use consistent locale (DD/MM/YYYY)
+}
+
 export default function UserRewardsCard({ rewardsData }: UserRewardsCardProps) {
   // Use provided data or fall back to dummy data
   const displayData = rewardsData || dummyRewardsData;
@@ -65,7 +79,7 @@ export default function UserRewardsCard({ rewardsData }: UserRewardsCardProps) {
                   {reward.awardType}
                 </h5>
                 <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(reward.awardDate).toLocaleDateString()}
+                  {formatDate(reward.awardDate)}
                 </p>
                 <div className="mt-2 flex items-center justify-center">
                   <svg 

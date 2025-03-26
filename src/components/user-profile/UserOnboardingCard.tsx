@@ -4,7 +4,7 @@ import { Onboarding, OnboardingFeedback } from '@/types/employee'
 
 // Props interface
 interface UserOnboardingCardProps {
-  onboardingData?: Onboarding;
+  onboardingData?: Onboarding | null;
 }
 
 // Dummy data for development
@@ -13,6 +13,12 @@ const dummyOnboardingData: Onboarding = {
   onboardingFeedback: OnboardingFeedback.GOOD,
   mentorAssigned: true,
   initialTrainingCompleted: true
+}
+
+// Helper function to format dates consistently
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB'); // Use consistent locale (DD/MM/YYYY)
 }
 
 export default function UserOnboardingCard({ onboardingData }: UserOnboardingCardProps) {
@@ -69,7 +75,7 @@ export default function UserOnboardingCard({ onboardingData }: UserOnboardingCar
             <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
               <p className="text-sm text-gray-500 dark:text-gray-400">Joining Date</p>
               <p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-                {new Date(displayData.joiningDate).toLocaleDateString()}
+                {formatDate(displayData.joiningDate)}
               </p>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 {daysSinceJoining()} days ago

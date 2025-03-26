@@ -56,6 +56,12 @@ const dummyVibeMeterData: VibeMeter[] = [
   }
 ]
 
+// Helper function to format dates consistently
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB'); // Use consistent locale (DD/MM/YYYY)
+}
+
 // Helper function to get emotion color
 const getEmotionColor = (emotionZone: EmotionZone) => {
   switch(emotionZone) {
@@ -102,7 +108,7 @@ const getEmotionBgColor = (emotionZone: EmotionZone) => {
 
 export default function UserVibeMeterCard({ vibeMeterData }: UserVibeMeterCardProps) {
   // Use provided data or fall back to dummy data
-  const displayData = vibeMeterData || dummyVibeMeterData;
+  const displayData = vibeMeterData && vibeMeterData.length > 0 ? vibeMeterData : dummyVibeMeterData;
   
   // Get most recent vibe data
   const latestVibe = displayData[displayData.length - 1];
@@ -122,7 +128,7 @@ export default function UserVibeMeterCard({ vibeMeterData }: UserVibeMeterCardPr
                 {latestVibe.emotionZone}
               </p>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Last updated: {new Date(latestVibe.responseDate).toLocaleDateString()}
+                Last updated: {formatDate(latestVibe.responseDate)}
               </p>
             </div>
             
@@ -140,30 +146,32 @@ export default function UserVibeMeterCard({ vibeMeterData }: UserVibeMeterCardPr
               </div>
             </div>
             
-            <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Mood Trend</p>
-              <p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-                {latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore ? 'Improving' : 'Declining'}
-              </p>
-              <div className="mt-2 flex items-center">
-                {latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore ? (
-                  <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 7a1 1 0 01-1 1H9a1 1 0 01-1-1V6a1 1 0 011-1h2a1 1 0 011 1v1zm-6 6a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1zm-8-4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z" clipRule="evenodd" />
-                  </svg>
-                ) : (
-                  <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 13a1 1 0 01-1 1H9a1 1 0 01-1-1v-1a1 1 0 011-1h2a1 1 0 011 1v1zm-6-6a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1h-2a1 1 0 00-1 1v1zm-8 4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z" clipRule="evenodd" />
-                  </svg>
-                )}
-                <span className={`ml-1 text-sm ${
-                  latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : 'text-red-600 dark:text-red-400'
-                }`}>
-                  {Math.abs(latestVibe.vibeScore - displayData[displayData.length - 2].vibeScore)}%
-                </span>
+            {displayData.length > 1 && (
+              <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Mood Trend</p>
+                <p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
+                  {latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore ? 'Improving' : 'Declining'}
+                </p>
+                <div className="mt-2 flex items-center">
+                  {latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore ? (
+                    <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M12 7a1 1 0 01-1 1H9a1 1 0 01-1-1V6a1 1 0 011-1h2a1 1 0 011 1v1zm-6 6a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1zm-8-4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M12 13a1 1 0 01-1 1H9a1 1 0 01-1-1v-1a1 1 0 011-1h2a1 1 0 011 1v1zm-6-6a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1h-2a1 1 0 00-1 1v1zm-8 4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                  <span className={`ml-1 text-sm ${
+                    latestVibe.vibeScore > displayData[displayData.length - 2].vibeScore 
+                      ? 'text-green-600 dark:text-green-400' 
+                      : 'text-red-600 dark:text-red-400'
+                  }`}>
+                    {Math.abs(latestVibe.vibeScore - displayData[displayData.length - 2].vibeScore)}%
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
           <div className="mt-6">
