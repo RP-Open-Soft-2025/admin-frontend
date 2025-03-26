@@ -46,9 +46,15 @@ const dummyActivityData: Activity[] = [
   }
 ]
 
+// Helper function to format dates consistently
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB'); // Use consistent locale (DD/MM/YYYY)
+}
+
 export default function UserActivityCard({ activityData }: UserActivityCardProps) {
   // Use provided data or fall back to dummy data
-  const displayData = activityData || dummyActivityData;
+  const displayData = activityData && activityData.length > 0 ? activityData : dummyActivityData;
   
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -83,7 +89,7 @@ export default function UserActivityCard({ activityData }: UserActivityCardProps
                 {displayData.map((activity, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-                      {new Date(activity.date).toLocaleDateString()}
+                      {formatDate(activity.date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
                       {activity.teamsMessagesSent}

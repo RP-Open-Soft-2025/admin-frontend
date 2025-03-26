@@ -51,7 +51,7 @@ const getFeedbackColor = (feedback: ManagerFeedback) => {
 
 export default function UserPerformanceCard({ performanceData }: UserPerformanceCardProps) {
   // Use provided data or fall back to dummy data
-  const displayData = performanceData || dummyPerformanceData;
+  const displayData = performanceData && performanceData.length > 0 ? performanceData : dummyPerformanceData;
 
   // Get most recent performance review
   const latestPerformance = displayData[displayData.length - 1];
