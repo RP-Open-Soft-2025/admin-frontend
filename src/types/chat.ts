@@ -28,3 +28,14 @@ export interface Chat {
 	created_at: string // ISO string timestamp for creation
 	updated_at: string // ISO string timestamp for last update
 }
+
+export interface MessageResp {
+	timestamp: string // ISO string timestamp
+	sender: SenderType
+	text: string
+}
+
+export type ChatResp = {
+	chatId: string
+	messages: MessageResp[]
+}

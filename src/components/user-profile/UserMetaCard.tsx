@@ -10,19 +10,19 @@ import Image from 'next/image'
 // Props interface
 interface UserMetaCardProps {
 	userData?: {
-		name: string;
-		bio: string;
+		name: string
+		bio: string
 		location: {
-			city: string;
-			country: string;
-		};
+			city: string
+			country: string
+		}
 		socialLinks: {
-			facebook: string;
-			twitter: string;
-			linkedin: string;
-			instagram: string;
-		};
-		profileImage?: string;
+			facebook: string
+			twitter: string
+			linkedin: string
+			instagram: string
+		}
+		profileImage?: string
 	}
 }
 
@@ -32,19 +32,19 @@ const dummyUserData = {
 	bio: 'Team Manager',
 	location: {
 		city: 'Arizona',
-		country: 'United States'
+		country: 'United States',
 	},
 	socialLinks: {
 		facebook: 'https://www.facebook.com/PimjoHQ',
 		twitter: 'https://x.com/PimjoHQ',
 		linkedin: 'https://www.linkedin.com/company/pimjo',
-		instagram: 'https://instagram.com/PimjoHQ'
-	}
+		instagram: 'https://instagram.com/PimjoHQ',
+	},
 }
 
 export default function UserMetaCard({ userData }: UserMetaCardProps) {
 	// Use provided data or fall back to dummy data
-	const displayData = userData || dummyUserData;
+	const displayData = userData || dummyUserData
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
 		// Handle save logic here
@@ -215,7 +215,10 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 
 									<div>
 										<Label>X.com</Label>
-										<Input type="text" defaultValue={displayData.socialLinks.twitter} />
+										<Input
+											type="text"
+											defaultValue={displayData.socialLinks.twitter}
+										/>
 									</div>
 
 									<div>

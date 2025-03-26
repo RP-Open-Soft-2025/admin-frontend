@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 import Badge from '../ui/badge/Badge'
 import { Video } from 'lucide-react'
 import { SessionType } from '@/types/sessions'
+import Link from 'next/link'
 
 type BadgeColor =
 	| 'primary'
@@ -33,13 +34,13 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 									isHeader
 									className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
 								>
-									Meeting Details
+									Session Details
 								</TableCell>
 								<TableCell
 									isHeader
 									className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
 								>
-									Meeting Start Time
+									Session Start Time
 								</TableCell>
 								<TableCell
 									isHeader
@@ -56,7 +57,9 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 								<TableRow key={session.session_id}>
 									<TableCell className="px-5 py-4 sm:px-6 text-start">
 										<div className="flex items-center gap-3">
-											<Video className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+											<Link href={`./chat-page/${session.chat_id}`}>
+												<Video className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+											</Link>
 											<div>
 												<span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
 													{session.session_id}
@@ -64,7 +67,9 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 												<span className="block text-gray-500 text-theme-xs dark:text-gray-400">
 													{session.created_at
 														? new Date(session.created_at).toLocaleDateString()
-														: new Date(session.scheduled_at).toLocaleDateString()}
+														: new Date(
+																session.scheduled_at
+															).toLocaleDateString()}
 												</span>
 											</div>
 										</div>
