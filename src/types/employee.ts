@@ -107,10 +107,10 @@ export interface Employee {
 }
 
 export interface LeaveRequest {
-	id: string;
-	type: string;
-	startDate: string;
-	endDate: string;
-	status: 'Approved' | 'Pending' | 'Rejected';
-	requestDate: string;
+	id: string
+	type: string
+	startDate: string
+	endDate: string
+	status: 'Approved' | 'Pending' | 'Rejected'
+	requestDate: string
 }

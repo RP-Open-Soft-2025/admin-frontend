@@ -9,17 +9,17 @@ import Label from '../form/Label'
 // Props interface
 interface UserInfoCardProps {
 	userData?: {
-		firstName: string;
-		lastName: string;
-		email: string;
-		phone: string;
-		bio: string;
+		firstName: string
+		lastName: string
+		email: string
+		phone: string
+		bio: string
 		socialLinks?: {
-			facebook: string;
-			twitter: string;
-			linkedin: string;
-			instagram: string;
-		};
+			facebook: string
+			twitter: string
+			linkedin: string
+			instagram: string
+		}
 	}
 }
 
@@ -34,13 +34,13 @@ const dummyUserData = {
 		facebook: 'https://www.facebook.com/PimjoHQ',
 		twitter: 'https://x.com/PimjoHQ',
 		linkedin: 'https://www.linkedin.com/company/pimjo',
-		instagram: 'https://instagram.com/PimjoHQ'
-	}
+		instagram: 'https://instagram.com/PimjoHQ',
+	},
 }
 
 export default function UserInfoCard({ userData }: UserInfoCardProps) {
 	// Use provided data or fall back to dummy data
-	const displayData = userData || dummyUserData;
+	const displayData = userData || dummyUserData
 	const { isOpen, openModal, closeModal } = useModal()
 	const handleSave = () => {
 		// Handle save logic here
@@ -154,7 +154,10 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 
 									<div>
 										<Label>X.com</Label>
-										<Input type="text" defaultValue={displayData.socialLinks?.twitter} />
+										<Input
+											type="text"
+											defaultValue={displayData.socialLinks?.twitter}
+										/>
 									</div>
 
 									<div>
