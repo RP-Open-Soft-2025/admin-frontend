@@ -52,7 +52,7 @@ export async function getProfileData(): Promise<ProfileApiResponse> {
 			})
 		) // Debug log - avoiding logging the actual token for security
 
-		const token = authState.user?.accessToken;
+		const token = authState.user?.accessToken
 
 		if (!token) {
 			throw new Error('Authentication token not found. Please log in.')
