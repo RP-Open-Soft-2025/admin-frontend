@@ -27,7 +27,6 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 
-
 export default function Profile() {
 	const [profileData, setProfileData] = useState<ProfileApiResponse | null>(
 		null
