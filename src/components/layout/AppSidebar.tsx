@@ -5,13 +5,19 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useSidebar } from '../context/SidebarContext'
 import {
+	Calendar,
 	ChevronDownIcon,
+	Gauge,
 	GridIcon,
-	ListIcon,
+	MessageSquare,
 	PieChartIcon,
-	TableIcon,
+	PlusCircle,
 	UserCircleIcon,
+	Users,
+	Video,
 } from 'lucide-react'
+import DeloitteLogo from './deloitte-logo.svg'
+import DeloitteLogoDark from './deloitte-logo-dark.svg'
 
 type NavItem = {
 	name: string
@@ -22,12 +28,12 @@ type NavItem = {
 
 const navItems: NavItem[] = [
 	{
-		icon: <GridIcon />,
-		name: 'Dashboard',
-		subItems: [{ name: 'Statistics', path: '/', pro: false }],
+		icon: <Gauge />,
+		name: 'Statistics',
+		path: '/',
 	},
 	{
-		icon: <GridIcon />,
+		icon: <Calendar />,
 		name: 'Calendar',
 		path: '/calendar',
 	},
@@ -38,18 +44,24 @@ const navItems: NavItem[] = [
 	},
 
 	{
-		name: 'Forms',
-		icon: <ListIcon />,
-		subItems: [{ name: 'Add User', path: '/form-layout', pro: false }],
+		name: 'Add User',
+		icon: <PlusCircle />,
+		path: '/form-layout',
 	},
 	{
-		name: 'Tables',
-		icon: <TableIcon />,
-		subItems: [
-			{ name: 'All Users', path: '/users', pro: false },
-			{ name: 'All Sessions', path: '/sessions', pro: false },
-			{ name: 'All Meets', path: '/meets', pro: false },
-		],
+		name: 'Users',
+		icon: <Users />,
+		path: '/users',
+	},
+	{
+		name: 'Sessions',
+		icon: <MessageSquare />,
+		path: '/sessions',
+	},
+	{
+		name: 'Sessions',
+		icon: <Video />,
+		path: '/meets',
 	},
 	{
 		icon: <PieChartIcon />,
@@ -309,26 +321,21 @@ const AppSidebar: React.FC = () => {
 						<>
 							<Image
 								className="dark:hidden"
-								src="/images/logo/logo.svg"
+								src={DeloitteLogoDark}
 								alt="Logo"
 								width={150}
 								height={40}
 							/>
 							<Image
 								className="hidden dark:block"
-								src="/images/logo/logo-dark.svg"
+								src={DeloitteLogoDark}
 								alt="Logo"
 								width={150}
 								height={40}
 							/>
 						</>
 					) : (
-						<Image
-							src="/images/logo/logo-icon.svg"
-							alt="Logo"
-							width={32}
-							height={32}
-						/>
+						<Image src={DeloitteLogo} alt="Logo" width={32} height={32} />
 					)}
 				</Link>
 			</div>
