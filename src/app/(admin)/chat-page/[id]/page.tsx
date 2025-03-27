@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { ChatResp, MessageResp, SenderType } from '@/types/chat'
-import { API_URL } from '@/constants'
+import { API_URL, WS_URL } from '@/constants'
 import store from '@/redux/store'
 import { Role } from '@/types/employee'
 
@@ -96,6 +96,30 @@ const ChatPage = () => {
 			.catch(() => {
 				setIsLoading(false)
 			})
+	}, [])
+
+	useEffect(() => {
+		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + id)
+
+		ws.onmessage = event => {
+			const data = JSON.parse(event.data)
+			console.log('New message received:', data)
+
+			if (data.type === 'new_message') {
+				setMessages(prev => [
+					...prev,
+					{
+						sender: data.sender,
+						text: data.message,
+						timestamp: data.timestamp,
+					},
+				])
+			}
+		}
+
+		return () => {
+			ws.close()
+		}
 	}, [])
 
 	// Handle message sending
