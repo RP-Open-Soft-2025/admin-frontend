@@ -27,7 +27,8 @@ export default function MeetsPage() {
 		const fetchMeets = async () => {
 			try {
 				setIsLoading(true)
-				if (!auth.isAuthenticated) throw new Error('No token found in Redux store')
+				if (!auth.isAuthenticated)
+					throw new Error('No token found in Redux store')
 
 				const response = await fetch(
 					`${API_URL}/${auth.user?.userRole}/meets`,
@@ -54,7 +55,7 @@ export default function MeetsPage() {
 			}
 		}
 
-		fetchMeets();
+		fetchMeets()
 	}, [])
 
 	if (isLoading) {

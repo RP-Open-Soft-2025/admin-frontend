@@ -66,7 +66,6 @@ const TableSession = ({ state }: { state: State }) => {
 	)
 }
 
-
 const Page = () => {
 	return (
 		<>
