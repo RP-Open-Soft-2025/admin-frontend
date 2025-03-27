@@ -65,6 +65,7 @@ const ChatPage = () => {
 	const messagesContainerRef = useRef<HTMLDivElement>(null)
 	const { auth } = store.getState()
 	const [isLoading, setIsLoading] = useState(true)
+	const [takeOver, setTakeOver] = useState<boolean>(false)
 
 	// Scroll to latest message
 	useEffect(() => {
@@ -133,6 +134,11 @@ const ChatPage = () => {
 		}
 	}
 
+	const initTakeOver = () => {
+		console.log('Chat Taken Over')
+		setTakeOver(true)
+	}
+
 	return (
 		<div className="flex flex-col h-[85vh] w-full">
 			{/* Chat Header */}
@@ -167,7 +173,7 @@ const ChatPage = () => {
 			</div>
 
 			{/* Chat Input */}
-			{auth.user?.userRole == Role.HR && (
+			{auth.user?.userRole == Role.HR && takeOver ? (
 				<div className="p-4 bg-gray-100 dark:bg-gray-800 border-t">
 					<div className="flex space-x-2">
 						<input
@@ -187,6 +193,15 @@ const ChatPage = () => {
 							Send
 						</button>
 					</div>
+				</div>
+			) : (
+				<div className="w-full bg-blue-100 dark:bg-blue-900 flex justify-center items-center py-4">
+					<button
+						className="px-6 py-2 bg-white text-blue-500 rounded-md shadow-md dark:bg-gray-800 dark:text-blue-100 hover:bg-blue-50 dark:hover:bg-blue-600 transition-colors"
+						onClick={() => initTakeOver()}
+					>
+						TakeOver
+					</button>
 				</div>
 			)}
 		</div>
