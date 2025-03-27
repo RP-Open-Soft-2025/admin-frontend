@@ -122,43 +122,56 @@ export default function Profile() {
 	}
 
 	return (
-		<div>
-			<div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-				<h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
+		<div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
+			<div className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-5 shadow-xl hover:shadow-2xl transition-all duration-300 dark:border-gray-700 dark:bg-gray-800/90 lg:p-6">
+				<h3 className="mb-5 text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-purple-400 lg:mb-7">
 					Profile
 				</h3>
 				<div className="space-y-6">
 					<UserMetaCard userData={getUserMetaData(profileData)} />
 					<UserInfoCard userData={getUserInfoData(profileData)} />
-					{/* No address data in API response, but keeping component with dummy data */}
 					<UserAddressCard />
 
 					{/* Only render components with data */}
 					{profileData.company_data.onboarding.length > 0 && (
-						<UserOnboardingCard
-							onboardingData={getOnboardingData(profileData)}
-						/>
+						<div className="transform hover:scale-[1.01] transition-transform duration-200">
+							<UserOnboardingCard
+								onboardingData={getOnboardingData(profileData)}
+							/>
+						</div>
 					)}
 
 					{profileData.company_data.activity.length > 0 && (
-						<UserActivityCard activityData={getActivityData(profileData)} />
+						<div className="transform hover:scale-[1.01] transition-transform duration-200">
+							<UserActivityCard activityData={getActivityData(profileData)} />
+						</div>
 					)}
 
 					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 						{profileData.company_data.performance.length > 0 && (
-							<UserPerformanceCard
-								performanceData={getPerformanceData(profileData)}
-							/>
+							<div className="transform hover:scale-[1.02] transition-transform duration-200">
+								<UserPerformanceCard
+									performanceData={getPerformanceData(profileData)}
+								/>
+							</div>
 						)}
 						{profileData.company_data.rewards.length > 0 && (
-							<UserRewardsCard rewardsData={getRewardsData(profileData)} />
+							<div className="transform hover:scale-[1.02] transition-transform duration-200">
+								<UserRewardsCard rewardsData={getRewardsData(profileData)} />
+							</div>
 						)}
 					</div>
 
-					<UserLeaveCard leaveData={getLeaveData(profileData)} />
+					<div className="transform hover:scale-[1.01] transition-transform duration-200">
+						<UserLeaveCard leaveData={getLeaveData(profileData)} />
+					</div>
 
 					{profileData.company_data.vibemeter.length > 0 && (
-						<UserVibeMeterCard vibeMeterData={getVibeMeterData(profileData)} />
+						<div className="transform hover:scale-[1.01] transition-transform duration-200">
+							<UserVibeMeterCard
+								vibeMeterData={getVibeMeterData(profileData)}
+							/>
+						</div>
 					)}
 				</div>
 			</div>

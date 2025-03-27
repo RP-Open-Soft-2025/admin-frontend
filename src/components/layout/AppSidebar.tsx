@@ -54,12 +54,12 @@ const navItems: NavItem[] = [
 		path: '/users',
 	},
 	{
-		name: 'Sessions',
+		name: 'Chat Sessions',
 		icon: <MessageSquare />,
 		path: '/sessions',
 	},
 	{
-		name: 'Sessions',
+		name: 'Video Sessions',
 		icon: <Video />,
 		path: '/meets',
 	},
