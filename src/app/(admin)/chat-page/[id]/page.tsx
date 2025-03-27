@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'
 import { ChatResp, MessageResp, SenderType } from '@/types/chat'
 import { API_URL } from '@/constants'
 import store from '@/redux/store'
+import { Role } from '@/types/employee'
 
 const MessageComp = ({ message }: { message: MessageResp }) => {
 	const { sender, text, timestamp } = message
@@ -99,13 +100,28 @@ const ChatPage = () => {
 	// Handle message sending
 	const sendMessage = () => {
 		if (newMessage.trim() !== '') {
-			const message: MessageResp = {
-				sender: SenderType.HR,
-				text: newMessage.trim(),
-				timestamp: new Date().toISOString(),
-			}
-			setMessages(prevMessages => [...prevMessages, message])
-			setNewMessage('')
+			console.log(API_URL)
+			fetch(`${API_URL}/chat/message-to-employee`, {
+				method: 'POST',
+				headers: {
+					'Content-type': 'Application/json',
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+				},
+				body: JSON.stringify({
+					chatId: id,
+					message: newMessage.trim(),
+				}),
+			}).then(resp => {
+				if (resp.ok) {
+					const message: MessageResp = {
+						sender: SenderType.HR,
+						text: newMessage.trim(),
+						timestamp: new Date().toISOString(),
+					}
+					setMessages(prevMessages => [...prevMessages, message])
+					setNewMessage('')
+				}
+			})
 		}
 	}
 
@@ -151,26 +167,28 @@ const ChatPage = () => {
 			</div>
 
 			{/* Chat Input */}
-			<div className="p-4 bg-gray-100 dark:bg-gray-800 border-t">
-				<div className="flex space-x-2">
-					<input
-						type="text"
-						className="flex-grow p-2 rounded bg-white dark:bg-gray-700 
+			{auth.user?.userRole == Role.HR && (
+				<div className="p-4 bg-gray-100 dark:bg-gray-800 border-t">
+					<div className="flex space-x-2">
+						<input
+							type="text"
+							className="flex-grow p-2 rounded bg-white dark:bg-gray-700 
 						border dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white"
-						value={newMessage}
-						onChange={e => setNewMessage(e.target.value)}
-						onKeyDown={handleKeyDown}
-						placeholder="Type your message..."
-					/>
-					<button
-						className="px-4 py-2 bg-indigo-500 text-white rounded 
+							value={newMessage}
+							onChange={e => setNewMessage(e.target.value)}
+							onKeyDown={handleKeyDown}
+							placeholder="Type your message..."
+						/>
+						<button
+							className="px-4 py-2 bg-indigo-500 text-white rounded 
 						hover:bg-indigo-600 transition-colors"
-						onClick={sendMessage}
-					>
-						Send
-					</button>
+							onClick={sendMessage}
+						>
+							Send
+						</button>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	)
 }
