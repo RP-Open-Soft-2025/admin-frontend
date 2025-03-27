@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 
 import Badge from '../ui/badge/Badge'
 import { User } from 'lucide-react'
-import Link from 'next/link'
 import { Employee, Role } from '@/types/employee'
 
 export default function BasicTableOne({
