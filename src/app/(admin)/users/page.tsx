@@ -53,6 +53,9 @@ function Page() {
 
 	return (
 		<div>
+			<h2 className="text-lg font-semibold mb-4 dark:text-white">
+				ALL USERS
+			</h2>
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">
 				<Pagination
