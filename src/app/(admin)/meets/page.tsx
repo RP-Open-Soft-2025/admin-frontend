@@ -1,8 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../../redux/store'
+import store from '../../../redux/store'
 import { ExternalLink, ArrowRight, ArrowLeft } from 'lucide-react'
+import { API_URL } from '@/constants'
 
 interface Meet {
 	meet_id: string
@@ -21,22 +21,20 @@ export default function MeetsPage() {
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState<string>('')
 
-	const token = useSelector(
-		(state: RootState) => state.auth.user?.accessToken || null
-	)
+	const { auth } = store.getState()
 
 	useEffect(() => {
 		const fetchMeets = async () => {
 			try {
 				setIsLoading(true)
-				if (!token) throw new Error('No token found in Redux store')
+				if (!auth.isAuthenticated) throw new Error('No token found in Redux store')
 
 				const response = await fetch(
-					'https://backend-deployment-792.as.r.appspot.com/admin/meets',
+					`${API_URL}/${auth.user?.userRole}/meets`,
 					{
 						method: 'GET',
 						headers: {
-							Authorization: `Bearer ${token}`, // ✅ Fixed string interpolation
+							Authorization: `Bearer ${auth.user?.accessToken}`, // ✅ Fixed string interpolation
 							'Content-Type': 'application/json',
 						},
 					}
@@ -56,8 +54,8 @@ export default function MeetsPage() {
 			}
 		}
 
-		if (token) fetchMeets()
-	}, [token])
+		fetchMeets();
+	}, [])
 
 	if (isLoading) {
 		return (
