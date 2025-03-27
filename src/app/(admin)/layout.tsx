@@ -5,14 +5,21 @@ import Backdrop from '@/components/layout/Backdrop'
 import AppSidebar from '@/components/layout/AppSidebar'
 import AppHeader from '@/components/layout/AppHeader'
 import React from 'react'
+import { useEffect } from 'react'
+import store from '@/redux/store'
+import { useRouter } from 'next/navigation'
 
 export default function AdminLayout({
 	children,
 }: {
 	children: React.ReactNode
 }) {
+	const router = useRouter()
 	const { isExpanded, isHovered, isMobileOpen } = useSidebar()
-
+	useEffect(() => {
+		const { auth } = store.getState()
+		if (!auth.isAuthenticated) router.push('./login')
+	})
 	// Dynamic class for main content margin based on sidebar state
 	const mainContentMargin = isMobileOpen
 		? 'ml-0'

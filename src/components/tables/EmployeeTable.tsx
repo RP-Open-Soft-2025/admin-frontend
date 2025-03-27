@@ -59,9 +59,7 @@ export default function BasicTableOne({
 									<TableCell className="px-5 py-4 sm:px-6 text-start">
 										<div className="flex items-center gap-3">
 											<div className="w-10 h-10 overflow-hidden rounded-full">
-												<Link href={`/profile/${order.userId}`}>
-													<User />
-												</Link>
+												<User />
 											</div>
 											<div>
 												<span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">

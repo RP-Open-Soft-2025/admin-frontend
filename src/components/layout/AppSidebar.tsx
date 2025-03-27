@@ -59,7 +59,7 @@ const navItems: NavItem[] = [
 		path: '/sessions',
 	},
 	{
-		name: 'Sessions',
+		name: 'Meetings',
 		icon: <Video />,
 		path: '/meets',
 	},
