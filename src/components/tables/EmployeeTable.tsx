@@ -5,12 +5,14 @@ import Badge from '../ui/badge/Badge'
 import { User } from 'lucide-react'
 import { Employee, Role } from '@/types/employee'
 import { DEL_TIME } from '@/constants'
+import { useRouter } from 'next/navigation'
 
 export default function BasicTableOne({
 	tableData,
 }: {
 	tableData: Employee[]
 }) {
+	const router = useRouter();
 	return (
 		<div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
 			<div className="max-w-full overflow-x-auto">
@@ -18,7 +20,7 @@ export default function BasicTableOne({
 					<Table>
 						{/* Table Header */}
 						<TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-							<TableRow>
+							<TableRow onClick={() => {}}>
 								<TableCell
 									isHeader
 									className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -58,7 +60,7 @@ export default function BasicTableOne({
 								const lastPingTime: number = new Date(order.lastPing).getTime()
 								const diff = Date.now() - lastPingTime
 								return (
-									<TableRow key={order.userId}>
+									<TableRow key={order.userId} onClick={() => router.push(`/profile/${order.userId}`)} className='cursor-pointer'>
 										<TableCell className="px-5 py-4 sm:px-6 text-start">
 											<div className="flex items-center gap-3">
 												<div className="w-10 h-10 overflow-hidden rounded-full">
