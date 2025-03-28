@@ -9,6 +9,7 @@ interface HRManagementProps {
 
 const HRManagement = ({
 	hrUsers,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	onReassignHR,
 	isLoading = false,
 }: HRManagementProps) => {

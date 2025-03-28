@@ -1,6 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import { User } from '@/services/adminService'
+import { ApexOptions } from 'apexcharts'
 
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
@@ -39,7 +40,7 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 
 	const { series, labels } = calculateRoleDistribution()
 
-	const options = {
+	const options: ApexOptions = {
 		chart: {
 			type: 'donut' as const,
 		},
@@ -56,12 +57,13 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 						},
 						value: {
 							show: true,
-							formatter: (val: number) => val.toFixed(0),
+							formatter: (val: string) => val,
 						},
 						total: {
 							show: true,
 							showAlways: true,
 							label: 'Total Users',
+							// eslint-disable-next-line @typescript-eslint/no-explicit-any
 							formatter: (w: any) => {
 								return w.globals.seriesTotals.reduce(
 									(a: number, b: number) => a + b,
@@ -81,9 +83,8 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 			horizontalAlign: 'center' as const,
 			fontSize: '14px',
 			markers: {
-				width: 12,
-				height: 12,
-				radius: 6,
+				size: 12,
+				strokeWidth: 12,
 			},
 			itemMargin: {
 				horizontal: 10,

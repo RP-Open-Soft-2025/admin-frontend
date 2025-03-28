@@ -1,5 +1,4 @@
 import React from 'react'
-import { User, Session } from '@/services/adminService'
 
 interface StatsOverviewProps {
 	totalUsers: number | 'UNAVAILABLE'
