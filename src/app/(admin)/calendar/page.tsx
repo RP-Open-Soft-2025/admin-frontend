@@ -5,13 +5,14 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { useModal } from '@/hooks/useModal'
-import { useSelector } from 'react-redux'
+import store from '@/redux/store'
 import {
 	EventInput,
 	DateSelectArg,
 	EventClickArg,
-	EventContentArg,
 } from '@fullcalendar/core'
+import { API_URL } from '@/constants'
+import { Meeting } from '@/types/meets'
 
 interface CalendarEvent extends EventInput {
 	extendedProps: {
@@ -27,7 +28,7 @@ const Calendar: React.FC = () => {
 	const [events, setEvents] = useState<CalendarEvent[]>([])
 	const calendarRef = useRef<FullCalendar>(null)
 	const { isOpen, openModal, closeModal } = useModal()
-	const auth = useSelector((state) => state.auth)
+	const { auth } = store.getState();
 
 	const calendarsEvents = {
 		Danger: 'danger',
@@ -41,7 +42,7 @@ const Calendar: React.FC = () => {
 			if (!auth.user || !auth.user.accessToken) return
 			try {
 				const response = await fetch(
-					'https://backend-deployment-792.as.r.appspot.com/admin/meets',
+					`${API_URL}/${auth.user.userRole}/meets`,
 					{
 						headers: {
 							Authorization: `Bearer ${auth.user.accessToken}`,
@@ -49,7 +50,7 @@ const Calendar: React.FC = () => {
 					}
 				)
 				const data = await response.json()
-				const formattedEvents = data.map((meet) => {
+				const formattedEvents = data.map((meet:Meeting) => {
 					const time = meet.scheduled_at.split('T')[1].split('+')[0].trim(); 
 					return {
 						id: meet.meet_id,
