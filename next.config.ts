@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
 		})
 		return config
 	},
+	experimental: {
+		turbo: {
+			rules: {
+				'*.svg': ['@svgr/webpack'],
+			},
+		},
+	},
 }
 
 export default nextConfig
