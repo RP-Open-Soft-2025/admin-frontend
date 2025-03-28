@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useSidebar } from '../context/SidebarContext'
+import UserDropdown from '@/components/common/UserDropdown'
 import {
 	Calendar,
 	ChevronDownIcon,
@@ -29,7 +30,7 @@ type NavItem = {
 const navItems: NavItem[] = [
 	{
 		icon: <Gauge />,
-		name: 'Statistics',
+		name: 'Dashboard',
 		path: '/',
 	},
 	{
@@ -63,17 +64,6 @@ const navItems: NavItem[] = [
 		icon: <Video />,
 		path: '/meets',
 	},
-	{
-		icon: <PieChartIcon />,
-		name: 'Charts',
-		subItems: [
-			{ name: 'Line Chart', path: '/line-chart', pro: false },
-			{ name: 'Bar Chart', path: '/bar-chart', pro: false },
-		],
-	},
-]
-
-const othersItems: NavItem[] = [
 	// {
 	// 	icon: <PieChartIcon />,
 	// 	name: 'Charts',
@@ -82,31 +72,14 @@ const othersItems: NavItem[] = [
 	// 		{ name: 'Bar Chart', path: '/bar-chart', pro: false },
 	// 	],
 	// },
-	// {
-	// 	icon: <PieChartIcon />,
-	// 	name: 'UI Elements',
-	// 	subItems: [
-	// 		{ name: 'Alerts', path: '/alerts', pro: false },
-	// 		{ name: 'Avatar', path: '/avatars', pro: false },
-	// 		{ name: 'Badge', path: '/badge', pro: false },
-	// 		{ name: 'Buttons', path: '/buttons', pro: false },
-	// 		{ name: 'Images', path: '/images', pro: false },
-	// 		{ name: 'Videos', path: '/videos', pro: false },
-	// 	],
-	// },
-	// {
-	// 	icon: <PieChartIcon />,
-	// 	name: 'Authentication',
-	// 	subItems: [
-	// 		{ name: 'Sign In', path: '/signin', pro: false },
-	// 		{ name: 'Sign Up', path: '/signup', pro: false },
-	// 	],
-	// },
 ]
+
+const othersItems: NavItem[] = []
 
 const AppSidebar: React.FC = () => {
 	const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
 	const pathname = usePathname()
+	const [isMobileSize, setIsMobileSize] = useState(false)
 
 	const renderMenuItems = (
 		navItems: NavItem[],
@@ -283,6 +256,19 @@ const AppSidebar: React.FC = () => {
 		}
 	}, [openSubmenu])
 
+	useEffect(() => {
+		// Set initial value
+		setIsMobileSize(window.innerWidth < 1024)
+		
+		// Update on resize
+		const handleResize = () => {
+			setIsMobileSize(window.innerWidth < 1024)
+		}
+		
+		window.addEventListener('resize', handleResize)
+		return () => window.removeEventListener('resize', handleResize)
+	}, [])
+
 	const handleSubmenuToggle = (index: number, menuType: 'main' | 'others') => {
 		setOpenSubmenu(prevOpenSubmenu => {
 			if (
@@ -298,7 +284,7 @@ const AppSidebar: React.FC = () => {
 
 	return (
 		<aside
-			className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+			className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 overflow-hidden
         ${
 					isExpanded || isMobileOpen
 						? 'w-[290px]'
@@ -311,8 +297,9 @@ const AppSidebar: React.FC = () => {
 			onMouseEnter={() => !isExpanded && setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 		>
+			{/* Only show logo in desktop view */}
 			<div
-				className={`py-8 flex  ${
+				className={`py-8 flex hidden lg:flex ${
 					!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
 				}`}
 			>
@@ -354,7 +341,11 @@ const AppSidebar: React.FC = () => {
 					)}
 				</Link>
 			</div>
-			<div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
+
+			{/* Add padding for mobile view without logo */}
+			<div className="pt-6 lg:hidden"></div>
+			
+			<div className="flex flex-col overflow-y-auto h-full">
 				<nav className="mb-6">
 					<div className="flex flex-col gap-4">
 						<div>
@@ -374,22 +365,17 @@ const AppSidebar: React.FC = () => {
 							{renderMenuItems(navItems, 'main')}
 						</div>
 
-						<div className="">
-							<h2
-								className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-									!isExpanded && !isHovered
-										? 'lg:justify-center'
-										: 'justify-start'
-								}`}
-							>
-								{isExpanded || isHovered || isMobileOpen ? (
-									'Others'
-								) : (
-									<GridIcon />
-								)}
-							</h2>
-							{renderMenuItems(othersItems, 'others')}
-						</div>
+						{/* User profile section - only visible in mobile/tablet view */}
+						{(isExpanded || isHovered || isMobileOpen) && isMobileSize && (
+							<div className="mb-6 mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 lg:hidden">
+								<h2 className="mb-4 text-xs uppercase flex leading-[20px] text-gray-400 justify-start">
+									Profile
+								</h2>
+								<div className="px-1">
+									<UserDropdown />
+								</div>
+							</div>
+						)}
 					</div>
 				</nav>
 			</div>

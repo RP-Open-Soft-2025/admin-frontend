@@ -41,6 +41,12 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 									isHeader
 									className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
 								>
+									Employee ID
+								</TableCell>
+								<TableCell
+									isHeader
+									className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+								>
 									Session Start Time
 								</TableCell>
 								<TableCell
@@ -78,6 +84,9 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 												</span>
 											</div>
 										</div>
+									</TableCell>
+									<TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+										{session.employee_id}
 									</TableCell>
 									<TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
 										{new Date(session.scheduled_at).toLocaleString()}
