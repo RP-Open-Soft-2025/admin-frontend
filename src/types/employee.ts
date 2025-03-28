@@ -104,6 +104,7 @@ export interface Employee {
 	blockedReason?: string
 	companyData: CompanyData
 	accountActivated: boolean
+	lastPing: string
 }
 
 export interface LeaveRequest {
