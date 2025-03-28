@@ -31,8 +31,8 @@ export default function Profile() {
 	const [profileData, setProfileData] = useState<ProfileApiResponse | null>(
 		null
 	)
-	const params = useParams();
-	const id = params.id as string;
+	const params = useParams()
+	const id = params.id as string
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const router = useRouter()
@@ -48,7 +48,7 @@ export default function Profile() {
 
 		async function fetchProfileData() {
 			try {
-				const data = await getUserProfileData(id);
+				const data = await getUserProfileData(id)
 				setProfileData(data)
 				setLoading(false)
 

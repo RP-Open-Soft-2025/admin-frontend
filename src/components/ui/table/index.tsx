@@ -48,8 +48,16 @@ const TableBody: React.FC<TableBodyProps> = ({ children, className }) => {
 }
 
 // TableRow Component
-const TableRow: React.FC<TableRowProps> = ({ children, className, onClick }) => {
-	return <tr className={className} onClick={onClick}>{children}</tr>
+const TableRow: React.FC<TableRowProps> = ({
+	children,
+	className,
+	onClick,
+}) => {
+	return (
+		<tr className={className} onClick={onClick}>
+			{children}
+		</tr>
+	)
 }
 
 // TableCell Component
