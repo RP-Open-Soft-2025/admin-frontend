@@ -2,7 +2,7 @@
 import BasicTableOne from '@/components/tables/EmployeeTable'
 import Pagination from '@/components/tables/Pagination'
 import React, { useEffect, useState } from 'react'
-import { API_URL, MAX_PER_PAGE_USER } from '@/constants'
+import { API_URL, DEL_TIME, MAX_PER_PAGE_USER } from '@/constants'
 import store from '@/redux/store'
 import { Employee } from '@/types/employee'
 
@@ -22,23 +22,38 @@ function Page() {
 			auth.user?.userRole == 'admin'
 				? '/admin/list-users'
 				: '/hr/list-assigned-users'
-		fetch(API_URL + route, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${auth.user?.accessToken}`,
-				'Content-type': 'application/json',
-			},
-		}).then(resp => {
-			if (resp.ok) {
-				resp.json().then((res: Response) => {
-					setCurrData(res.users)
-					const pages = Math.ceil(res.users.length / MAX_PER_PAGE_USER)
-					console.log(pages)
-					setTotalPages(pages)
-					setCurrentPage(1)
-				})
-			}
-		})
+		const getUpdate = () => {
+			fetch(API_URL + route, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+					'Content-type': 'application/json',
+				},
+			}).then(resp => {
+				if (resp.ok) {
+					resp.json().then((res: Response) => {
+						const sort_user = res.users.sort((a: Employee, b: Employee) => {
+							const da = new Date(a.lastPing)
+							const db = new Date(b.lastPing)
+							return db.getTime() - da.getTime()
+						})
+						setCurrData(sort_user)
+						const pages = Math.ceil(res.users.length / MAX_PER_PAGE_USER)
+						console.log(pages)
+						setTotalPages(pages)
+						setCurrentPage(1)
+					})
+				}
+			})
+		}
+
+		getUpdate()
+
+		const interval = setInterval(() => {
+			getUpdate()
+		}, DEL_TIME)
+
+		return () => clearInterval(interval)
 	}, [])
 
 	useEffect(() => {
