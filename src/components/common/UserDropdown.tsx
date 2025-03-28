@@ -1,21 +1,43 @@
 'use client'
 import Image from 'next/image'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { User, LogOut, ChevronDown } from 'lucide-react'
 import { logout } from '@/redux/features/auth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { getProfileData } from '@/services/profileService'
 
 const UserDropdown = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
+	const user = useSelector((state: any) => state.auth.user)
+	const [userName, setUserName] = useState('User')
+	
+	useEffect(() => {
+		// Fetch user profile data when component mounts
+		const fetchUserProfile = async () => {
+			try {
+				const profileData = await getProfileData()
+				if (profileData && profileData.name) {
+					setUserName(profileData.name.split(' ')[0]) // Use first name only
+				}
+			} catch (error) {
+				console.error('Error fetching user profile:', error)
+			}
+		}
+		
+		// Only fetch if user is authenticated
+		if (user && user.accessToken) {
+			fetchUserProfile()
+		}
+	}, [user])
 
 	const handleLogout = () => {
 		dispatch(logout())
@@ -35,7 +57,7 @@ const UserDropdown = () => {
 					/>
 				</span>
 				<span className="block mr-1 font-medium text-theme-sm text-gray-700 dark:text-gray-100">
-					Musharof
+					{userName}
 				</span>
 				<ChevronDown className="w-4 h-4 text-gray-700 dark:text-white transition-all duration-200 group-data-[state=open]:rotate-180" />
 			</DropdownMenuTrigger>
