@@ -89,6 +89,58 @@ export async function getProfileData(): Promise<ProfileApiResponse> {
 	}
 }
 
+export async function getUserProfileData(userId:string): Promise<ProfileApiResponse> {
+	try {
+		// Use API_URL from constants
+		console.log('API URL:', API_URL) // Debug log
+
+		// Get auth token from Redux store
+		const authState = store.getState().auth
+		console.log(
+			'Auth state:',
+			JSON.stringify({
+				isAuthenticated: authState.isAuthenticated,
+				hasToken: !!authState.user?.accessToken,
+			})
+		) // Debug log - avoiding logging the actual token for security
+
+		const token = authState.user?.accessToken
+
+		if (!token) {
+			throw new Error('Authentication token not found. Please log in.')
+		}
+
+		console.log('Making API request to /employee/profile') // Debug log
+
+		const response = await fetch(`${API_URL}/${authState.user?.userRole}/user-det/${userId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+		})
+
+		console.log('API Response status:', response.status) // Debug log
+
+		if (response.status === 401) {
+			throw new Error(
+				'Authentication failed. Your session may have expired. Please log in again.'
+			)
+		}
+
+		if (!response.ok) {
+			throw new Error(`Error fetching profile: ${response.statusText}`)
+		}
+
+		const data: ProfileApiResponse = await response.json()
+		console.log('Profile data received successfully') // Debug log
+		return data
+	} catch (error) {
+		console.error('Failed to fetch profile data:', error)
+		throw error
+	}
+}
+
 // Function to transform API data into the format expected by UserMetaCard
 export function getUserMetaData(profileData: ProfileApiResponse) {
 	return {
