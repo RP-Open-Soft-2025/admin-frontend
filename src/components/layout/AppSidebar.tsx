@@ -16,8 +16,8 @@ import {
 	Users,
 	Video,
 } from 'lucide-react'
-import DeloitteLogo from './deloitte-logo.svg'
-import DeloitteLogoDark from './deloitte-logo-dark.svg'
+import DeloitteLogo from './deloitte-logo.png'
+import DeloitteLogoDark from './deloitte-logo-dark.png'
 
 type NavItem = {
 	name: string
