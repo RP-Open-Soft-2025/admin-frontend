@@ -321,7 +321,7 @@ const AppSidebar: React.FC = () => {
 						<>
 							<Image
 								className="dark:hidden"
-								src={DeloitteLogoDark}
+								src={DeloitteLogo}
 								alt="Logo"
 								width={150}
 								height={40}
@@ -335,7 +335,10 @@ const AppSidebar: React.FC = () => {
 							/>
 						</>
 					) : (
-						<Image src={DeloitteLogo} alt="Logo" width={32} height={32} />
+						<>
+						<Image src={DeloitteLogo} alt="Logo" width={32} height={32} className="dark:hidden"/>
+						<Image src={DeloitteLogoDark} alt="Logo" width={32} height={32} className="hidden dark:block"/>
+						</>
 					)}
 				</Link>
 			</div>
