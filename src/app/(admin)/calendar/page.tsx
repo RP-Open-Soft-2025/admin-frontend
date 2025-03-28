@@ -6,11 +6,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { useModal } from '@/hooks/useModal'
 import store from '@/redux/store'
-import {
-	EventInput,
-	DateSelectArg,
-	EventClickArg,
-} from '@fullcalendar/core'
+import { EventInput, DateSelectArg, EventClickArg } from '@fullcalendar/core'
 import { API_URL } from '@/constants'
 import { Meeting } from '@/types/meets'
 
@@ -28,7 +24,7 @@ const Calendar: React.FC = () => {
 	const [events, setEvents] = useState<CalendarEvent[]>([])
 	const calendarRef = useRef<FullCalendar>(null)
 	const { isOpen, openModal, closeModal } = useModal()
-	const { auth } = store.getState();
+	const { auth } = store.getState()
 
 	const calendarsEvents = {
 		Danger: 'danger',
@@ -41,20 +37,17 @@ const Calendar: React.FC = () => {
 		const fetchMeetings = async () => {
 			if (!auth.user || !auth.user.accessToken) return
 			try {
-				const response = await fetch(
-					`${API_URL}/${auth.user.userRole}/meets`,
-					{
-						headers: {
-							Authorization: `Bearer ${auth.user.accessToken}`,
-						},
-					}
-				)
+				const response = await fetch(`${API_URL}/${auth.user.userRole}/meets`, {
+					headers: {
+						Authorization: `Bearer ${auth.user.accessToken}`,
+					},
+				})
 				const data = await response.json()
-				const formattedEvents = data.map((meet:Meeting) => {
-					const time = meet.scheduled_at.split('T')[1].split('+')[0].trim(); 
+				const formattedEvents = data.map((meet: Meeting) => {
+					const time = meet.scheduled_at.split('T')[1].split('+')[0].trim()
 					return {
 						id: meet.meet_id,
-						title: ` Meeting at ${time}`, 
+						title: ` Meeting at ${time}`,
 						start: meet.scheduled_at,
 						url: meet.meeting_link,
 						extendedProps: { calendar: 'Success' },
@@ -89,11 +82,11 @@ const Calendar: React.FC = () => {
 				prevEvents.map(event =>
 					event.id === selectedEvent.id
 						? {
-							...event,
-							title: eventTitle,
-							start: eventStartDate,
-							extendedProps: { calendar: eventLevel },
-						}
+								...event,
+								title: eventTitle,
+								start: eventStartDate,
+								extendedProps: { calendar: eventLevel },
+							}
 						: event
 				)
 			)
@@ -133,8 +126,8 @@ const Calendar: React.FC = () => {
 					selectable={true}
 					select={handleDateSelect}
 					eventClick={handleEventClick}
-					eventContent={(eventInfo) => {
-						return <b>{eventInfo.event.title}</b>;
+					eventContent={eventInfo => {
+						return <b>{eventInfo.event.title}</b>
 					}}
 					customButtons={{
 						addEventButton: {
@@ -156,25 +149,28 @@ const Calendar: React.FC = () => {
 						>
 							✖
 						</button>
-			
+
 						<h2 className="text-2xl font-semibold text-black">Add Event</h2>
 						<p className="text-gray-500">Plan your next big moment.</p>
-			
+
 						{/* Event Title */}
 						<input
 							type="text"
 							placeholder="Event Title"
 							value={eventTitle}
-							onChange={(e) => setEventTitle(e.target.value)}
+							onChange={e => setEventTitle(e.target.value)}
 							className="w-full mt-4 p-2 border rounded-md text-black"
 						/>
-			
+
 						{/* Event Color Options */}
 						<div className="mt-4">
 							<span className="font-semibold text-black">Event Color</span>
 							<div className="flex gap-3 mt-2">
-								{Object.keys(calendarsEvents).map((color) => (
-									<label key={color} className="flex items-center gap-1 text-black">
+								{Object.keys(calendarsEvents).map(color => (
+									<label
+										key={color}
+										className="flex items-center gap-1 text-black"
+									>
 										<input
 											type="radio"
 											name="color"
@@ -188,18 +184,20 @@ const Calendar: React.FC = () => {
 								))}
 							</div>
 						</div>
-			
+
 						{/* Date Inputs */}
 						<div className="mt-4">
-							<label className="block font-semibold text-black">Enter Start Date</label>
+							<label className="block font-semibold text-black">
+								Enter Start Date
+							</label>
 							<input
 								type="date"
 								value={eventStartDate}
-								onChange={(e) => setEventStartDate(e.target.value)}
+								onChange={e => setEventStartDate(e.target.value)}
 								className="w-full p-2 border rounded-md text-black"
 							/>
 						</div>
-			
+
 						{/* Buttons */}
 						<div className="flex justify-end gap-3 mt-6">
 							<button
@@ -218,8 +216,6 @@ const Calendar: React.FC = () => {
 					</div>
 				</div>
 			)}
-			
-			
 		</div>
 	)
 }

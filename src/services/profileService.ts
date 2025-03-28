@@ -89,7 +89,9 @@ export async function getProfileData(): Promise<ProfileApiResponse> {
 	}
 }
 
-export async function getUserProfileData(userId:string): Promise<ProfileApiResponse> {
+export async function getUserProfileData(
+	userId: string
+): Promise<ProfileApiResponse> {
 	try {
 		// Use API_URL from constants
 		console.log('API URL:', API_URL) // Debug log
@@ -112,13 +114,16 @@ export async function getUserProfileData(userId:string): Promise<ProfileApiRespo
 
 		console.log('Making API request to /employee/profile') // Debug log
 
-		const response = await fetch(`${API_URL}/${authState.user?.userRole}/user-det/${userId}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
+		const response = await fetch(
+			`${API_URL}/${authState.user?.userRole}/user-det/${userId}`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		)
 
 		console.log('API Response status:', response.status) // Debug log
 

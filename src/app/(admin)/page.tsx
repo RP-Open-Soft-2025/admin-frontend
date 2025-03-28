@@ -43,14 +43,20 @@ function AdminDashboard() {
 	// State for all data
 	const [users, setUsers] = useState<User[] | 'UNAVAILABLE'>([])
 	const [hrUsers, setHRUsers] = useState<HRUser[] | 'UNAVAILABLE'>([])
-	const [activeSessions, setActiveSessions] = useState<Session[] | 'UNAVAILABLE'>([])
-	const [pendingSessions, setPendingSessions] = useState<Session[] | 'UNAVAILABLE'>([])
-	const [completedSessions, setCompletedSessions] = useState<Session[] | 'UNAVAILABLE'>([])
+	const [activeSessions, setActiveSessions] = useState<
+		Session[] | 'UNAVAILABLE'
+	>([])
+	const [pendingSessions, setPendingSessions] = useState<
+		Session[] | 'UNAVAILABLE'
+	>([])
+	const [completedSessions, setCompletedSessions] = useState<
+		Session[] | 'UNAVAILABLE'
+	>([])
 	const [meetings, setMeetings] = useState<Meet[] | 'UNAVAILABLE'>([])
-	
+
 	// UI state
 	const [showCreateUserModal, setShowCreateUserModal] = useState(false)
-	
+
 	// Loading states
 	const [loading, setLoading] = useState({
 		users: true,
@@ -76,7 +82,7 @@ function AdminDashboard() {
 				sessions: true,
 				meetings: true,
 			})
-			
+
 			// Fetch users
 			try {
 				const userData = await fetchUsers()
@@ -114,7 +120,7 @@ function AdminDashboard() {
 					const sessionData = await fetchSessions()
 					setActiveSessions(sessionData.active)
 					setPendingSessions(sessionData.pending)
-					
+
 					// Still need to fetch completed sessions separately
 					const completed = await fetchCompletedSessions()
 					setCompletedSessions(completed)
@@ -122,18 +128,21 @@ function AdminDashboard() {
 					console.log('Session data:', {
 						active: sessionData.active.length,
 						pending: sessionData.pending.length,
-						completed: completed.length
+						completed: completed.length,
 					})
 				} catch (error) {
-					console.error('Failed to fetch combined sessions, trying individual endpoints:', error)
-					
+					console.error(
+						'Failed to fetch combined sessions, trying individual endpoints:',
+						error
+					)
+
 					// Fallback to individual endpoints
 					const [active, pending, completed] = await Promise.all([
 						fetchActiveSessions(),
 						fetchPendingSessions(),
 						fetchCompletedSessions(),
 					])
-					
+
 					setActiveSessions(active)
 					setPendingSessions(pending)
 					setCompletedSessions(completed)
@@ -141,12 +150,12 @@ function AdminDashboard() {
 					console.log('Session data from individual endpoints:', {
 						active: active.length,
 						pending: pending.length,
-						completed: completed.length
+						completed: completed.length,
 					})
 				}
 
 				// Process chart data based on actual session dates
-				processSessionData();
+				processSessionData()
 			} catch (error) {
 				console.error('Failed to fetch sessions:', error)
 				setActiveSessions('UNAVAILABLE')
@@ -198,7 +207,7 @@ function AdminDashboard() {
 	const handleOpenCreateUserModal = () => {
 		setShowCreateUserModal(true)
 	}
-	
+
 	const handleCloseCreateUserModal = () => {
 		setShowCreateUserModal(false)
 	}
@@ -211,7 +220,7 @@ function AdminDashboard() {
 	}) => {
 		try {
 			const newUser = await createUser(userData)
-			setUsers(prev => Array.isArray(prev) ? [...prev, newUser] : [newUser])
+			setUsers(prev => (Array.isArray(prev) ? [...prev, newUser] : [newUser]))
 			setShowCreateUserModal(false)
 			toast({
 				type: 'success',
@@ -230,9 +239,9 @@ function AdminDashboard() {
 	const handleDeleteUser = async (userId: string) => {
 		try {
 			await deleteUser(userId)
-			setUsers(prev => 
-				Array.isArray(prev) 
-					? prev.filter(user => user.id !== userId) 
+			setUsers(prev =>
+				Array.isArray(prev)
+					? prev.filter(user => user.id !== userId)
 					: 'UNAVAILABLE'
 			)
 			toast({
@@ -251,10 +260,8 @@ function AdminDashboard() {
 	const handleCreateSession = async (userId: string) => {
 		try {
 			const newSession = await createSession(userId)
-			setPendingSessions(prev => 
-				Array.isArray(prev) 
-					? [...prev, newSession] 
-					: [newSession]
+			setPendingSessions(prev =>
+				Array.isArray(prev) ? [...prev, newSession] : [newSession]
 			)
 			toast({
 				type: 'success',
@@ -288,105 +295,115 @@ function AdminDashboard() {
 	// Process session data for chart based on actual session counts
 	const processSessionData = () => {
 		if (
-			activeSessionsCount === 'UNAVAILABLE' || 
+			activeSessionsCount === 'UNAVAILABLE' ||
 			pendingSessionsCount === 'UNAVAILABLE'
 		) {
-			return;
+			return
 		}
-		
+
 		// Generate dates for a week (we'll simply use the next 7 days)
-		const startDate = new Date();
-		startDate.setHours(0, 0, 0, 0);
-		
+		const startDate = new Date()
+		startDate.setHours(0, 0, 0, 0)
+
 		// Generate 7 consecutive days
 		const chartDates = Array.from({ length: 7 }, (_, i) => {
-			const date = new Date(startDate);
-			date.setDate(date.getDate() + i);
-			return date;
-		});
-		
+			const date = new Date(startDate)
+			date.setDate(date.getDate() + i)
+			return date
+		})
+
 		// Generate labels for the chart
-		const labels = chartDates.map(date => 
+		const labels = chartDates.map(date =>
 			date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-		);
-		
+		)
+
 		// For the chart data, use actual counts from the API
 		// Create an array where all days have the actual session count
 		// First day shows actual count, other days zero to emphasize current state
 		const activeSessionsArray = [
 			typeof activeSessionsCount === 'number' ? activeSessionsCount : 0,
-			0, 0, 0, 0, 0, 0
-		];
-		
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+		]
+
 		const pendingSessionsArray = [
 			typeof pendingSessionsCount === 'number' ? pendingSessionsCount : 0,
-			0, 0, 0, 0, 0, 0
-		];
-		
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+		]
+
 		// Since we don't have a completedSessionsCount prop in the StatsOverview,
 		// we'll calculate it from the total if available
-		let completedCount = 0;
+		let completedCount = 0
 		if (
-			typeof totalSessions === 'number' && 
-			typeof activeSessionsCount === 'number' && 
+			typeof totalSessions === 'number' &&
+			typeof activeSessionsCount === 'number' &&
 			typeof pendingSessionsCount === 'number'
 		) {
-			completedCount = totalSessions - activeSessionsCount - pendingSessionsCount;
+			completedCount =
+				totalSessions - activeSessionsCount - pendingSessionsCount
 		}
-		
-		const completedSessionsArray = [
-			completedCount,
-			0, 0, 0, 0, 0, 0
-		];
-		
+
+		const completedSessionsArray = [completedCount, 0, 0, 0, 0, 0, 0]
+
 		// Update chart data
 		setSessionChartData({
 			labels: labels,
 			active: activeSessionsArray,
 			pending: pendingSessionsArray,
-			completed: completedSessionsArray
-		});
-		
+			completed: completedSessionsArray,
+		})
+
 		console.log('Updated chart data with actual session counts:', {
 			labels,
 			activeSessionsArray,
 			pendingSessionsArray,
-			completedSessionsArray
-		});
-	};
+			completedSessionsArray,
+		})
+	}
 
 	// Calculate stats
 	const totalUsers = Array.isArray(users) ? users.length : 'UNAVAILABLE'
-	const activeUsers = Array.isArray(users) 
-		? users.filter(user => !user.is_blocked).length 
+	const activeUsers = Array.isArray(users)
+		? users.filter(user => !user.is_blocked).length
 		: 'UNAVAILABLE'
-	
-	const totalSessions = 
-		Array.isArray(activeSessions) && 
-		Array.isArray(pendingSessions) && 
+
+	const totalSessions =
+		Array.isArray(activeSessions) &&
+		Array.isArray(pendingSessions) &&
 		Array.isArray(completedSessions)
-			? activeSessions.length + pendingSessions.length + completedSessions.length
+			? activeSessions.length +
+				pendingSessions.length +
+				completedSessions.length
 			: 'UNAVAILABLE'
-	
-	const activeSessionsCount = Array.isArray(activeSessions) 
-		? activeSessions.length 
+
+	const activeSessionsCount = Array.isArray(activeSessions)
+		? activeSessions.length
 		: 'UNAVAILABLE'
-	
-	const pendingSessionsCount = Array.isArray(pendingSessions) 
-		? pendingSessions.length 
+
+	const pendingSessionsCount = Array.isArray(pendingSessions)
+		? pendingSessions.length
 		: 'UNAVAILABLE'
-	
+
 	const totalMeets = Array.isArray(meetings) ? meetings.length : 'UNAVAILABLE'
 
 	// Update chart whenever session stats change
 	useEffect(() => {
-		processSessionData();
-	}, [activeSessionsCount, pendingSessionsCount, totalSessions]);
+		processSessionData()
+	}, [activeSessionsCount, pendingSessionsCount, totalSessions])
 
 	return (
 		<div className="space-y-6">
 			{/* Stats Overview */}
-			<StatsOverview 
+			<StatsOverview
 				totalUsers={totalUsers}
 				activeUsers={activeUsers}
 				totalSessions={totalSessions}
@@ -398,21 +415,22 @@ function AdminDashboard() {
 
 			{/* Sessions Chart & Meetings */}
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-				<SessionStatusChart 
+				<SessionStatusChart
 					activeSessions={activeSessionsCount}
 					pendingSessions={pendingSessionsCount}
-					completedSessions={totalSessions - (activeSessionsCount === 'UNAVAILABLE' ? 0 : activeSessionsCount) - (pendingSessionsCount === 'UNAVAILABLE' ? 0 : pendingSessionsCount)}
+					completedSessions={
+						totalSessions -
+						(activeSessionsCount === 'UNAVAILABLE' ? 0 : activeSessionsCount) -
+						(pendingSessionsCount === 'UNAVAILABLE' ? 0 : pendingSessionsCount)
+					}
 					isLoading={loading.sessions}
 				/>
-				
-				<UserRoleChart 
-					users={users}
-					isLoading={loading.users}
-				/>
+
+				<UserRoleChart users={users} isLoading={loading.users} />
 			</div>
 
 			{/* User Management */}
-			<UserManagement 
+			<UserManagement
 				users={users}
 				onDeleteUser={handleDeleteUser}
 				onCreateSession={handleCreateSession}
@@ -422,18 +440,15 @@ function AdminDashboard() {
 			/>
 
 			{/* Meetings Overview */}
-			<MeetingsOverview 
-				meetings={meetings}
-				isLoading={loading.meetings}
-			/>
+			<MeetingsOverview meetings={meetings} isLoading={loading.meetings} />
 
 			{/* HR Management */}
-			<HRManagement 
+			<HRManagement
 				hrUsers={hrUsers}
 				onReassignHR={handleReassignHR}
 				isLoading={loading.hr}
 			/>
-			
+
 			{/* Create User Modal */}
 			{showCreateUserModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -448,15 +463,15 @@ function AdminDashboard() {
 									className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
 									onClick={handleCloseCreateUserModal}
 								>
-									<svg 
-										className="h-5 w-5" 
-										fill="currentColor" 
-										viewBox="0 0 20 20" 
+									<svg
+										className="h-5 w-5"
+										fill="currentColor"
+										viewBox="0 0 20 20"
 										xmlns="http://www.w3.org/2000/svg"
 									>
-										<path 
-											fillRule="evenodd" 
-											d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" 
+										<path
+											fillRule="evenodd"
+											d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
 											clipRule="evenodd"
 										></path>
 									</svg>
