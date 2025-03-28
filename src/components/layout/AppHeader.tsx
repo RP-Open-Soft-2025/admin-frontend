@@ -5,8 +5,8 @@ import { useSidebar } from '@/components/context/SidebarContext'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState, useEffect, useRef } from 'react'
-import DeloitteLogo from './deloitte-logo.svg'
-import DeloitteLogoDark from './deloitte-logo-dark.svg'
+import DeloitteLogo from './deloitte-logo.png'
+import DeloitteLogoDark from './deloitte-logo-dark.png'
 import { AlignJustify } from 'lucide-react'
 
 const AppHeader: React.FC = () => {
