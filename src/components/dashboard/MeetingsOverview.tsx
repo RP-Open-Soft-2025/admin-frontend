@@ -21,6 +21,7 @@ const MeetingsOverview = ({
 				hour12: true,
 			}).format(date)
 		} catch (error) {
+			console.log(error)
 			return 'Invalid date'
 		}
 	}

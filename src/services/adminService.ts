@@ -330,7 +330,7 @@ export async function deleteUser(
 			throw new Error(`Error deleting user: ${response.statusText}`)
 		}
 
-		const data = await response.json()
+		await response.json()
 		return { success: true }
 	} catch (error) {
 		console.error('Failed to delete user:', error)
@@ -389,7 +389,7 @@ export async function reassignHR(
 			throw new Error(`Error reassigning HR: ${response.statusText}`)
 		}
 
-		const data = await response.json()
+		await response.json()
 		return { success: true }
 	} catch (error) {
 		console.error('Failed to reassign HR:', error)

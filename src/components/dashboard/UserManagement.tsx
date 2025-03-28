@@ -41,6 +41,7 @@ const UserManagement = ({
 				day: 'numeric',
 			}).format(date)
 		} catch (error) {
+			console.log(error)
 			return 'Invalid date'
 		}
 	}

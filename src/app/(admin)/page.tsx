@@ -1,7 +1,6 @@
-// @ts-nocheck
 'use client'
 
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from '@/components/ui/sonner'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
@@ -29,12 +28,9 @@ import {
 	HRUser,
 	Session,
 	Meet,
-	fetchStats,
 } from '@/services/adminService'
 import SessionStatusChart from '@/components/dashboard/SessionStatusChart'
 import UserRoleChart from '@/components/dashboard/UserRoleChart'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 function AdminDashboard() {
 	const router = useRouter()
@@ -66,6 +62,7 @@ function AdminDashboard() {
 	})
 
 	// Session chart data
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [sessionChartData, setSessionChartData] = useState({
 		active: [] as number[],
 		pending: [] as number[],
@@ -415,16 +412,22 @@ function AdminDashboard() {
 
 			{/* Sessions Chart & Meetings */}
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-				<SessionStatusChart
-					activeSessions={activeSessionsCount}
-					pendingSessions={pendingSessionsCount}
-					completedSessions={
-						totalSessions -
-						(activeSessionsCount === 'UNAVAILABLE' ? 0 : activeSessionsCount) -
-						(pendingSessionsCount === 'UNAVAILABLE' ? 0 : pendingSessionsCount)
-					}
-					isLoading={loading.sessions}
-				/>
+				{totalSessions !== 'UNAVAILABLE' && (
+					<SessionStatusChart
+						activeSessions={activeSessionsCount}
+						pendingSessions={pendingSessionsCount}
+						completedSessions={
+							totalSessions -
+							(activeSessionsCount === 'UNAVAILABLE'
+								? 0
+								: activeSessionsCount) -
+							(pendingSessionsCount === 'UNAVAILABLE'
+								? 0
+								: pendingSessionsCount)
+						}
+						isLoading={loading.sessions}
+					/>
+				)}
 
 				<UserRoleChart users={users} isLoading={loading.users} />
 			</div>
