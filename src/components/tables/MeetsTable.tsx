@@ -4,6 +4,7 @@ import Badge from '../ui/badge/Badge'
 import { Video } from 'lucide-react'
 import { SessionType } from '@/types/sessions'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 type BadgeColor =
 	| 'primary'
@@ -21,7 +22,7 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 		completed: 'success',
 		cancelled: 'warning',
 	}
-
+	const router = useRouter();
 	return (
 		<div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
 			<div className="max-w-full overflow-x-auto">
@@ -29,7 +30,7 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 					<Table>
 						{/* Table Header */}
 						<TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-							<TableRow>
+							<TableRow onClick={() => {}}>
 								<TableCell
 									isHeader
 									className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -54,7 +55,7 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 						{/* Table Body */}
 						<TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
 							{tableData.map(session => (
-								<TableRow key={session.session_id}>
+								<TableRow key={session.session_id} onClick={() => router.push(`/chat-page/${session.chat_id}`)} className='cursor-pointer'>
 									<TableCell className="px-5 py-4 sm:px-6 text-start">
 										<div className="flex items-center gap-3">
 											<Link href={`./chat-page/${session.chat_id}`}>
