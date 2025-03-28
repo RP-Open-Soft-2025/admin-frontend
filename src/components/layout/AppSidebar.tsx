@@ -16,8 +16,8 @@ import {
 	Users,
 	Video,
 } from 'lucide-react'
-import DeloitteLogo from './deloitte-logo.svg'
-import DeloitteLogoDark from './deloitte-logo-dark.svg'
+import DeloitteLogo from './deloitte-logo.png'
+import DeloitteLogoDark from './deloitte-logo-dark.png'
 
 type NavItem = {
 	name: string
@@ -321,7 +321,7 @@ const AppSidebar: React.FC = () => {
 						<>
 							<Image
 								className="dark:hidden"
-								src={DeloitteLogoDark}
+								src={DeloitteLogo}
 								alt="Logo"
 								width={150}
 								height={40}
