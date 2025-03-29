@@ -27,8 +27,8 @@ const SessionStatusChart = ({
 		setIsDarkMode(document.documentElement.classList.contains('dark'))
 
 		// Create observer to watch for theme changes
-		const observer = new MutationObserver((mutations) => {
-			mutations.forEach((mutation) => {
+		const observer = new MutationObserver(mutations => {
+			mutations.forEach(mutation => {
 				if (
 					mutation.attributeName === 'class' &&
 					mutation.target === document.documentElement
@@ -67,9 +67,9 @@ const SessionStatusChart = ({
 	const { series, categories } = getChartData()
 
 	// Color settings based on theme
-	const lineColor = isDarkMode ? '#818cf8' : '#4F46E5'; // Lighter indigo in dark mode
-	const markerColor = isDarkMode ? '#818cf8' : '#4F46E5';
-	const fillOpacity = isDarkMode ? 0.3 : 0.2; // Slightly higher opacity in dark mode
+	const lineColor = isDarkMode ? '#818cf8' : '#4F46E5' // Lighter indigo in dark mode
+	const markerColor = isDarkMode ? '#818cf8' : '#4F46E5'
+	const fillOpacity = isDarkMode ? 0.3 : 0.2 // Slightly higher opacity in dark mode
 
 	const options: ApexOptions = {
 		chart: {
@@ -118,12 +118,12 @@ const SessionStatusChart = ({
 		plotOptions: {
 			radar: {
 				polygons: {
-					strokeColors: isDarkMode ? '#4b5563' : '#E5E7EB', 
+					strokeColors: isDarkMode ? '#4b5563' : '#E5E7EB',
 					strokeWidth: isDarkMode ? '1.5px' : '1px', // Slightly thicker in dark mode
 					connectorColors: isDarkMode ? '#4b5563' : '#E5E7EB',
 					fill: {
-						colors: isDarkMode 
-							? ['#1f2937', '#1f2937'] // Less contrast in dark mode polygons 
+						colors: isDarkMode
+							? ['#1f2937', '#1f2937'] // Less contrast in dark mode polygons
 							: ['#F9FAFB', '#F3F4F6'],
 					},
 				},
@@ -143,8 +143,8 @@ const SessionStatusChart = ({
 					top: 1,
 					left: 1,
 					blur: 1,
-					opacity: 0.2
-				}
+					opacity: 0.2,
+				},
 			},
 			style: {
 				fontSize: '14px',

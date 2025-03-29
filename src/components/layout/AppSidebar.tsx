@@ -11,7 +11,6 @@ import {
 	Gauge,
 	GridIcon,
 	MessageSquare,
-	PieChartIcon,
 	PlusCircle,
 	UserCircleIcon,
 	Users,
@@ -259,12 +258,12 @@ const AppSidebar: React.FC = () => {
 	useEffect(() => {
 		// Set initial value
 		setIsMobileSize(window.innerWidth < 1024)
-		
+
 		// Update on resize
 		const handleResize = () => {
 			setIsMobileSize(window.innerWidth < 1024)
 		}
-		
+
 		window.addEventListener('resize', handleResize)
 		return () => window.removeEventListener('resize', handleResize)
 	}, [])
@@ -344,7 +343,7 @@ const AppSidebar: React.FC = () => {
 
 			{/* Add padding for mobile view without logo */}
 			<div className="pt-6 lg:hidden"></div>
-			
+
 			<div className="flex flex-col overflow-y-auto h-full">
 				<nav className="mb-6">
 					<div className="flex flex-col gap-4">
