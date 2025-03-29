@@ -27,7 +27,7 @@ export function AuthForm({
 				<Input
 					id="employee_id"
 					name="employee_id"
-					className="bg-muted text-md md:text-sm text-black dark:text-white" 
+					className="bg-muted text-md md:text-sm text-black dark:text-white"
 					type="text"
 					placeholder="EMPXXXX"
 					autoComplete="employee_id"

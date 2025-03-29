@@ -41,11 +41,13 @@ function Page() {
 							return db.getTime() - da.getTime()
 						})
 						setCurrData(sort_user)
-						
+
 						// Extract unique roles from the data
-						const roles = [...new Set(sort_user.map(user => user.role))].filter(Boolean)
+						const roles = [...new Set(sort_user.map(user => user.role))].filter(
+							Boolean
+						)
 						setAvailableRoles(roles)
-						
+
 						const pages = Math.ceil(res.users.length / MAX_PER_PAGE_USER)
 						console.log(pages)
 						setTotalPages(pages)
@@ -66,40 +68,37 @@ function Page() {
 
 	useEffect(() => {
 		// First filter the data
-		let filteredData = currData;
-		
+		let filteredData = currData
+
 		if (searchTerm) {
-			filteredData = filteredData.filter(user => 
+			filteredData = filteredData.filter(user =>
 				user.name.toLowerCase().includes(searchTerm.toLowerCase())
-			);
+			)
 		}
-		
+
 		if (selectedRole) {
-			filteredData = filteredData.filter(user => 
-				user.role === selectedRole
-			);
+			filteredData = filteredData.filter(user => user.role === selectedRole)
 		}
-		
+
 		// Calculate total pages based on filtered data
-		const pages = Math.ceil(filteredData.length / MAX_PER_PAGE_USER);
-		setTotalPages(pages || 1);
-		
+		const pages = Math.ceil(filteredData.length / MAX_PER_PAGE_USER)
+		setTotalPages(pages || 1)
+
 		// Ensure current page is valid with new filter results
 		if (currPage > pages && pages > 0) {
-			setCurrentPage(1);
+			setCurrentPage(1)
 		}
-		
+
 		// Apply pagination to filtered data
-		const start = (currPage - 1) * MAX_PER_PAGE_USER;
-		const end = start + MAX_PER_PAGE_USER;
-		setPaginatedData(filteredData.slice(start, end));
-		
+		const start = (currPage - 1) * MAX_PER_PAGE_USER
+		const end = start + MAX_PER_PAGE_USER
+		setPaginatedData(filteredData.slice(start, end))
 	}, [currPage, currData, searchTerm, selectedRole])
 
 	return (
 		<div>
 			<h2 className="text-lg font-semibold mb-4 dark:text-white">ALL USERS</h2>
-			
+
 			<div className="flex flex-col mb-4 gap-4 md:flex-row md:items-center">
 				<div className="relative max-w-sm md:w-64">
 					<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -126,7 +125,7 @@ function Page() {
 						onChange={e => setSearchTerm(e.target.value)}
 					/>
 				</div>
-				
+
 				<div className="md:w-48">
 					<select
 						className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
@@ -135,12 +134,14 @@ function Page() {
 					>
 						<option value="">All Roles</option>
 						{availableRoles.map(role => (
-							<option key={role} value={role}>{role}</option>
+							<option key={role} value={role}>
+								{role}
+							</option>
 						))}
 					</select>
 				</div>
 			</div>
-			
+
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">
 				<Pagination

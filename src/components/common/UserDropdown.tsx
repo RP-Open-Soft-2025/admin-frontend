@@ -7,19 +7,20 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { User, LogOut, ChevronDown } from 'lucide-react'
 import { logout } from '@/redux/features/auth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getProfileData } from '@/services/profileService'
+import store from '@/redux/store'
 
 const UserDropdown = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
-	const user = useSelector((state: any) => state.auth.user)
+	const user = store.getState().auth.user
 	const [userName, setUserName] = useState('User')
-	
+
 	useEffect(() => {
 		// Fetch user profile data when component mounts
 		const fetchUserProfile = async () => {
@@ -32,7 +33,7 @@ const UserDropdown = () => {
 				console.error('Error fetching user profile:', error)
 			}
 		}
-		
+
 		// Only fetch if user is authenticated
 		if (user && user.accessToken) {
 			fetchUserProfile()
