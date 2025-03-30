@@ -46,7 +46,7 @@ export default function Profile() {
 
 		async function fetchProfileData() {
 			try {
-				const data:EmployeeAPI = await getUserProfileData(id)
+				const data: EmployeeAPI = await getUserProfileData(id)
 				setProfileData(data)
 				setLoading(false)
 
