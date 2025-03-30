@@ -18,6 +18,7 @@ A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Ta
 ## 🚀 Features
 
 - **Modern Tech Stack**
+
   - Next.js 15 with App Router
   - TypeScript for type safety
   - Tailwind CSS for styling
@@ -42,18 +43,21 @@ A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Ta
 ## 📦 Installation
 
 1. Clone the repository:
+
 ```bash
 git clone [repository-url]
 cd admin-frontend
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
-Create a `.env` file in the root directory with the following variables:
+   Create a `.env` file in the root directory with the following variables:
+
 ```env
 NEXT_PUBLIC_API_URL=your_api_url
 ```
