@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
-import { Chat, ChatResp, MessageResp, SenderType } from '@/types/chat'
+import { Chat, ChatResp, Message, MessageResp, SenderType } from '@/types/chat'
 import { API_URL, WS_URL } from '@/constants'
 import store from '@/redux/store'
 import { Role } from '@/types/employee'
@@ -24,23 +24,23 @@ const MessageComp = ({ message }: { message: MessageResp }) => {
 	const messageStyles = {
 		[SenderType.EMPLOYEE]: {
 			container: 'justify-start',
-			bg: 'bg-blue-100 dark:bg-blue-900',
-			textColor: 'text-gray-800 dark:text-blue-100',
+			bg: 'bg-blue-200 dark:bg-blue-800',
+			textColor: 'text-gray-900 dark:text-blue-100',
 		},
 		[SenderType.BOT]: {
 			container: 'justify-end',
-			bg: 'bg-green-100 dark:bg-green-900',
-			textColor: 'text-gray-800 dark:text-green-100',
+			bg: 'bg-green-200 dark:bg-green-800',
+			textColor: 'text-gray-900 dark:text-green-100',
 		},
 		[SenderType.HR]: {
 			container: 'justify-end',
-			bg: 'bg-indigo-100 dark:bg-indigo-900',
-			textColor: 'text-gray-800 dark:text-indigo-100',
+			bg: 'bg-purple-200 dark:bg-purple-800',
+			textColor: 'text-gray-900 dark:text-purple-100',
 		},
 		[SenderType.SYSTEM]: {
 			container: 'justify-center',
-			bg: 'bg-indigo-100 dark:bg-indigo-900',
-			textColor: 'text-gray-800 dark:text-indigo-100',
+			bg: 'bg-gray-300 dark:bg-gray-700', // Improved contrast
+			textColor: 'text-gray-900 dark:text-gray-100',
 		},
 	}
 
@@ -49,24 +49,34 @@ const MessageComp = ({ message }: { message: MessageResp }) => {
 	return (
 		<div className={`flex ${container} w-full`}>
 			<div
-				className={`max-w-[70%] ${bg} p-3 rounded-xl shadow-sm ${textColor}`}
+				className={`${
+					sender === SenderType.SYSTEM
+						? 'max-w-max px-4 py-2 rounded-lg text-sm font-semibold'
+						: 'max-w-[70%] p-3 rounded-xl shadow-sm'
+				} ${bg} ${textColor}`}
 			>
-				<div className="flex justify-between items-center mb-1">
-					<span className="text-xs font-semibold opacity-70">
-						{sender === SenderType.EMPLOYEE
-							? 'Employee'
-							: sender === SenderType.BOT
-								? 'Bot'
-								: 'HR'}
-					</span>
-					<span className="text-xs opacity-50 ml-2">
-						{new Date(timestamp).toLocaleTimeString([], {
-							hour: '2-digit',
-							minute: '2-digit',
-						})}
-					</span>
-				</div>
-				<p className="text-sm font-medium">{text}</p>
+				{sender !== SenderType.SYSTEM && (
+					<div className="flex justify-between items-center mb-1">
+						<span className="text-xs font-semibold opacity-70">
+							{sender === SenderType.EMPLOYEE
+								? 'Employee'
+								: sender === SenderType.BOT
+									? 'Bot'
+									: sender === SenderType.HR
+										? 'HR'
+										: ''}
+						</span>
+						<span className="text-xs opacity-50 ml-2">
+							{new Date(timestamp).toLocaleTimeString([], {
+								hour: '2-digit',
+								minute: '2-digit',
+							})}
+						</span>
+					</div>
+				)}
+				<p className="text-sm font-medium text-center">
+					{sender == SenderType.SYSTEM ? `Chat ID: ${text}` : text}
+				</p>
 			</div>
 		</div>
 	)
@@ -96,9 +106,9 @@ const ChatHistoryItem = ({
 					{new Date(chat.last_message_time).toLocaleDateString()}
 				</span>
 			</div>
-			{chat.chat_id && (
+			{chat.last_message && (
 				<p className="text-xs dark:text-gray-400 text-gray-600 truncate mt-1">
-					{chat.chat_id}
+					{chat.last_message}
 				</p>
 			)}
 		</div>
@@ -139,54 +149,61 @@ const ChatPage = () => {
 		localStorage.setItem('chatSidebarOpen', sidebarOpen.toString())
 	}, [sidebarOpen])
 
-	// Fetch chat history
-	useEffect(() => {
-		setIsLoading(true)
-		fetch(`${API_URL}/chat/history/${id}`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${auth.user?.accessToken}`,
-			},
-		})
-			.then(resp => {
-				if (resp.ok) {
-					resp.json().then((data: ChatResp) => {
-						setMessages(data.messages)
-						setIsLoading(false)
-					})
-				} else {
-					setIsLoading(false)
-				}
-			})
-			.catch(() => {
-				setIsLoading(false)
-			})
-	}, [id])
-
 	// Fetch all chat histories for sidebar
 	useEffect(() => {
-		if (auth.user?.userRole !== Role.EMPLOYEE) {
-			setHistoryLoading(true)
-			fetch(`${API_URL}/llm/chat/history/${id}`, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${auth.user?.accessToken}`,
-				},
-			})
-				.then(resp => {
-					if (resp.ok) {
-						return resp.json().then((data: SessionHist[]) => {
-							setSessions(data)
-							setHistoryLoading(false)
-							console.log(data)
-						})
-					}
+		setHistoryLoading(true)
+
+		const fetchChatHistory = async (chatId: string, timestamp: string) => {
+			setIsLoading(true)
+			try {
+				const resp = await fetch(`${API_URL}/chat/history/${chatId}`, {
+					method: 'GET',
+					headers: { Authorization: `Bearer ${auth.user?.accessToken}` },
 				})
-				.catch(() => {
-					setHistoryLoading(false)
-				})
+				if (resp.ok) {
+					const data: ChatResp = await resp.json()
+					setMessages(prev => [
+						...prev,
+						{ timestamp: timestamp, text: chatId, sender: SenderType.SYSTEM },
+						...data.messages,
+					])
+				}
+			} catch (error) {
+				console.error('Error fetching chat history:', error)
+			} finally {
+				setIsLoading(false)
+			}
 		}
-	}, [auth.user])
+
+		const fetchSessionHistory = async () => {
+			try {
+				const resp = await fetch(`${API_URL}/llm/chat/history/${id}`, {
+					method: 'GET',
+					headers: { Authorization: `Bearer ${auth.user?.accessToken}` },
+				})
+				if (resp.ok) {
+					const data: SessionHist[] = await resp.json()
+					data.sort(
+						(a: SessionHist, b: SessionHist) =>
+							new Date(a.last_message_time).getTime() -
+							new Date(b.last_message_time).getTime()
+					)
+					setSessions(data)
+					await Promise.all(
+						data.map(session =>
+							fetchChatHistory(session.chat_id, session.created_at)
+						)
+					)
+				}
+			} catch (error) {
+				console.error('Error fetching session history:', error)
+			} finally {
+				setHistoryLoading(false)
+			}
+		}
+
+		fetchSessionHistory()
+	}, [auth.user, id])
 
 	useEffect(() => {
 		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + id)
