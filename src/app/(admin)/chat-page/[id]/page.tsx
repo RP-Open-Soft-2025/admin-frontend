@@ -260,7 +260,7 @@ const ChatPage = () => {
         }`}
       >
         {/* Sidebar Content */}
-        <div className="h-full bg-[#0f172a] text-white flex flex-col">
+        <div className="h-full bg-white dark:bg-[#0f172a] dark:text-white flex flex-col">
           <div className="p-2 border-b border-gray-700 flex items-center">
             <h2 className="text-lg font-bold">Chat History</h2>
           </div>
@@ -291,9 +291,9 @@ const ChatPage = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex flex-col flex-grow overflow-hidden">
+      <div className="flex flex-col flex-grow overflow-hidden ">
         {/* Chat Header with Toggle Button */}
-        <div className="flex items-center p-2 bg-[#0f172a] border-b border-gray-700 text-white">
+        <div className="flex items-center p-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-700 dark:text-white">
           <button
             className="mr-3 text-gray-300 hover:text-white focus:outline-none"
             onClick={toggleSidebar}
@@ -308,10 +308,10 @@ const ChatPage = () => {
         {/* Chat Messages Container */}
         <div
           ref={messagesContainerRef}
-          className="flex-grow overflow-hidden bg-[#0f172a]"
+          className="flex-grow overflow-hidden bg-white dark:bg-gray-900"
         >
           <div
-            className="h-full overflow-y-auto flex flex-col space-y-2 p-3"
+            className="h-full overflow-y-auto flex flex-col space-y-2 p-3 "
           >
             {isLoading ? (
               <div className="flex justify-center items-center h-full">
@@ -330,20 +330,20 @@ const ChatPage = () => {
 
         {/* Chat Input */}
         {auth.user?.userRole == Role.HR && takeOver ? (
-          <div className="p-2 bg-[#162040] border-t border-gray-700">
+          <div className="p-2 bg-gray-100 dark:bg-gray-800 border-t border-gray-700">
             <div className="flex space-x-2">
               <input
                 type="text"
-                className="flex-grow p-2 rounded bg-[#1e293b] 
-                border border-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-white text-sm"
+                className="flex-grow p-2 rounded bg-white dark:bg-gray-700 
+						border dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white text-sm"
                 value={newMessage}
                 onChange={e => setNewMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
               />
               <button
-                className="px-3 py-2 bg-indigo-500 text-white rounded text-sm
-                hover:bg-indigo-600 transition-colors"
+                className="px-4 py-2 bg-indigo-500 text-white rounded 
+						hover:bg-indigo-600 transition-colors"
                 onClick={sendMessage}
               >
                 Send
@@ -351,10 +351,9 @@ const ChatPage = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700">
+          <div className="w-full bg-blue-100 dark:bg-blue-900 flex justify-center items-center py-4">
             <button
-              className="px-4 py-2 bg-[#1e293b] text-white rounded-md shadow-md text-sm
-              hover:bg-[#334155] transition-colors"
+              className="px-6 py-2 bg-white text-blue-500 rounded-md shadow-md dark:bg-gray-800 dark:text-blue-100 hover:bg-blue-50 dark:hover:bg-blue-600 transition-colors"
               onClick={() => initTakeOver()}
             >
               TakeOver
