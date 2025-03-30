@@ -1,6 +1,7 @@
 import store from '@/redux/store'
 import { API_URL } from '@/constants'
 import { CompanyData } from '@/types/employee'
+import { EmployeeAPI } from '@/types/UserProfile'
 
 // Define the API response type based on the backend structure
 export interface ProfileApiResponse {
@@ -91,7 +92,7 @@ export async function getProfileData(): Promise<ProfileApiResponse> {
 
 export async function getUserProfileData(
 	userId: string
-): Promise<ProfileApiResponse> {
+): Promise<EmployeeAPI> {
 	try {
 		// Use API_URL from constants
 		console.log('API URL:', API_URL) // Debug log
@@ -137,7 +138,7 @@ export async function getUserProfileData(
 			throw new Error(`Error fetching profile: ${response.statusText}`)
 		}
 
-		const data: ProfileApiResponse = await response.json()
+		const data: EmployeeAPI = await response.json()
 		console.log('Profile data received successfully') // Debug log
 		return data
 	} catch (error) {
@@ -147,7 +148,7 @@ export async function getUserProfileData(
 }
 
 // Function to transform API data into the format expected by UserMetaCard
-export function getUserMetaData(profileData: ProfileApiResponse) {
+export function getUserMetaData(profileData: EmployeeAPI) {
 	return {
 		name: profileData.name,
 		bio: profileData.role,
@@ -166,7 +167,7 @@ export function getUserMetaData(profileData: ProfileApiResponse) {
 }
 
 // Function to transform API data into the format expected by UserInfoCard
-export function getUserInfoData(profileData: ProfileApiResponse) {
+export function getUserInfoData(profileData: EmployeeAPI) {
 	const names = profileData.name.split(' ')
 	return {
 		firstName: names[0] || '',
@@ -184,7 +185,7 @@ export function getUserInfoData(profileData: ProfileApiResponse) {
 }
 
 // Function to transform API data into the format expected by UserVibeMeterCard
-export function getVibeMeterData(profileData: ProfileApiResponse) {
+export function getVibeMeterData(profileData: EmployeeAPI) {
 	console.log(
 		'Transforming VibeMeter data:',
 		profileData.company_data.vibemeter
@@ -193,13 +194,13 @@ export function getVibeMeterData(profileData: ProfileApiResponse) {
 }
 
 // Function to transform API data into the format expected by UserActivityCard
-export function getActivityData(profileData: ProfileApiResponse) {
+export function getActivityData(profileData: EmployeeAPI) {
 	console.log('Transforming Activity data:', profileData.company_data.activity)
 	return profileData.company_data.activity
 }
 
 // Function to transform API data into the format expected by UserLeaveCard
-export function getLeaveData(profileData: ProfileApiResponse) {
+export function getLeaveData(profileData: EmployeeAPI) {
 	console.log('Transforming Leave data:', profileData.company_data.leave)
 	return {
 		usedLeave: 0,
@@ -209,7 +210,7 @@ export function getLeaveData(profileData: ProfileApiResponse) {
 }
 
 // Function to transform API data into the format expected by UserPerformanceCard
-export function getPerformanceData(profileData: ProfileApiResponse) {
+export function getPerformanceData(profileData: EmployeeAPI) {
 	console.log(
 		'Transforming Performance data:',
 		profileData.company_data.performance
@@ -218,13 +219,13 @@ export function getPerformanceData(profileData: ProfileApiResponse) {
 }
 
 // Function to transform API data into the format expected by UserRewardsCard
-export function getRewardsData(profileData: ProfileApiResponse) {
+export function getRewardsData(profileData: EmployeeAPI) {
 	console.log('Transforming Rewards data:', profileData.company_data.rewards)
 	return profileData.company_data.rewards
 }
 
 // Function to transform API data into the format expected by UserOnboardingCard
-export function getOnboardingData(profileData: ProfileApiResponse) {
+export function getOnboardingData(profileData: EmployeeAPI) {
 	console.log(
 		'Transforming Onboarding data:',
 		profileData.company_data.onboarding

@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { Performance, ManagerFeedback } from '@/types/employee'
+import { Performance, ManagerFeedback } from '@/types/UserProfile'
 
 // Props interface
 interface UserPerformanceCardProps {
@@ -10,28 +10,28 @@ interface UserPerformanceCardProps {
 // Dummy data for development
 const dummyPerformanceData: Performance[] = [
 	{
-		reviewPeriod: '2023 Q1',
-		performanceRating: 4.2,
-		managerFeedback: ManagerFeedback.EXCEEDS_EXPECTATIONS,
-		promotionConsideration: false,
+		Review_Period: '2023 Q1',
+		Performance_Rating: 4.2,
+		Manager_Feedback: ManagerFeedback.EXCEEDS_EXPECTATIONS,
+		Promotion_Consideration: false,
 	},
 	{
-		reviewPeriod: '2023 Q2',
-		performanceRating: 4.5,
-		managerFeedback: ManagerFeedback.EXCEEDS_EXPECTATIONS,
-		promotionConsideration: true,
+		Review_Period: '2023 Q2',
+		Performance_Rating: 4.5,
+		Manager_Feedback: ManagerFeedback.EXCEEDS_EXPECTATIONS,
+		Promotion_Consideration: true,
 	},
 	{
-		reviewPeriod: '2023 Q3',
-		performanceRating: 3.8,
-		managerFeedback: ManagerFeedback.MEETS_EXPECTATIONS,
-		promotionConsideration: false,
+		Review_Period: '2023 Q3',
+		Performance_Rating: 3.8,
+		Manager_Feedback: ManagerFeedback.MEETS_EXPECTATIONS,
+		Promotion_Consideration: false,
 	},
 	{
-		reviewPeriod: '2023 Q4',
-		performanceRating: 4.7,
-		managerFeedback: ManagerFeedback.EXCEEDS_EXPECTATIONS,
-		promotionConsideration: true,
+		Review_Period: '2023 Q4',
+		Performance_Rating: 4.7,
+		Manager_Feedback: ManagerFeedback.EXCEEDS_EXPECTATIONS,
+		Promotion_Consideration: true,
 	},
 ]
 
@@ -63,7 +63,7 @@ export default function UserPerformanceCard({
 
 	// Calculate average rating
 	const averageRating =
-		displayData.reduce((total, perf) => total + perf.performanceRating, 0) /
+		displayData.reduce((total, perf) => total + perf.Performance_Rating, 0) /
 		displayData.length
 
 	return (
@@ -81,14 +81,14 @@ export default function UserPerformanceCard({
 							</p>
 							<div className="mt-2 flex items-end">
 								<p className="text-3xl font-bold text-gray-800 dark:text-white">
-									{latestPerformance.performanceRating.toFixed(1)}
+									{latestPerformance.Performance_Rating.toFixed(1)}
 								</p>
 								<p className="ml-1 mb-1 text-sm text-gray-500 dark:text-gray-400">
 									/5.0
 								</p>
 							</div>
 							<p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-								{latestPerformance.reviewPeriod}
+								{latestPerformance.Review_Period}
 							</p>
 						</div>
 
@@ -123,15 +123,15 @@ export default function UserPerformanceCard({
 								Manager Feedback
 							</p>
 							<p
-								className={`mt-2 text-base font-semibold ${getFeedbackColor(latestPerformance.managerFeedback)}`}
+								className={`mt-2 text-base font-semibold ${getFeedbackColor(latestPerformance.Manager_Feedback)}`}
 							>
-								{latestPerformance.managerFeedback}
+								{latestPerformance.Manager_Feedback}
 							</p>
 							<div className="mt-2">
 								<span
-									className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${latestPerformance.promotionConsideration ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+									className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${latestPerformance.Promotion_Consideration ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
 								>
-									{latestPerformance.promotionConsideration
+									{latestPerformance.Promotion_Consideration
 										? 'Promotion Considered'
 										: 'No Promotion'}
 								</span>
@@ -152,24 +152,24 @@ export default function UserPerformanceCard({
 									<div className="relative w-full">
 										<div
 											className={`w-full rounded-t-sm ${
-												performance.managerFeedback ===
+												performance.Manager_Feedback ===
 												ManagerFeedback.EXCEEDS_EXPECTATIONS
 													? 'bg-green-500 dark:bg-green-600'
-													: performance.managerFeedback ===
+													: performance.Manager_Feedback ===
 														  ManagerFeedback.MEETS_EXPECTATIONS
 														? 'bg-blue-500 dark:bg-blue-600'
 														: 'bg-amber-500 dark:bg-amber-600'
 											}`}
 											style={{
-												height: `${performance.performanceRating * 20}px`,
+												height: `${performance.Performance_Rating * 20}px`,
 											}}
 										></div>
 										<div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-700 dark:text-gray-300">
-											{performance.performanceRating.toFixed(1)}
+											{performance.Performance_Rating.toFixed(1)}
 										</div>
 									</div>
 									<span className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-										{performance.reviewPeriod}
+										{performance.Review_Period}
 									</span>
 								</div>
 							))}
