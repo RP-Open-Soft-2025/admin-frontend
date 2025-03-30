@@ -1,6 +1,6 @@
 'use client'
 
-import UserAddressCard from '@/components/user-profile/UserAddressCard'
+// import UserAddressCard from '@/components/user-profile/UserAddressCard'
 import UserInfoCard from '@/components/user-profile/UserInfoCard'
 import UserMetaCard from '@/components/user-profile/UserMetaCard'
 import UserActivityCard from '@/components/user-profile/UserActivityCard'
@@ -131,7 +131,7 @@ export default function Profile() {
 					<UserMetaCard userData={getUserMetaData(profileData)} />
 					<UserInfoCard userData={getUserInfoData(profileData)} />
 					{/* No address data in API response, but keeping component with dummy data */}
-					<UserAddressCard />
+					{/*<UserAddressCard />*/}
 
 					{/* Only render components with data */}
 					{profileData.company_data.onboarding.length > 0 && (

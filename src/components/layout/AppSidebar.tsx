@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
 	},
 
 	{
-		name: 'Add User',
+		name: 'Add Employee',
 		icon: <PlusCircle />,
 		path: '/form-layout',
 	},
