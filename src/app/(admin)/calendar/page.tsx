@@ -15,6 +15,7 @@ import {
 import { API_URL } from '@/constants'
 import { Meeting } from '@/types/meets'
 import { SessionType } from '@/types/sessions'
+import { useRouter } from 'next/navigation'
 
 interface CalendarEvent extends EventInput {
 	extendedProps: {
@@ -22,11 +23,14 @@ interface CalendarEvent extends EventInput {
 	}
 }
 
-const renderEventContent = (eventInfo: EventContentArg) => {
+const RenderEventContent = (eventInfo: EventContentArg) => {
 	const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`
+	const redirectUrl = eventInfo.event.extendedProps.redirectUrl;
+	const router = useRouter();
 	return (
 		<div
 			className={`event-fc-color flex fc-event-main ${colorClass} p-1 rounded-sm w-full`}
+			onClick={() => router.push(redirectUrl)}
 		>
 			<div className="fc-daygrid-event-dot"></div>
 			<div className="fc-event-time">{eventInfo.timeText}</div>
@@ -79,7 +83,7 @@ const Calendar: React.FC = () => {
 						title: ` meet at ${time}`,
 						start: meet.scheduled_at,
 						url: meet.meeting_link,
-						extendedProps: { calendar: 'primary' },
+						extendedProps: { calendar: 'primary', redirectUrl: meet.meeting_link },
 					}
 				})
 				const formattedEvents2 = data2.map((meet: SessionType) => {
@@ -89,7 +93,7 @@ const Calendar: React.FC = () => {
 						title: ` session at ${time}`,
 						start: meet.scheduled_at,
 						url: meet.employee_id,
-						extendedProps: { calendar: 'Success' },
+						extendedProps: { calendar: 'Success', redirectUrl: `/chat-page/${meet.chat_id}`},
 					}
 				})
 
@@ -166,7 +170,7 @@ const Calendar: React.FC = () => {
 					selectable={true}
 					select={handleDateSelect}
 					eventClick={handleEventClick}
-					eventContent={renderEventContent}
+					eventContent={RenderEventContent}
 					customButtons={{
 						addEventButton: {
 							text: 'Add Event +',
