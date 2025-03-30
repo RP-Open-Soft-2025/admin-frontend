@@ -21,7 +21,7 @@ export default function Page() {
 		(state: RootState) => state.auth.isAuthenticated
 	)
 	const error = useSelector((state: RootState) => state.auth.error)
-	console.log(error);
+	console.log(error)
 	// Check authentication status on component mount
 	useEffect(() => {
 		dispatch(checkAuth())
