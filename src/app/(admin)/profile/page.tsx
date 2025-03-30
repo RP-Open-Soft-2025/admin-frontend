@@ -12,7 +12,6 @@ import UserVibeMeterCard from '@/components/user-profile/UserVibeMeterCard'
 import React, { useEffect, useState } from 'react'
 import {
 	getProfileData,
-	ProfileApiResponse,
 	getUserMetaData,
 	getUserInfoData,
 	getVibeMeterData,
@@ -26,11 +25,10 @@ import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
+import { EmployeeAPI } from '@/types/UserProfile'
 
 export default function Profile() {
-	const [profileData, setProfileData] = useState<ProfileApiResponse | null>(
-		null
-	)
+	const [profileData, setProfileData] = useState<EmployeeAPI | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const router = useRouter()

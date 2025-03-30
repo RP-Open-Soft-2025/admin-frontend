@@ -79,7 +79,7 @@ export interface Reward {
 export interface VibeMeter {
 	Response_Date: string
 	Vibe_Score: number
-    emotionZone: EmotionZone
+	emotionZone: EmotionZone
 }
 
 export interface CompanyData {

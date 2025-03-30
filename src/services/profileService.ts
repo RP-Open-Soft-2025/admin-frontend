@@ -38,7 +38,7 @@ export interface ProfileApiResponse {
 }
 
 // Fetch profile data from the API
-export async function getProfileData(): Promise<ProfileApiResponse> {
+export async function getProfileData(): Promise<EmployeeAPI> {
 	try {
 		// Use API_URL from constants
 		console.log('API URL:', API_URL) // Debug log
@@ -81,7 +81,7 @@ export async function getProfileData(): Promise<ProfileApiResponse> {
 			throw new Error(`Error fetching profile: ${response.statusText}`)
 		}
 
-		const data: ProfileApiResponse = await response.json()
+		const data: EmployeeAPI = await response.json()
 		console.log('Profile data received successfully') // Debug log
 		return data
 	} catch (error) {
@@ -90,9 +90,7 @@ export async function getProfileData(): Promise<ProfileApiResponse> {
 	}
 }
 
-export async function getUserProfileData(
-	userId: string
-): Promise<EmployeeAPI> {
+export async function getUserProfileData(userId: string): Promise<EmployeeAPI> {
 	try {
 		// Use API_URL from constants
 		console.log('API URL:', API_URL) // Debug log
