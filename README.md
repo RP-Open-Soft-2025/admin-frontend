@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GC OpenSoft 2025 Admin Frontend
 
-## Getting Started
+A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Tailwind CSS. This project serves as the administrative interface for GC OpenSoft 2025.
 
-First, run the development server:
+## 📑 Table of Contents
+
+- [Features](#-features)
+- [Prerequisites](#️-prerequisites)
+- [Installation](#-installation)
+- [Development](#-development)
+- [Available Scripts](#-available-scripts)
+- [Project Structure](#️-project-structure)
+- [Configuration Files](#-configuration-files)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Acknowledgments](#-acknowledgments)
+
+## 🚀 Features
+
+- **Modern Tech Stack**
+  - Next.js 15 with App Router
+  - TypeScript for type safety
+  - Tailwind CSS for styling
+  - Redux Toolkit for state management
+  - FullCalendar for calendar functionality
+  - ApexCharts for data visualization
+  - React Dropzone for file uploads
+  - WebSocket support for real-time features
+
+- **UI Components**
+  - Radix UI components for accessible interfaces
+  - Heroicons for beautiful icons
+  - Lucide React for additional icon sets
+  - Sonner for toast notifications
+  - Dark mode support with next-themes
+
+## 🛠️ Prerequisites
+
+- Node.js (Latest LTS version recommended)
+- npm or yarn package manager
+
+## 📦 Installation
+
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd admin-frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+Create a `.env` file in the root directory with the following variables:
+```env
+NEXT_PUBLIC_API_URL=your_api_url
+```
+
+## 🚀 Development
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📝 Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build the application for production
+- `npm run start` - Start the production server
+- `npm run lint` - Run ESLint
+- `npm run format` - Check code formatting
+- `npm run format:fix` - Fix code formatting issues
 
-## Learn More
+## 🏗️ Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+admin-frontend/
+├── src/                    # Source code
+│   ├── app/               # Next.js app router pages
+│   ├── components/        # Reusable components
+│   ├── lib/              # Utility functions and configurations
+│   └── store/            # Redux store and slices
+├── public/               # Static assets
+└── ...config files       # Various configuration files
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔧 Configuration Files
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `next.config.ts` - Next.js configuration
+- `tsconfig.json` - TypeScript configuration
+- `tailwind.config.ts` - Tailwind CSS configuration
+- `eslint.config.mjs` - ESLint configuration
+- `.prettierrc.json` - Prettier configuration
 
-## Deploy on Vercel
+## 🤝 Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Next.js team for the amazing framework
+- All contributors and maintainers of the used libraries
