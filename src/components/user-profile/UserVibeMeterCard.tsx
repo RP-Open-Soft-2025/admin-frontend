@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { VibeMeter, EmotionZone } from '@/types/employee'
+import { VibeMeter, EmotionZone } from '@/types/UserProfile'
 
 // Props interface
 interface UserVibeMeterCardProps {
@@ -10,48 +10,48 @@ interface UserVibeMeterCardProps {
 // Dummy data for development
 const dummyVibeMeterData: VibeMeter[] = [
 	{
-		responseDate: '2023-01-05',
-		vibeScore: 85,
+		Response_Date: '2023-01-05',
+		Vibe_Score: 85,
 		emotionZone: EmotionZone.HAPPY,
 	},
 	{
-		responseDate: '2023-01-12',
-		vibeScore: 72,
+		Response_Date: '2023-01-12',
+		Vibe_Score: 72,
 		emotionZone: EmotionZone.LEANING_HAPPY,
 	},
 	{
-		responseDate: '2023-01-19',
-		vibeScore: 67,
+		Response_Date: '2023-01-19',
+		Vibe_Score: 67,
 		emotionZone: EmotionZone.LEANING_HAPPY,
 	},
 	{
-		responseDate: '2023-01-26',
-		vibeScore: 55,
+		Response_Date: '2023-01-26',
+		Vibe_Score: 55,
 		emotionZone: EmotionZone.NEUTRAL,
 	},
 	{
-		responseDate: '2023-02-02',
-		vibeScore: 45,
+		Response_Date: '2023-02-02',
+		Vibe_Score: 45,
 		emotionZone: EmotionZone.NEUTRAL,
 	},
 	{
-		responseDate: '2023-02-09',
-		vibeScore: 38,
+		Response_Date: '2023-02-09',
+		Vibe_Score: 38,
 		emotionZone: EmotionZone.LEANING_SAD,
 	},
 	{
-		responseDate: '2023-02-16',
-		vibeScore: 60,
+		Response_Date: '2023-02-16',
+		Vibe_Score: 60,
 		emotionZone: EmotionZone.NEUTRAL,
 	},
 	{
-		responseDate: '2023-02-23',
-		vibeScore: 78,
+		Response_Date: '2023-02-23',
+		Vibe_Score: 78,
 		emotionZone: EmotionZone.LEANING_HAPPY,
 	},
 	{
-		responseDate: '2023-03-02',
-		vibeScore: 92,
+		Response_Date: '2023-03-02',
+		Vibe_Score: 92,
 		emotionZone: EmotionZone.EXCITED,
 	},
 ]
@@ -137,7 +137,7 @@ export default function UserVibeMeterCard({
 								{latestVibe.emotionZone}
 							</p>
 							<p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-								Last updated: {formatDate(latestVibe.responseDate)}
+								Last updated: {formatDate(latestVibe.Response_Date)}
 							</p>
 						</div>
 
@@ -147,7 +147,7 @@ export default function UserVibeMeterCard({
 							</p>
 							<div className="flex items-end">
 								<p className="text-3xl font-bold text-gray-800 dark:text-white">
-									{latestVibe.vibeScore}
+									{latestVibe.Vibe_Score}
 								</p>
 								<p className="ml-1 mb-1 text-sm text-gray-500 dark:text-gray-400">
 									/100
@@ -156,7 +156,7 @@ export default function UserVibeMeterCard({
 							<div className="mt-2 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
 								<div
 									className={`h-2 rounded-full ${getEmotionBgColor(latestVibe.emotionZone)}`}
-									style={{ width: `${latestVibe.vibeScore}%` }}
+									style={{ width: `${latestVibe.Vibe_Score}%` }}
 								></div>
 							</div>
 						</div>
@@ -167,14 +167,14 @@ export default function UserVibeMeterCard({
 									Mood Trend
 								</p>
 								<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-									{latestVibe.vibeScore >
-									displayData[displayData.length - 2].vibeScore
+									{latestVibe.Vibe_Score >
+									displayData[displayData.length - 2].Vibe_Score
 										? 'Improving'
 										: 'Declining'}
 								</p>
 								<div className="mt-2 flex items-center">
-									{latestVibe.vibeScore >
-									displayData[displayData.length - 2].vibeScore ? (
+									{latestVibe.Vibe_Score >
+									displayData[displayData.length - 2].Vibe_Score ? (
 										<svg
 											className="h-5 w-5 text-green-500"
 											fill="currentColor"
@@ -201,15 +201,15 @@ export default function UserVibeMeterCard({
 									)}
 									<span
 										className={`ml-1 text-sm ${
-											latestVibe.vibeScore >
-											displayData[displayData.length - 2].vibeScore
+											latestVibe.Vibe_Score >
+											displayData[displayData.length - 2].Vibe_Score
 												? 'text-green-600 dark:text-green-400'
 												: 'text-red-600 dark:text-red-400'
 										}`}
 									>
 										{Math.abs(
-											latestVibe.vibeScore -
-												displayData[displayData.length - 2].vibeScore
+											latestVibe.Vibe_Score -
+												displayData[displayData.length - 2].Vibe_Score
 										)}
 										%
 									</span>
@@ -227,11 +227,11 @@ export default function UserVibeMeterCard({
 								<div key={index} className="flex flex-1 flex-col items-center">
 									<div
 										className={`w-full rounded-t-sm ${getEmotionBgColor(vibe.emotionZone)}`}
-										style={{ height: `${vibe.vibeScore * 0.35}px` }} // Scale to fit in container
+										style={{ height: `${vibe.Vibe_Score * 0.35}px` }} // Scale to fit in container
 									></div>
 									<div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-										{new Date(vibe.responseDate).getDate()}/
-										{new Date(vibe.responseDate).getMonth() + 1}
+										{new Date(vibe.Response_Date).getDate()}/
+										{new Date(vibe.Response_Date).getMonth() + 1}
 									</div>
 								</div>
 							))}

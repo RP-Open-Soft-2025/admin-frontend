@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { Onboarding, OnboardingFeedback } from '@/types/employee'
+import { Onboarding, OnboardingFeedback } from '@/types/UserProfile'
 
 // Props interface
 interface UserOnboardingCardProps {
@@ -9,10 +9,10 @@ interface UserOnboardingCardProps {
 
 // Dummy data for development
 const dummyOnboardingData: Onboarding = {
-	joiningDate: '2023-01-10',
-	onboardingFeedback: OnboardingFeedback.GOOD,
-	mentorAssigned: true,
-	initialTrainingCompleted: true,
+	Joining_Date: '2023-01-10',
+	Onboarding_Feedback: OnboardingFeedback.GOOD,
+	Mentor_Assigned: true,
+	Initial_Training_Completed: true,
 }
 
 // Helper function to format dates consistently
@@ -29,7 +29,7 @@ export default function UserOnboardingCard({
 
 	// Calculate days since joining
 	const daysSinceJoining = () => {
-		const joiningDate = new Date(displayData.joiningDate)
+		const joiningDate = new Date(displayData.Joining_Date)
 		const today = new Date()
 		const diffTime = Math.abs(today.getTime() - joiningDate.getTime())
 		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
@@ -40,10 +40,10 @@ export default function UserOnboardingCard({
 	const onboardingSteps = [
 		{ label: 'Documentation Completed', completed: true },
 		{ label: 'Access Granted', completed: true },
-		{ label: 'Mentor Assigned', completed: displayData.mentorAssigned },
+		{ label: 'Mentor Assigned', completed: displayData.Mentor_Assigned },
 		{
 			label: 'Initial Training',
-			completed: displayData.initialTrainingCompleted,
+			completed: displayData.Initial_Training_Completed,
 		},
 		{ label: 'Team Introduction', completed: true },
 		{ label: '30-Day Review', completed: daysSinceJoining() > 30 },
@@ -82,7 +82,7 @@ export default function UserOnboardingCard({
 								Joining Date
 							</p>
 							<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-								{formatDate(displayData.joiningDate)}
+								{formatDate(displayData.Joining_Date)}
 							</p>
 							<p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
 								{daysSinceJoining()} days ago
@@ -95,10 +95,10 @@ export default function UserOnboardingCard({
 							</p>
 							<div className="mt-2 flex items-center">
 								<div
-									className={`h-3 w-3 rounded-full ${getFeedbackColor(displayData.onboardingFeedback)}`}
+									className={`h-3 w-3 rounded-full ${getFeedbackColor(displayData.Onboarding_Feedback)}`}
 								></div>
 								<p className="ml-2 text-base font-medium text-gray-800 dark:text-white/90">
-									{displayData.onboardingFeedback}
+									{displayData.Onboarding_Feedback}
 								</p>
 							</div>
 						</div>

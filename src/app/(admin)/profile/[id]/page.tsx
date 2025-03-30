@@ -1,6 +1,6 @@
 'use client'
 
-import UserAddressCard from '@/components/user-profile/UserAddressCard'
+// import UserAddressCard from '@/components/user-profile/UserAddressCard'
 import UserInfoCard from '@/components/user-profile/UserInfoCard'
 import UserMetaCard from '@/components/user-profile/UserMetaCard'
 import UserActivityCard from '@/components/user-profile/UserActivityCard'
@@ -12,7 +12,6 @@ import UserVibeMeterCard from '@/components/user-profile/UserVibeMeterCard'
 import React, { useEffect, useState } from 'react'
 import {
 	getUserProfileData,
-	ProfileApiResponse,
 	getUserMetaData,
 	getUserInfoData,
 	getVibeMeterData,
@@ -26,11 +25,10 @@ import { useParams, useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
+import { EmployeeAPI } from '@/types/UserProfile'
 
 export default function Profile() {
-	const [profileData, setProfileData] = useState<ProfileApiResponse | null>(
-		null
-	)
+	const [profileData, setProfileData] = useState<EmployeeAPI | null>()
 	const params = useParams()
 	const id = params.id as string
 	const [loading, setLoading] = useState(true)
@@ -48,7 +46,7 @@ export default function Profile() {
 
 		async function fetchProfileData() {
 			try {
-				const data = await getUserProfileData(id)
+				const data:EmployeeAPI = await getUserProfileData(id)
 				setProfileData(data)
 				setLoading(false)
 
@@ -133,7 +131,7 @@ export default function Profile() {
 					<UserMetaCard userData={getUserMetaData(profileData)} />
 					<UserInfoCard userData={getUserInfoData(profileData)} />
 					{/* No address data in API response, but keeping component with dummy data */}
-					<UserAddressCard />
+					{/* <UserAddressCard /> */}
 
 					{/* Only render components with data */}
 					{profileData.company_data.onboarding.length > 0 && (
