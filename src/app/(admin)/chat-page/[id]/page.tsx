@@ -74,7 +74,7 @@ const MessageComp = ({ message }: { message: MessageResp }) => {
 						</span>
 					</div>
 				)}
-				<p className="text-sm font-medium text-center">
+				<p className="text-sm font-medium text-left">
 					{sender == SenderType.SYSTEM ? `Chat ID: ${text}` : text}
 				</p>
 			</div>
