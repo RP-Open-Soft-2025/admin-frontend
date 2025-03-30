@@ -6,14 +6,33 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { useModal } from '@/hooks/useModal'
 import store from '@/redux/store'
-import { EventInput, DateSelectArg, EventClickArg } from '@fullcalendar/core'
+import {
+	EventInput,
+	DateSelectArg,
+	EventClickArg,
+	EventContentArg,
+} from '@fullcalendar/core'
 import { API_URL } from '@/constants'
 import { Meeting } from '@/types/meets'
+import { SessionType } from '@/types/sessions'
 
 interface CalendarEvent extends EventInput {
 	extendedProps: {
 		calendar: string
 	}
+}
+
+const renderEventContent = (eventInfo: EventContentArg) => {
+	const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`
+	return (
+		<div
+			className={`event-fc-color flex fc-event-main ${colorClass} p-1 rounded-sm w-full`}
+		>
+			<div className="fc-daygrid-event-dot"></div>
+			<div className="fc-event-time">{eventInfo.timeText}</div>
+			<div className="fc-event-title">{eventInfo.event.title}</div>
+		</div>
+	)
 }
 
 const Calendar: React.FC = () => {
@@ -37,23 +56,46 @@ const Calendar: React.FC = () => {
 		const fetchMeetings = async () => {
 			if (!auth.user || !auth.user.accessToken) return
 			try {
-				const response = await fetch(`${API_URL}/${auth.user.userRole}/meets`, {
-					headers: {
-						Authorization: `Bearer ${auth.user.accessToken}`,
-					},
-				})
-				const data = await response.json()
-				const formattedEvents = data.map((meet: Meeting) => {
+				const response1 = await fetch(
+					`${API_URL}/${auth.user.userRole}/meets`,
+					{
+						headers: {
+							Authorization: `Bearer ${auth.user.accessToken}`,
+						},
+					}
+				)
+				const response2 = await fetch(
+					`${API_URL}/${auth.user.userRole}/sessions`,
+					{
+						headers: {
+							Authorization: `Bearer ${auth.user.accessToken}`,
+						},
+					}
+				)
+				const data1 = await response1.json()
+				const data2 = await response2.json()
+				const formattedEvents1 = data1.map((meet: Meeting) => {
 					const time = meet.scheduled_at.split('T')[1].split('+')[0].trim()
 					return {
 						id: meet.meet_id,
-						title: ` Meeting at ${time}`,
+						title: ` meet at ${time}`,
 						start: meet.scheduled_at,
 						url: meet.meeting_link,
 						extendedProps: { calendar: 'Success' },
 					}
 				})
-				setEvents(formattedEvents)
+				const formattedEvents2 = data2.map((meet: SessionType) => {
+					const time = meet.scheduled_at.split('T')[1].split('+')[0].trim()
+					return {
+						id: meet.session_id,
+						title: ` session at ${time}`,
+						start: meet.scheduled_at,
+						url: meet.employee_id,
+						extendedProps: { calendar: 'Success' },
+					}
+				})
+
+				setEvents([...formattedEvents1, ...formattedEvents2])
 			} catch (error) {
 				console.error('Error fetching meetings:', error)
 			}
@@ -126,9 +168,7 @@ const Calendar: React.FC = () => {
 					selectable={true}
 					select={handleDateSelect}
 					eventClick={handleEventClick}
-					eventContent={eventInfo => {
-						return <b>{eventInfo.event.title}</b>
-					}}
+					eventContent={renderEventContent}
 					customButtons={{
 						addEventButton: {
 							text: 'Add Event +',
