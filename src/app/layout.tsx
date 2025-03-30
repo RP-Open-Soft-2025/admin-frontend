@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<title>Admin Portal - Employee AI</title>
+			<title>Admin - Vibemeter</title>
 			<body className={`${outfit.variable} dark:bg-gray-900`}>
 				<ThemeProvider>
 					<StateProvider>
