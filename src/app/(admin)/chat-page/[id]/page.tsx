@@ -7,16 +7,16 @@ import store from '@/redux/store'
 import { Role } from '@/types/employee'
 
 type SessionHist = {
-	chat_id: string;
-	last_message: string;
-	last_message_time: string; // ISO timestamp
-	unread_count: number;
-	total_messages: number;
-	chat_mode: "BOT" | "HUMAN"; // Assuming only these two modes
-	is_escalated: boolean;
-	created_at: string; // ISO timestamp
-  };
-  
+	chat_id: string
+	last_message: string
+	last_message_time: string // ISO timestamp
+	unread_count: number
+	total_messages: number
+	chat_mode: 'BOT' | 'HUMAN' // Assuming only these two modes
+	is_escalated: boolean
+	created_at: string // ISO timestamp
+}
+
 const MessageComp = ({ message }: { message: MessageResp }) => {
 	const { sender, text, timestamp } = message
 
@@ -105,7 +105,6 @@ const ChatHistoryItem = ({
 	)
 }
 
-
 const ChatPage = () => {
 	const params = useParams()
 	const id = params.id as string
@@ -177,9 +176,9 @@ const ChatPage = () => {
 				.then(resp => {
 					if (resp.ok) {
 						return resp.json().then((data: SessionHist[]) => {
-							setSessions(data);
-							setHistoryLoading(false);
-							console.log(data);
+							setSessions(data)
+							setHistoryLoading(false)
+							console.log(data)
 						})
 					}
 				})
@@ -274,7 +273,9 @@ const ChatPage = () => {
 				{/* Sidebar Content */}
 				<div className="h-full dark:bg-[#0f172a] text-white flex flex-col bg-white">
 					<div className="p-2 border-b border-gray-700 flex items-center">
-						<h2 className="text-lg font-bold dark:text-white text-gray-900 items-center flex justify-center">Chat History</h2>
+						<h2 className="text-lg font-bold dark:text-white text-gray-900 items-center flex justify-center">
+							Chat History
+						</h2>
 					</div>
 
 					<div className="overflow-y-auto flex-grow">
