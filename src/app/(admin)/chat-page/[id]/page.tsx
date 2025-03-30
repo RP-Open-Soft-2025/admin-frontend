@@ -183,11 +183,18 @@ const ChatPage = () => {
 				})
 				if (resp.ok) {
 					const data: SessionHist[] = await resp.json()
-					data.sort(
-						(a: SessionHist, b: SessionHist) =>
+					data.sort((a: SessionHist, b: SessionHist) => {
+						if (a.last_message_time === null) {
+							return 1
+						}
+						if (b.last_message_time === null) {
+							return -1
+						}
+						return (
 							new Date(a.last_message_time).getTime() -
 							new Date(b.last_message_time).getTime()
-					)
+						)
+					})
 					setSessions(data)
 					await Promise.all(
 						data.map(session =>
