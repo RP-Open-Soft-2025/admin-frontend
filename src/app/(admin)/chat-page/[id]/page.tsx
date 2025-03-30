@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
-import { Chat, ChatResp, Message, MessageResp, SenderType } from '@/types/chat'
+import { ChatResp, MessageResp, SenderType } from '@/types/chat'
 import { API_URL, WS_URL } from '@/constants'
 import store from '@/redux/store'
 import { Role } from '@/types/employee'
