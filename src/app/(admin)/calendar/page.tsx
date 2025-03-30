@@ -46,10 +46,8 @@ const Calendar: React.FC = () => {
 	const { auth } = store.getState()
 
 	const calendarsEvents = {
-		Danger: 'danger',
-		Success: 'success',
-		Primary: 'primary',
-		Warning: 'warning',
+		Session: 'success',
+		Meeting: 'primary',
 	}
 
 	useEffect(() => {
@@ -81,7 +79,7 @@ const Calendar: React.FC = () => {
 						title: ` meet at ${time}`,
 						start: meet.scheduled_at,
 						url: meet.meeting_link,
-						extendedProps: { calendar: 'Success' },
+						extendedProps: { calendar: 'primary' },
 					}
 				})
 				const formattedEvents2 = data2.map((meet: SessionType) => {

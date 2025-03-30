@@ -18,6 +18,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
+			<title>Admin Portal - Employee AI</title>
 			<body className={`${outfit.variable} dark:bg-gray-900`}>
 				<ThemeProvider>
 					<StateProvider>
