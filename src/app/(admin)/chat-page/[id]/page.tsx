@@ -103,7 +103,9 @@ const ChatHistoryItem = ({
 					{chat.chat_id}
 				</h3>
 				<span className="text-xs dark:text-gray-400 text-gray-600">
-					{new Date(chat.last_message_time).toLocaleDateString()}
+					{chat.last_message_time
+						? new Date(chat.last_message_time).toLocaleDateString()
+						: new Date(chat.created_at).toLocaleDateString()}
 				</span>
 			</div>
 			{chat.last_message && (
