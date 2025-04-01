@@ -77,7 +77,7 @@ const AppHeader: React.FC = () => {
 					{/* Desktop layout */}
 					<div className="hidden lg:flex lg:flex-1 lg:justify-between lg:items-center">
 						<div className="relative">
-							<form>
+							{/* <form>
 								<div className="relative">
 									<span className="absolute -translate-y-1/2 left-4 top-1/2 pointer-events-none">
 										<svg
@@ -108,7 +108,7 @@ const AppHeader: React.FC = () => {
 										<span> K </span>
 									</button>
 								</div>
-							</form>
+							</form> */}
 						</div>
 
 						{/* Desktop user dropdown */}

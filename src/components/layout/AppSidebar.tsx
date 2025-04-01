@@ -40,12 +40,6 @@ const navItems: NavItem[] = [
 		path: '/calendar',
 	},
 	{
-		icon: <UserCircleIcon />,
-		name: 'User Profile',
-		path: '/profile',
-	},
-
-	{
 		name: 'Add Employee',
 		icon: <PlusCircle />,
 		path: '/form-layout',
