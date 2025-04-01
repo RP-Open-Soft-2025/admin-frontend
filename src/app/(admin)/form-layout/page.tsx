@@ -103,6 +103,17 @@ export default function FormLayout() {
 			return
 		}
 
+		setFormData({
+			...formData,
+			password: [...Array(16)]
+				.map(
+					() =>
+						'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+'[
+							Math.floor(Math.random() * 72)
+						]
+				)
+				.join(''),
+		})
 		try {
 			const { auth } = store.getState()
 			const response = await fetch(`${API_URL}/admin/create-user`, {
@@ -237,7 +248,7 @@ export default function FormLayout() {
 							</div>
 
 							{/* Password Field */}
-							<div>
+							{/* <div>
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 									Password*
 								</label>
@@ -260,7 +271,7 @@ export default function FormLayout() {
 										{errors.password}
 									</p>
 								)}
-							</div>
+							</div> */}
 
 							{/* Role Field */}
 							<div>
