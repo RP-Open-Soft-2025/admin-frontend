@@ -103,7 +103,9 @@ const ChatHistoryItem = ({
 					{chat.chat_id}
 				</h3>
 				<span className="text-xs dark:text-gray-400 text-gray-600">
-					{new Date(chat.last_message_time).toLocaleDateString()}
+					{chat.last_message_time
+						? new Date(chat.last_message_time).toLocaleDateString()
+						: new Date(chat.created_at).toLocaleDateString()}
 				</span>
 			</div>
 			{chat.last_message && (
@@ -172,6 +174,7 @@ const ChatPage = () => {
 				console.error('Error fetching chat history:', error)
 			} finally {
 				setIsLoading(false)
+				setHistoryLoading(false)
 			}
 		}
 
@@ -204,9 +207,9 @@ const ChatPage = () => {
 				}
 			} catch (error) {
 				console.error('Error fetching session history:', error)
-			} finally {
-				setHistoryLoading(false)
 			}
+			setHistoryLoading(false)
+			setIsLoading(false)
 		}
 
 		fetchSessionHistory()
@@ -369,9 +372,15 @@ const ChatPage = () => {
 							</div>
 						) : (
 							<>
-								{messages.map((message, index) => (
-									<MessageComp key={index} message={message} />
-								))}
+								{messages.length > 0 ? (
+									messages.map((message, index) => (
+										<MessageComp key={index} message={message} />
+									))
+								) : (
+									<p className="text-center p-2 dark:text-gray-400 text-sm text-gray-700">
+										No chat history messages found
+									</p>
+								)}
 								<div ref={chatEndRef} className="h-1" />
 							</>
 						)}

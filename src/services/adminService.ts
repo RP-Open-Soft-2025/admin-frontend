@@ -11,6 +11,7 @@ export interface User {
 	manager_id?: string
 	is_blocked: boolean
 	created_at: string
+	lastPing: string
 }
 
 export interface HRUser {
