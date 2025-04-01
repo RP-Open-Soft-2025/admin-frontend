@@ -116,12 +116,13 @@ const Calendar: React.FC = () => {
 	}
 
 	const handleEventClick = (clickInfo: EventClickArg) => {
-		const event = clickInfo.event
-		setSelectedEvent(event as unknown as CalendarEvent)
-		setEventTitle(event.title.replace(/\d{1,2}\.\d{2}[ap]\s?/, ''))
-		setEventStartDate(event.start?.toISOString().split('T')[0] || '')
-		setEventLevel(event.extendedProps.calendar)
-		openModal()
+		// const event = clickInfo.event
+		// setSelectedEvent(event as unknown as CalendarEvent)
+		// setEventTitle(event.title.replace(/\d{1,2}\.\d{2}[ap]\s?/, ''))
+		// setEventStartDate(event.start?.toISOString().split('T')[0] || '')
+		// setEventLevel(event.extendedProps.calendar)
+		// openModal()
+		console.log(clickInfo)
 	}
 
 	const handleAddOrUpdateEvent = () => {
