@@ -150,6 +150,7 @@ export function getUserMetaData(profileData: EmployeeAPI) {
 	return {
 		name: profileData.name,
 		bio: profileData.role,
+		email: profileData.email,
 		location: {
 			city: '',
 			country: '',

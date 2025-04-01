@@ -38,19 +38,19 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 }
 
 const Calendar: React.FC = () => {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [eventTitle, setEventTitle] = useState('')
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [eventStartDate, setEventStartDate] = useState('')
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [eventLevel, setEventLevel] = useState('')
 	const [events, setEvents] = useState<CalendarEvent[]>([])
 	const calendarRef = useRef<FullCalendar>(null)
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { isOpen, openModal, closeModal } = useModal()
 	const { auth } = store.getState()
-
-	const calendarsEvents = {
-		Session: 'success',
-		Meeting: 'primary',
-	}
 
 	useEffect(() => {
 		const fetchMeetings = async () => {
@@ -116,39 +116,13 @@ const Calendar: React.FC = () => {
 	}
 
 	const handleEventClick = (clickInfo: EventClickArg) => {
-		const event = clickInfo.event
-		setSelectedEvent(event as unknown as CalendarEvent)
-		setEventTitle(event.title.replace(/\d{1,2}\.\d{2}[ap]\s?/, ''))
-		setEventStartDate(event.start?.toISOString().split('T')[0] || '')
-		setEventLevel(event.extendedProps.calendar)
-		openModal()
-	}
-
-	const handleAddOrUpdateEvent = () => {
-		if (selectedEvent) {
-			setEvents(prevEvents =>
-				prevEvents.map(event =>
-					event.id === selectedEvent.id
-						? {
-								...event,
-								title: eventTitle,
-								start: eventStartDate,
-								extendedProps: { calendar: eventLevel },
-							}
-						: event
-				)
-			)
-		} else {
-			const newEvent: CalendarEvent = {
-				title: eventTitle,
-				start: eventStartDate,
-				allDay: true,
-				extendedProps: { calendar: eventLevel },
-			}
-			setEvents(prevEvents => [...prevEvents, newEvent])
-		}
-		closeModal()
-		resetModalFields()
+		// const event = clickInfo.event
+		// setSelectedEvent(event as unknown as CalendarEvent)
+		// setEventTitle(event.title.replace(/\d{1,2}\.\d{2}[ap]\s?/, ''))
+		// setEventStartDate(event.start?.toISOString().split('T')[0] || '')
+		// setEventLevel(event.extendedProps.calendar)
+		// openModal()
+		console.log(clickInfo)
 	}
 
 	const resetModalFields = () => {
@@ -175,93 +149,10 @@ const Calendar: React.FC = () => {
 					select={handleDateSelect}
 					eventClick={handleEventClick}
 					eventContent={RenderEventContent}
-					customButtons={{
-						addEventButton: {
-							text: 'Add Event +',
-							click: () => openModal(),
-						},
-					}}
 				/>
 			</div>
 
 			{/* MODAL FOR ADDING/EDITING EVENTS */}
-			{isOpen && (
-				<div className="fixed inset-0 flex items-center justify-center z-50">
-					<div className="bg-white rounded-lg p-6 w-96 shadow-lg relative">
-						{/* Close Button (X) */}
-						<button
-							onClick={closeModal}
-							className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-						>
-							✖
-						</button>
-
-						<h2 className="text-2xl font-semibold text-black">Add Event</h2>
-						<p className="text-gray-500">Plan your next big moment.</p>
-
-						{/* Event Title */}
-						<input
-							type="text"
-							placeholder="Event Title"
-							value={eventTitle}
-							onChange={e => setEventTitle(e.target.value)}
-							className="w-full mt-4 p-2 border rounded-md text-black"
-						/>
-
-						{/* Event Color Options */}
-						<div className="mt-4">
-							<span className="font-semibold text-black">Event Color</span>
-							<div className="flex gap-3 mt-2">
-								{Object.keys(calendarsEvents).map(color => (
-									<label
-										key={color}
-										className="flex items-center gap-1 text-black"
-									>
-										<input
-											type="radio"
-											name="color"
-											value={color}
-											checked={eventLevel === color}
-											onChange={() => setEventLevel(color)}
-											className="accent-blue-500"
-										/>
-										{color}
-									</label>
-								))}
-							</div>
-						</div>
-
-						{/* Date Inputs */}
-						<div className="mt-4">
-							<label className="block font-semibold text-black">
-								Enter Start Date
-							</label>
-							<input
-								type="date"
-								value={eventStartDate}
-								onChange={e => setEventStartDate(e.target.value)}
-								className="w-full p-2 border rounded-md text-black"
-							/>
-						</div>
-
-						{/* Buttons */}
-						<div className="flex justify-end gap-3 mt-6">
-							<button
-								onClick={closeModal}
-								className="px-4 py-2 border rounded-md hover:bg-gray-200"
-							>
-								Close
-							</button>
-							<button
-								onClick={handleAddOrUpdateEvent}
-								className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-							>
-								Add Event
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
 		</div>
 	)
 }

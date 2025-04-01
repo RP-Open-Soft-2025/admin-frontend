@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { API_URL } from '@/constants'
 import { Role } from '@/types/employee'
 import store from '@/redux/store'
+import { toast } from '@/components/ui/sonner'
 
 interface FormErrors {
 	employee_id?: string
@@ -25,15 +26,6 @@ export default function FormLayout() {
 	})
 	const [errors, setErrors] = useState<FormErrors>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [toast, setToast] = useState<{
-		show: boolean
-		message: string
-		type: 'success' | 'error'
-	}>({
-		show: false,
-		message: '',
-		type: 'success',
-	})
 
 	// Add ref to first input
 	const employeeIdRef = useRef<HTMLInputElement>(null)
@@ -125,26 +117,22 @@ export default function FormLayout() {
 			const errorData = await response.json()
 
 			if (response.ok) {
-				setToast({
-					show: true,
-					message: 'User created successfully',
-					type: 'success',
+				toast({
+					type: 'error',
+					description: errorData,
 				})
 				resetForm()
-				setTimeout(() => setToast(prev => ({ ...prev, show: false })), 3000)
 			} else {
-				setToast({
-					show: true,
-					message: errorData.message || 'Failed to create user',
+				toast({
 					type: 'error',
+					description: errorData,
 				})
 			}
 		} catch (error) {
 			console.error('Error creating user:', error)
-			setToast({
-				show: true,
-				message: 'Failed to create user. Please try again.',
+			toast({
 				type: 'error',
+				description: 'Failed to create user, contact system admins',
 			})
 		} finally {
 			setIsSubmitting(false)
@@ -382,15 +370,6 @@ export default function FormLayout() {
 					</form>
 				</div>
 			</div>
-			{toast.show && (
-				<div
-					className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
-						toast.type === 'success' ? 'bg-success-500' : 'bg-error-500'
-					} text-white transition-opacity`}
-				>
-					{toast.message}
-				</div>
-			)}
 		</div>
 	)
 }
