@@ -103,17 +103,6 @@ export default function FormLayout() {
 			return
 		}
 
-		setFormData({
-			...formData,
-			password: [...Array(16)]
-				.map(
-					() =>
-						'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+'[
-							Math.floor(Math.random() * 72)
-						]
-				)
-				.join(''),
-		})
 		try {
 			const { auth } = store.getState()
 			const response = await fetch(`${API_URL}/admin/create-user`, {
