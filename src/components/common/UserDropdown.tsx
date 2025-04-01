@@ -8,9 +8,8 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDispatch } from 'react-redux'
-import { User, LogOut, ChevronDown } from 'lucide-react'
+import { LogOut, ChevronDown } from 'lucide-react'
 import { logout } from '@/redux/features/auth'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getProfileData } from '@/services/profileService'
 import store from '@/redux/store'

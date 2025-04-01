@@ -12,7 +12,6 @@ import {
 	LogOut,
 	MessageSquare,
 	PlusCircle,
-	UserCircleIcon,
 	Users,
 	Video,
 } from 'lucide-react'

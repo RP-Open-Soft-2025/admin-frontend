@@ -1,10 +1,11 @@
 'use client'
 import PageBreadcrumb from '@/components/common/PageBreadCrumb'
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { API_URL } from '@/constants'
 import { Role } from '@/types/employee'
 import store from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
+import Select from 'react-select'
 
 interface FormErrors {
 	employee_id?: string
@@ -15,7 +16,20 @@ interface FormErrors {
 	manager_id?: string
 }
 
+interface LocalHR {
+	currentAssignedUsers: number
+	hrId: string
+	name: string
+}
+
+interface HRResponse {
+	hrs: LocalHR[]
+}
+
 export default function FormLayout() {
+	const [hrsGot, setHrs] = useState<LocalHR[]>([])
+	const [filterHR, setFilterHR] = useState<LocalHR[]>([])
+	const [currSel, SetCurrSel] = useState<string>('')
 	const [formData, setFormData] = useState({
 		employee_id: '',
 		name: '',
@@ -151,6 +165,36 @@ export default function FormLayout() {
 		setErrors({})
 	}
 
+	useEffect(() => {
+		const { auth } = store.getState()
+		fetch(`${API_URL}/admin/list-hr`, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${auth.user?.accessToken}`,
+			},
+		}).then(resp => {
+			if (resp.ok) {
+				resp.json().then((res: HRResponse) => {
+					setHrs(res.hrs)
+					setFilterHR(res.hrs)
+				})
+			}
+		})
+	}, [])
+
+	useEffect(() => {
+		if (currSel) {
+			setFilterHR(
+				hrsGot.filter(
+					(res: LocalHR) =>
+						res.hrId && res.hrId.toLowerCase().includes(currSel.toLowerCase())
+				)
+			)
+		} else {
+			setFilterHR(hrsGot) // Optional: You can clear the filter when currSel is empty.
+		}
+	}, [currSel, hrsGot])
+
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-900">
 			<PageBreadcrumb pageTitle="Add New User" />
@@ -236,32 +280,6 @@ export default function FormLayout() {
 								)}
 							</div>
 
-							{/* Password Field */}
-							{/* <div>
-								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-									Password*
-								</label>
-								<input
-									type="password"
-									placeholder="Enter password"
-									value={formData.password}
-									onChange={e =>
-										setFormData({ ...formData, password: e.target.value })
-									}
-									className={`w-full p-3 bg-white dark:bg-gray-900 border ${
-										errors.password
-											? 'border-error-500'
-											: 'border-gray-200 dark:border-gray-700'
-									} rounded-lg text-gray-900 dark:text-white/90 placeholder-gray-500 dark:placeholder-gray-400
-									focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:focus:border-brand-500 transition`}
-								/>
-								{errors.password && (
-									<p className="mt-1 text-sm text-error-500">
-										{errors.password}
-									</p>
-								)}
-							</div> */}
-
 							{/* Role Field */}
 							<div>
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -290,30 +308,18 @@ export default function FormLayout() {
 
 							{/* Manager ID Field - Only shown if role is Employee */}
 							{formData.role === Role.EMPLOYEE && (
-								<div>
-									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-										Manager ID*
-									</label>
-									<input
-										type="text"
-										placeholder="Enter manager ID"
-										value={formData.manager_id}
-										onChange={e =>
-											setFormData({ ...formData, manager_id: e.target.value })
-										}
-										className={`w-full p-3 bg-white dark:bg-gray-900 border ${
-											errors.manager_id
-												? 'border-error-500'
-												: 'border-gray-200 dark:border-gray-700'
-										} rounded-lg text-gray-900 dark:text-white/90 placeholder-gray-500 dark:placeholder-gray-400
-										focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:focus:border-brand-500 transition`}
-									/>
-									{errors.manager_id && (
-										<p className="mt-1 text-sm text-error-500">
-											{errors.manager_id}
-										</p>
-									)}
-								</div>
+								<Select
+									isSearchable
+									options={filterHR.map((hr: LocalHR) => ({
+										value: hr.hrId,
+										label: `${hr.hrId}`,
+									}))}
+									onChange={e => {
+										setFormData({ ...formData, manager_id: e!.value })
+										SetCurrSel(e!.value)
+									}}
+									className="dark:bg-gray-900 bg-white"
+								/>
 							)}
 
 							<div className="col-span-full pt-4 flex gap-4">
