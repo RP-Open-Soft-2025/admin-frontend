@@ -3,19 +3,40 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from '@/components/ui/sonner'
 import { SubmitButton } from '@/components/auth-form/button'
-import DeloitteLogo from '../../login/deloitte-logo.svg' // Adjust path for the nested folder structure
+import DeloitteLogo from '../../login/deloitte-logo.png' // Adjust path for the nested folder structure
+import { API_URL } from '@/constants'
 
 // Use environment variable for API URL with fallback
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
 export default function ResetPasswordPage() {
 	const router = useRouter()
 	const params = useParams()
 	const token = params.token as string
 	const [isSuccessful, setIsSuccessful] = useState(false)
+	const [isLoad, setIsLoad] = useState<boolean>(true)
+
+	useEffect(() => {
+		fetch(`${API_URL}/auth/admin/validate-reset-token/${token}`).then(resp => {
+			if (resp.status == 404) {
+				toast({
+					type: 'error',
+					description: 'Reset token is not valid',
+				})
+				router.push('/login')
+			} else if (resp.status == 410) {
+				toast({
+					type: 'error',
+					description: 'Reset token is expired',
+				})
+				router.push('/login')
+			}
+
+			setIsLoad(false)
+		})
+	}, [])
 
 	const handleSubmit = async (formData: FormData) => {
 		const password = formData.get('password') as string
@@ -85,7 +106,7 @@ export default function ResetPasswordPage() {
 		}
 	}
 
-	return (
+	return !isLoad ? (
 		<div className="w-full h-screen md:min-h-screen flex flex-col md:flex-row">
 			{/* Left Section (Green) */}
 			<div className="h-[50vh] md:h-auto w-full md:w-1/2 flex items-center justify-center bg-[#66872B] dark:bg-[#334016] relative">
@@ -119,7 +140,7 @@ export default function ResetPasswordPage() {
 								<input
 									id="password"
 									name="password"
-									className="bg-muted text-md md:text-sm p-2 rounded-md border border-gray-300 dark:border-gray-700"
+									className="bg-muted text-md md:text-sm p-2 rounded-md border border-gray-300 dark:border-gray-700 dark:text-white"
 									type="password"
 									placeholder="Enter new password"
 									required
@@ -137,7 +158,7 @@ export default function ResetPasswordPage() {
 								<input
 									id="confirm_password"
 									name="confirm_password"
-									className="bg-muted text-md md:text-sm p-2 rounded-md border border-gray-300 dark:border-gray-700"
+									className="bg-muted text-md md:text-sm p-2 rounded-md border border-gray-300 dark:border-gray-700 dark:text-white"
 									type="password"
 									placeholder="Confirm new password"
 									required
@@ -160,6 +181,10 @@ export default function ResetPasswordPage() {
 					</div>
 				</div>
 			</div>
+		</div>
+	) : (
+		<div className="flex justify-center items-center h-full">
+			<div className="animate-spin rounded-full h-10 w-10 border-t-3 border-indigo-500"></div>
 		</div>
 	)
 }
