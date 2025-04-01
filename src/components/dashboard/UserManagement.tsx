@@ -192,7 +192,7 @@ const UserManagement = ({
 									scope="col"
 									className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
 								>
-									Created At
+									Last Online
 								</th>
 								<th
 									scope="col"
@@ -239,7 +239,7 @@ const UserManagement = ({
 											</span>
 										</td>
 										<td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-											{formatDate(user.created_at)}
+											{formatDate(user.lastPing)}
 										</td>
 										<td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
 											<div className="flex justify-end space-x-2">
