@@ -249,7 +249,7 @@ export default function FormLayout() {
 							</div>
 
 							{/* Password Field */}
-							<div>
+							{/* <div>
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 									Password*
 								</label>
@@ -272,7 +272,7 @@ export default function FormLayout() {
 										{errors.password}
 									</p>
 								)}
-							</div>
+							</div> */}
 
 							{/* Role Field */}
 							<div>

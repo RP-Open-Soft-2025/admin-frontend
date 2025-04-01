@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from '@/components/ui/sonner'
 import { SubmitButton } from '@/components/auth-form/button'
-import DeloitteLogo from '../login/deloitte-logo.svg' // Reuse the logo from login page
+import DeloitteLogo from './deloitte-logo.png' // Reuse the logo from login page
 import { API_URL } from '@/constants'
 // Use environment variable for API URL with fallback
 
