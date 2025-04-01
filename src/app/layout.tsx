@@ -5,6 +5,7 @@ import './globals.css'
 import { SidebarProvider } from '@/components/context/SidebarContext'
 import { ThemeProvider } from '@/components/context/ThemeContext'
 import StateProvider from '@/components/context/ReduxContext'
+import { Toaster } from 'sonner'
 
 const outfit = Outfit({
 	variable: '--font-outfit-sans',
@@ -23,6 +24,7 @@ export default function RootLayout({
 				<ThemeProvider>
 					<StateProvider>
 						<SidebarProvider>{children}</SidebarProvider>
+						<Toaster />
 					</StateProvider>
 				</ThemeProvider>
 			</body>
