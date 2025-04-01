@@ -17,11 +17,6 @@ const ResetPasswordPage = () => {
 	const token = params?.id as string | undefined
 	const [isLoad, setIsLoad] = useState<boolean>(true)
 
-	if (!token) {
-		router.push('/login')
-		return null
-	}
-
 	useEffect(() => {
 		fetch(`${API_URL}/auth/admin/validate-reset-token/${token}`).then(resp => {
 			if (resp.status == 404) {
@@ -41,6 +36,11 @@ const ResetPasswordPage = () => {
 			}
 		})
 	}, [])
+
+	if (!token) {
+		router.push('/login')
+		return null
+	}
 
 	const handleSubmit = async (formData: FormData) => {
 		const password = formData.get('password') as string
