@@ -2,22 +2,23 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useSidebar } from '../context/SidebarContext'
-import UserDropdown from '@/components/common/UserDropdown'
 import {
 	Calendar,
 	ChevronDownIcon,
 	Gauge,
 	GridIcon,
+	LogOut,
 	MessageSquare,
 	PlusCircle,
-	UserCircleIcon,
 	Users,
 	Video,
 } from 'lucide-react'
 import DeloitteLogo from './deloitte-logo.png'
 import DeloitteLogoDark from './deloitte-logo-dark.png'
+import { logout } from '@/redux/features/auth'
+import { useDispatch } from 'react-redux'
 
 type NavItem = {
 	name: string
@@ -38,13 +39,7 @@ const navItems: NavItem[] = [
 		path: '/calendar',
 	},
 	{
-		icon: <UserCircleIcon />,
-		name: 'User Profile',
-		path: '/profile',
-	},
-
-	{
-		name: 'Add User',
+		name: 'Add Employee',
 		icon: <PlusCircle />,
 		path: '/form-layout',
 	},
@@ -76,6 +71,8 @@ const navItems: NavItem[] = [
 const othersItems: NavItem[] = []
 
 const AppSidebar: React.FC = () => {
+	const dispatch = useDispatch()
+	const router = useRouter()
 	const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
 	const pathname = usePathname()
 	const [isMobileSize, setIsMobileSize] = useState(false)
@@ -281,6 +278,11 @@ const AppSidebar: React.FC = () => {
 		})
 	}
 
+	const handleLogout = () => {
+		dispatch(logout())
+		router.push('/login')
+	}
+
 	return (
 		<aside
 			className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 overflow-hidden
@@ -298,7 +300,7 @@ const AppSidebar: React.FC = () => {
 		>
 			{/* Only show logo in desktop view */}
 			<div
-				className={`py-8 flex hidden lg:flex ${
+				className={`py-8 hidden lg:flex ${
 					!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
 				}`}
 			>
@@ -370,8 +372,17 @@ const AppSidebar: React.FC = () => {
 								<h2 className="mb-4 text-xs uppercase flex leading-[20px] text-gray-400 justify-start">
 									Profile
 								</h2>
-								<div className="px-1">
-									<UserDropdown />
+								<div
+									onClick={handleLogout}
+									className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-orange-50 rounded-lg dark:text-red-300 dark:hover:from-red-900/30 dark:hover:to-orange-900/30 cursor-pointer mt-1 transition-all duration-200"
+								>
+									<LogOut className="w-4 h-4" />
+									<div>
+										<p className="font-medium">Logout</p>
+										<p className="text-xs text-red-500/80 dark:text-red-300/80">
+											Sign out of your account
+										</p>
+									</div>
 								</div>
 							</div>
 						)}

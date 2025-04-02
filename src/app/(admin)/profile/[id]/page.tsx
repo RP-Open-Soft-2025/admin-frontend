@@ -1,6 +1,6 @@
 'use client'
 
-import UserAddressCard from '@/components/user-profile/UserAddressCard'
+// import UserAddressCard from '@/components/user-profile/UserAddressCard'
 import UserInfoCard from '@/components/user-profile/UserInfoCard'
 import UserMetaCard from '@/components/user-profile/UserMetaCard'
 import UserActivityCard from '@/components/user-profile/UserActivityCard'
@@ -9,34 +9,29 @@ import UserRewardsCard from '@/components/user-profile/UserRewardsCard'
 import UserPerformanceCard from '@/components/user-profile/UserPerformanceCard'
 import UserOnboardingCard from '@/components/user-profile/UserOnboardingCard'
 import UserVibeMeterCard from '@/components/user-profile/UserVibeMeterCard'
+import UserSessionsCard from '@/components/user-profile/UserSessionsCard'
 import React, { useEffect, useState } from 'react'
 import {
 	getUserProfileData,
-	ProfileApiResponse,
-	getUserMetaData,
-	getUserInfoData,
 	getVibeMeterData,
 	getActivityData,
-	getLeaveData,
 	getPerformanceData,
 	getRewardsData,
 	getOnboardingData,
 } from '@/services/profileService'
 import { useParams, useRouter } from 'next/navigation'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/redux/store'
+import store from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
+import { EmployeeAPI } from '@/types/UserProfile'
 
 export default function Profile() {
-	const [profileData, setProfileData] = useState<ProfileApiResponse | null>(
-		null
-	)
+	const [profileData, setProfileData] = useState<EmployeeAPI | null>()
 	const params = useParams()
 	const id = params.id as string
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const router = useRouter()
-	const auth = useSelector((state: RootState) => state.auth)
+	const { auth } = store.getState()
 
 	useEffect(() => {
 		// Check if user is authenticated
@@ -48,7 +43,7 @@ export default function Profile() {
 
 		async function fetchProfileData() {
 			try {
-				const data = await getUserProfileData(id)
+				const data: EmployeeAPI = await getUserProfileData(id)
 				setProfileData(data)
 				setLoading(false)
 
@@ -59,6 +54,7 @@ export default function Profile() {
 					performance: data.company_data.performance,
 					rewards: data.company_data.rewards,
 					vibemeter: data.company_data.vibemeter,
+					leave: data.company_data.leave,
 				})
 
 				// Debug logs for transformed data
@@ -130,10 +126,8 @@ export default function Profile() {
 					Profile
 				</h3>
 				<div className="space-y-6">
-					<UserMetaCard userData={getUserMetaData(profileData)} />
-					<UserInfoCard userData={getUserInfoData(profileData)} />
-					{/* No address data in API response, but keeping component with dummy data */}
-					<UserAddressCard />
+					<UserMetaCard userData={profileData} />
+					<UserInfoCard userData={profileData} />
 
 					{/* Only render components with data */}
 					{profileData.company_data.onboarding.length > 0 && (
@@ -157,10 +151,24 @@ export default function Profile() {
 						)}
 					</div>
 
-					<UserLeaveCard leaveData={getLeaveData(profileData)} />
+					{profileData.company_data.leave.length > 0 && (
+						<UserLeaveCard leaveData={profileData.company_data.leave} />
+					)}
 
 					{profileData.company_data.vibemeter.length > 0 && (
-						<UserVibeMeterCard vibeMeterData={getVibeMeterData(profileData)} />
+						<>
+							<UserVibeMeterCard
+								vibeMeterData={getVibeMeterData(profileData)}
+							/>
+						</>
+					)}
+
+					{/* Sessions Section */}
+					{auth.user && (
+						<UserSessionsCard
+							employeeId={profileData.employee_id}
+							role={auth.user.userRole!}
+						/>
 					)}
 				</div>
 			</div>

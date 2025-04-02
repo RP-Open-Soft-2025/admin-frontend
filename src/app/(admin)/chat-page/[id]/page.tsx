@@ -6,6 +6,17 @@ import { API_URL, WS_URL } from '@/constants'
 import store from '@/redux/store'
 import { Role } from '@/types/employee'
 
+type SessionHist = {
+	chat_id: string
+	last_message: string
+	last_message_time: string // ISO timestamp
+	unread_count: number
+	total_messages: number
+	chat_mode: 'BOT' | 'HUMAN' // Assuming only these two modes
+	is_escalated: boolean
+	created_at: string // ISO timestamp
+}
+
 const MessageComp = ({ message }: { message: MessageResp }) => {
 	const { sender, text, timestamp } = message
 
@@ -13,18 +24,23 @@ const MessageComp = ({ message }: { message: MessageResp }) => {
 	const messageStyles = {
 		[SenderType.EMPLOYEE]: {
 			container: 'justify-start',
-			bg: 'bg-blue-100 dark:bg-blue-900',
-			textColor: 'text-gray-800 dark:text-blue-100',
+			bg: 'bg-blue-200 dark:bg-blue-800',
+			textColor: 'text-gray-900 dark:text-blue-100',
 		},
 		[SenderType.BOT]: {
 			container: 'justify-end',
-			bg: 'bg-green-100 dark:bg-green-900',
-			textColor: 'text-gray-800 dark:text-green-100',
+			bg: 'bg-green-200 dark:bg-green-800',
+			textColor: 'text-gray-900 dark:text-green-100',
 		},
 		[SenderType.HR]: {
 			container: 'justify-end',
-			bg: 'bg-indigo-100 dark:bg-indigo-900',
-			textColor: 'text-gray-800 dark:text-indigo-100',
+			bg: 'bg-purple-200 dark:bg-purple-800',
+			textColor: 'text-gray-900 dark:text-purple-100',
+		},
+		[SenderType.SYSTEM]: {
+			container: 'justify-center',
+			bg: 'bg-gray-300 dark:bg-gray-700', // Improved contrast
+			textColor: 'text-gray-900 dark:text-gray-100',
 		},
 	}
 
@@ -33,59 +49,72 @@ const MessageComp = ({ message }: { message: MessageResp }) => {
 	return (
 		<div className={`flex ${container} w-full`}>
 			<div
-				className={`max-w-[70%] ${bg} p-3 rounded-xl shadow-sm ${textColor}`}
+				className={`${
+					sender === SenderType.SYSTEM
+						? 'max-w-max px-4 py-2 rounded-lg text-sm font-semibold'
+						: 'max-w-[70%] p-3 rounded-xl shadow-sm'
+				} ${bg} ${textColor}`}
 			>
-				<div className="flex justify-between items-center mb-1">
-					<span className="text-xs font-semibold opacity-70">
-						{sender === SenderType.EMPLOYEE
-							? 'Employee'
-							: sender === SenderType.BOT
-								? 'Bot'
-								: 'HR'}
-					</span>
-					<span className="text-xs opacity-50 ml-2">
-						{new Date(timestamp).toLocaleTimeString([], {
-							hour: '2-digit',
-							minute: '2-digit',
-						})}
-					</span>
-				</div>
-				<p className="text-sm font-medium">{text}</p>
+				{sender !== SenderType.SYSTEM && (
+					<div className="flex justify-between items-center mb-1">
+						<span className="text-xs font-semibold opacity-70">
+							{sender === SenderType.EMPLOYEE
+								? 'Employee'
+								: sender === SenderType.BOT
+									? 'Bot'
+									: sender === SenderType.HR
+										? 'HR'
+										: ''}
+						</span>
+						<span className="text-xs opacity-50 ml-2">
+							{new Date(timestamp).toLocaleTimeString([], {
+								hour: '2-digit',
+								minute: '2-digit',
+							})}
+						</span>
+					</div>
+				)}
+				<p className="text-sm font-medium text-left">
+					{sender == SenderType.SYSTEM ? `Chat ID: ${text}` : text}
+				</p>
 			</div>
 		</div>
 	)
 }
 
 // Chat history item component
-const ChatHistoryItem = ({ 
-  chat, 
-  isActive, 
-  onClick 
-}: { 
-  chat: { id: string; name: string; lastMessage?: string; timestamp: string }; 
-  isActive: boolean; 
-  onClick: () => void 
+const ChatHistoryItem = ({
+	chat,
+	isActive,
+	onClick,
+}: {
+	chat: SessionHist
+	isActive: boolean
+	onClick: () => void
 }) => {
-  return (
-    <div 
-      className={`p-2 cursor-pointer border-b border-gray-700 hover:bg-[#172040] ${
-        isActive ? 'bg-[#172040]' : ''
-      }`}
-      onClick={onClick}
-    >
-      <div className="flex justify-between items-center">
-        <h3 className="font-medium text-white text-sm">{chat.name}</h3>
-        <span className="text-xs text-gray-400">
-          {new Date(chat.timestamp).toLocaleDateString()}
-        </span>
-      </div>
-      {chat.lastMessage && (
-        <p className="text-xs text-gray-400 truncate mt-1">
-          {chat.lastMessage}
-        </p>
-      )}
-    </div>
-  )
+	return (
+		<div
+			className={`p-2 cursor-pointer border-b dark:border-gray-700 border-gray-300 
+				${isActive ? 'dark:bg-[#1E293B] bg-gray-200' : 'dark:hover:bg-[#1E293B] hover:bg-gray-100'}`}
+			onClick={onClick}
+		>
+			<div className="flex justify-between items-center">
+				<h3 className="font-medium dark:text-white text-gray-900 text-sm">
+					{chat.chat_id}
+				</h3>
+				<span className="text-xs dark:text-gray-400 text-gray-600">
+					{chat.last_message_time
+						? new Date(chat.last_message_time).toLocaleDateString()
+						: new Date(chat.created_at).toLocaleDateString()}
+				</span>
+			</div>
+			{chat.last_message && (
+				<p className="text-xs dark:text-gray-400 text-gray-600 truncate mt-1">
+					{chat.last_message}
+				</p>
+			)}
+		</div>
+	)
 }
 
 const ChatPage = () => {
@@ -98,14 +127,10 @@ const ChatPage = () => {
 	const { auth } = store.getState()
 	const [isLoading, setIsLoading] = useState(true)
 	const [takeOver, setTakeOver] = useState<boolean>(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true) // Default to open to match UI
-  const [chatHistory, setChatHistory] = useState<Array<{
-    id: string;
-    name: string;
-    lastMessage?: string;
-    timestamp: string;
-  }>>([])
-  const [historyLoading, setHistoryLoading] = useState(false)
+	const [sidebarOpen, setSidebarOpen] = useState(true)
+	const [sessions, setSessions] = useState<SessionHist[]>([])
+	const [historyLoading, setHistoryLoading] = useState(false)
+	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
 
 	// Scroll to latest message
 	useEffect(() => {
@@ -113,6 +138,23 @@ const ChatPage = () => {
 			chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
 		}
 	}, [messages])
+
+	// Scroll to selected chat's system message
+	useEffect(() => {
+		if (selectedChatId && messagesContainerRef.current) {
+			const systemMessage = messages.find(
+				msg => msg.sender === SenderType.SYSTEM && msg.text === selectedChatId
+			)
+			if (systemMessage) {
+				const messageElement = document.querySelector(
+					`[data-chat-id="${selectedChatId}"]`
+				)
+				if (messageElement) {
+					messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+				}
+			}
+		}
+	}, [selectedChatId, messages])
 
 	// Get sidebar state from localStorage on component mount
 	useEffect(() => {
@@ -127,55 +169,65 @@ const ChatPage = () => {
 		localStorage.setItem('chatSidebarOpen', sidebarOpen.toString())
 	}, [sidebarOpen])
 
-	// Fetch chat history
+	// Fetch all chat histories for sidebar
 	useEffect(() => {
-		setIsLoading(true)
-		fetch(`${API_URL}/chat/history/${id}`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${auth.user?.accessToken}`,
-			},
-		})
-			.then(resp => {
-				if (resp.ok) {
-					resp.json().then((data: ChatResp) => {
-						setMessages(data.messages)
-						setIsLoading(false)
-					})
-				} else {
-					setIsLoading(false)
-				}
-			})
-			.catch(() => {
-				setIsLoading(false)
-			})
-	}, [id])
+		setHistoryLoading(true)
 
-  // Fetch all chat histories for sidebar
-  useEffect(() => {
-    if (auth.user?.userRole === Role.HR) {
-      setHistoryLoading(true)
-      fetch(`${API_URL}/chat/all-histories`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${auth.user?.accessToken}`,
-        },
-      })
-        .then(resp => {
-          if (resp.ok) {
-            return resp.json()
-          }
-          return []
-        })
-        .then(data => {
-          setChatHistory(data)
-          setHistoryLoading(false)
-        })
-        .catch(() => {
-          setHistoryLoading(false)
-        })
-    }
-  }, [auth.user])
+		const fetchChatHistory = async (chatId: string, timestamp: string) => {
+			setIsLoading(true)
+			try {
+				const resp = await fetch(`${API_URL}/chat/history/${chatId}`, {
+					method: 'GET',
+					headers: { Authorization: `Bearer ${auth.user?.accessToken}` },
+				})
+				if (resp.ok) {
+					const data: ChatResp = await resp.json()
+					setMessages(prev => [
+						...prev,
+						{ timestamp: timestamp, text: chatId, sender: SenderType.SYSTEM },
+						...data.messages,
+					])
+				}
+			} catch (error) {
+				console.error('Error fetching chat history:', error)
+			} finally {
+				setIsLoading(false)
+				setHistoryLoading(false)
+			}
+		}
+
+		const fetchSessionHistory = async () => {
+			try {
+				const resp = await fetch(`${API_URL}/llm/chat/history/${id}`, {
+					method: 'GET',
+					headers: { Authorization: `Bearer ${auth.user?.accessToken}` },
+				})
+				if (resp.ok) {
+					const data: SessionHist[] = await resp.json()
+					const updtData: SessionHist[] = data.sort(
+						(a: SessionHist, b: SessionHist) => {
+							return (
+								new Date(a.created_at).getTime() -
+								new Date(b.created_at).getTime()
+							)
+						}
+					)
+					setSessions(updtData)
+					await Promise.all(
+						updtData.map(session =>
+							fetchChatHistory(session.chat_id, session.created_at)
+						)
+					)
+				}
+			} catch (error) {
+				console.error('Error fetching session history:', error)
+			}
+			setHistoryLoading(false)
+			setIsLoading(false)
+		}
+
+		fetchSessionHistory()
+	}, [auth.user, id])
 
 	useEffect(() => {
 		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + id)
@@ -242,14 +294,14 @@ const ChatPage = () => {
 		setTakeOver(true)
 	}
 
-  const navigateToChat = (chatId: string) => {
-    // Here you would typically use a router to navigate
-    window.location.href = `/chat/${chatId}`
-  }
+	const navigateToChat = (chatId: string) => {
+		setSelectedChatId(chatId)
+		// window.location.href = `/chat-page/${chatId}`
+	}
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
+	const toggleSidebar = () => {
+		setSidebarOpen(!sidebarOpen)
+	}
 
 	return (
     <div className="flex h-[80vh] w-full bg-[#0f172a]">
@@ -260,7 +312,7 @@ const ChatPage = () => {
         }`}
       >
         {/* Sidebar Content */}
-        <div className="h-full bg-white dark:bg-[#0f172a] dark:text-white flex flex-col">
+        <div className="h-full bg-[#0f172a] text-white flex flex-col">
           <div className="p-2 border-b border-gray-700 flex items-center">
             <h2 className="text-lg font-bold">Chat History</h2>
           </div>
@@ -291,9 +343,9 @@ const ChatPage = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex flex-col flex-grow overflow-hidden ">
+      <div className="flex flex-col flex-grow overflow-hidden">
         {/* Chat Header with Toggle Button */}
-        <div className="flex items-center p-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-700 dark:text-white">
+        <div className="flex items-center p-2 bg-[#0f172a] border-b border-gray-700 text-white">
           <button
             className="mr-3 text-gray-300 hover:text-white focus:outline-none"
             onClick={toggleSidebar}
@@ -308,10 +360,10 @@ const ChatPage = () => {
         {/* Chat Messages Container */}
         <div
           ref={messagesContainerRef}
-          className="flex-grow overflow-hidden bg-white dark:bg-gray-900"
+          className="flex-grow overflow-hidden bg-[#0f172a]"
         >
           <div
-            className="h-full overflow-y-auto flex flex-col space-y-2 p-3 "
+            className="h-full overflow-y-auto flex flex-col space-y-2 p-3"
           >
             {isLoading ? (
               <div className="flex justify-center items-center h-full">
@@ -330,20 +382,20 @@ const ChatPage = () => {
 
         {/* Chat Input */}
         {auth.user?.userRole == Role.HR && takeOver ? (
-          <div className="p-2 bg-gray-100 dark:bg-gray-800 border-t border-gray-700">
+          <div className="p-2 bg-[#162040] border-t border-gray-700">
             <div className="flex space-x-2">
               <input
                 type="text"
-                className="flex-grow p-2 rounded bg-white dark:bg-gray-700 
-						border dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white text-sm"
+                className="flex-grow p-2 rounded bg-[#1e293b] 
+                border border-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-white text-sm"
                 value={newMessage}
                 onChange={e => setNewMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
               />
               <button
-                className="px-4 py-2 bg-indigo-500 text-white rounded 
-						hover:bg-indigo-600 transition-colors"
+                className="px-3 py-2 bg-indigo-500 text-white rounded text-sm
+                hover:bg-indigo-600 transition-colors"
                 onClick={sendMessage}
               >
                 Send
@@ -351,9 +403,10 @@ const ChatPage = () => {
             </div>
           </div>
         ) : (
-          <div className="w-full bg-blue-100 dark:bg-blue-900 flex justify-center items-center py-4">
+          <div className="bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700">
             <button
-              className="px-6 py-2 bg-white text-blue-500 rounded-md shadow-md dark:bg-gray-800 dark:text-blue-100 hover:bg-blue-50 dark:hover:bg-blue-600 transition-colors"
+              className="px-4 py-2 bg-[#1e293b] text-white rounded-md shadow-md text-sm
+              hover:bg-[#334155] transition-colors"
               onClick={() => initTakeOver()}
             >
               TakeOver

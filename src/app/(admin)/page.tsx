@@ -433,17 +433,17 @@ function AdminDashboard() {
 			</div>
 
 			{/* User Management */}
-			<UserManagement
+			{/* <UserManagement
 				users={users}
 				onDeleteUser={handleDeleteUser}
 				onCreateSession={handleCreateSession}
 				onCreateUser={handleOpenCreateUserModal}
 				onRefresh={fetchAllData}
 				isLoading={loading.users}
-			/>
+			/> */}
 
 			{/* Meetings Overview */}
-			<MeetingsOverview meetings={meetings} isLoading={loading.meetings} />
+			{/* <MeetingsOverview meetings={meetings} isLoading={loading.meetings} /> */}
 
 			{/* HR Management */}
 			<HRManagement

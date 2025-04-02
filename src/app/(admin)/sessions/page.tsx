@@ -12,6 +12,7 @@ const TableSession = ({ state }: { state: State }) => {
 	const [currData, setCurrData] = useState<SessionType[]>([])
 	const [paginatedData, setPaginatedData] = useState<SessionType[]>([])
 	const [currPage, setCurrentPage] = useState<number>(1)
+	const [historyLoading, setHistoryLoading] = useState<boolean>(true)
 	const [totalPages, setTotalPages] = useState<number>(1)
 	const { auth } = store.getState()
 
@@ -28,6 +29,7 @@ const TableSession = ({ state }: { state: State }) => {
 						resp.json().then((result: SessionType[]) => {
 							setCurrData(result)
 							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE_SESSION))
+							setHistoryLoading(false)
 						})
 					}
 				})
@@ -47,10 +49,18 @@ const TableSession = ({ state }: { state: State }) => {
 		}
 	}, [currPage, currData])
 
+	if (historyLoading) {
+		return (
+			<div className="flex justify-center items-center h-24">
+				<div className="animate-spin rounded-full h-6 w-6 border-t-2 border-indigo-500"></div>
+			</div>
+		)
+	}
+
 	return (
 		<div>
 			<h2 className="text-lg font-semibold mb-4 dark:text-white">
-				{state.toUpperCase()}
+				{state.toUpperCase() == 'pending' ? 'scheduled' : state.toUpperCase()}
 			</h2>
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">

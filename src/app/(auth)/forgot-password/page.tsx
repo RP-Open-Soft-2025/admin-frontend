@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from '@/components/ui/sonner'
 import { SubmitButton } from '@/components/auth-form/button'
-import DeloitteLogo from '../login/deloitte-logo.svg' // Reuse the logo from login page
+import DeloitteLogo from '../login/deloitte-logo.png' // Reuse the logo from login page
 import { API_URL } from '@/constants'
 // Use environment variable for API URL with fallback
 
@@ -105,7 +105,7 @@ export default function ForgotPasswordPage() {
 										<input
 											id="email"
 											name="email"
-											className="bg-muted text-md md:text-sm p-2 rounded-md border border-gray-300 dark:border-gray-700"
+											className="bg-muted text-md md:text-sm p-2 rounded-md border border-gray-300 dark:border-gray-700 dark:text-white"
 											type="email"
 											placeholder="example@email.com"
 											autoComplete="email"

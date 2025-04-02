@@ -18,6 +18,7 @@ function Page() {
 	const [searchTerm, setSearchTerm] = useState<string>('')
 	const [selectedRole, setSelectedRole] = useState<string>('')
 	const [availableRoles, setAvailableRoles] = useState<string[]>([])
+	const [historyLoading, setHistoryLoading] = useState<boolean>(true)
 
 	useEffect(() => {
 		const { auth } = store.getState()
@@ -52,6 +53,7 @@ function Page() {
 						console.log(pages)
 						setTotalPages(pages)
 						setCurrentPage(1)
+						setHistoryLoading(false)
 					})
 				}
 			})
@@ -71,8 +73,11 @@ function Page() {
 		let filteredData = currData
 
 		if (searchTerm) {
-			filteredData = filteredData.filter(user =>
-				user.name.toLowerCase().includes(searchTerm.toLowerCase())
+			filteredData = filteredData.filter(
+				user =>
+					user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+					user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+					user.userId.toLowerCase().includes(searchTerm.toLowerCase())
 			)
 		}
 
@@ -94,6 +99,14 @@ function Page() {
 		const end = start + MAX_PER_PAGE_USER
 		setPaginatedData(filteredData.slice(start, end))
 	}, [currPage, currData, searchTerm, selectedRole])
+
+	if (historyLoading) {
+		return (
+			<div className="flex justify-center items-center h-24">
+				<div className="animate-spin rounded-full h-6 w-6 border-t-2 border-indigo-500"></div>
+			</div>
+		)
+	}
 
 	return (
 		<div>
@@ -120,7 +133,7 @@ function Page() {
 					<input
 						type="search"
 						className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-						placeholder="Search users by name..."
+						placeholder="Search users..."
 						value={searchTerm}
 						onChange={e => setSearchTerm(e.target.value)}
 					/>
@@ -135,7 +148,7 @@ function Page() {
 						<option value="">All Roles</option>
 						{availableRoles.map(role => (
 							<option key={role} value={role}>
-								{role}
+								{role.toUpperCase()}
 							</option>
 						))}
 					</select>
