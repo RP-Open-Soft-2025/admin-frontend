@@ -126,7 +126,6 @@ export default function Profile() {
 					Profile
 				</h3>
 				<div className="space-y-6">
-				
 					<UserMetaCard userData={profileData} />
 					{auth.user && (
 						<UserSessionsCard
@@ -142,7 +141,6 @@ export default function Profile() {
 							onboardingData={getOnboardingData(profileData)}
 						/>
 					)}
-					
 
 					{profileData.company_data.activity.length > 0 && (
 						<UserActivityCard activityData={getActivityData(profileData)} />
@@ -172,7 +170,6 @@ export default function Profile() {
 					)}
 
 					{/* Sessions Section */}
-					
 				</div>
 			</div>
 		</div>
