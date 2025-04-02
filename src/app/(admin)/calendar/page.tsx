@@ -6,6 +6,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { useModal } from '@/hooks/useModal'
 import store from '@/redux/store'
+import { toast } from '@/components/ui/sonner'
 import {
 	EventInput,
 	DateSelectArg,
@@ -16,6 +17,7 @@ import { API_URL } from '@/constants'
 import { Meeting } from '@/types/meets'
 import { SessionType } from '@/types/sessions'
 import { SessionStatus } from '@/types/sessions'
+import { useRouter } from 'next/navigation'
 
 interface CalendarEvent extends EventInput {
 	extendedProps: {
@@ -39,6 +41,7 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 }
 
 const Calendar: React.FC = () => {
+	const router = useRouter()
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -53,9 +56,20 @@ const Calendar: React.FC = () => {
 	const { isOpen, openModal, closeModal } = useModal()
 	const { auth } = store.getState()
 
+	const handleAuthError = () => {
+		toast({
+			type: 'error',
+			description: 'Your session has expired. Please login again.',
+		})
+		router.push('/login')
+	}
+
 	useEffect(() => {
 		const fetchMeetings = async () => {
-			if (!auth.user || !auth.user.accessToken) return
+			if (!auth.user || !auth.user.accessToken) {
+				handleAuthError()
+				return
+			}
 			try {
 				// Fetch meetings
 				const meetingsResponse = await fetch(
@@ -68,34 +82,50 @@ const Calendar: React.FC = () => {
 				)
 
 				// Fetch all session types
-				const [activeResponse, completedResponse, pendingResponse] = await Promise.all([
-					fetch(`${API_URL}/${auth.user.userRole}/sessions/active`, {
-						headers: {
-							Authorization: `Bearer ${auth.user.accessToken}`,
-						},
-					}),
-					fetch(`${API_URL}/${auth.user.userRole}/sessions/completed`, {
-						headers: {
-							Authorization: `Bearer ${auth.user.accessToken}`,
-						},
-					}),
-					fetch(`${API_URL}/${auth.user.userRole}/sessions/pending`, {
-						headers: {
-							Authorization: `Bearer ${auth.user.accessToken}`,
-						},
-					}),
-				])
+				const [activeResponse, completedResponse, pendingResponse] =
+					await Promise.all([
+						fetch(`${API_URL}/${auth.user.userRole}/sessions/active`, {
+							headers: {
+								Authorization: `Bearer ${auth.user.accessToken}`,
+							},
+						}),
+						fetch(`${API_URL}/${auth.user.userRole}/sessions/completed`, {
+							headers: {
+								Authorization: `Bearer ${auth.user.accessToken}`,
+							},
+						}),
+						fetch(`${API_URL}/${auth.user.userRole}/sessions/pending`, {
+							headers: {
+								Authorization: `Bearer ${auth.user.accessToken}`,
+							},
+						}),
+					])
 
-				if (!meetingsResponse.ok || !activeResponse.ok || !completedResponse.ok || !pendingResponse.ok) {
+				if (
+					!meetingsResponse.ok ||
+					!activeResponse.ok ||
+					!completedResponse.ok ||
+					!pendingResponse.ok
+				) {
+					if (
+						meetingsResponse.status === 401 ||
+						activeResponse.status === 401 ||
+						completedResponse.status === 401 ||
+						pendingResponse.status === 401
+					) {
+						handleAuthError()
+						return
+					}
 					throw new Error('Failed to fetch calendar data')
 				}
 
 				const meetingsData = await meetingsResponse.json()
-				const [activeSessions, completedSessions, pendingSessions] = await Promise.all([
-					activeResponse.json(),
-					completedResponse.json(),
-					pendingResponse.json(),
-				])
+				const [activeSessions, completedSessions, pendingSessions] =
+					await Promise.all([
+						activeResponse.json(),
+						completedResponse.json(),
+						pendingResponse.json(),
+					])
 
 				// Format meetings
 				const formattedMeetings = meetingsData.map((meet: Meeting) => {
@@ -134,14 +164,23 @@ const Calendar: React.FC = () => {
 				}
 
 				const formattedSessions = [
-					...activeSessions.map((session: SessionType) => formatSession(session, SessionStatus.ACTIVE)),
-					...completedSessions.map((session: SessionType) => formatSession(session, SessionStatus.COMPLETED)),
-					...pendingSessions.map((session: SessionType) => formatSession(session, SessionStatus.PENDING)),
+					...activeSessions.map((session: SessionType) =>
+						formatSession(session, SessionStatus.ACTIVE)
+					),
+					...completedSessions.map((session: SessionType) =>
+						formatSession(session, SessionStatus.COMPLETED)
+					),
+					...pendingSessions.map((session: SessionType) =>
+						formatSession(session, SessionStatus.PENDING)
+					),
 				]
 
 				setEvents([...formattedMeetings, ...formattedSessions])
 			} catch (error) {
 				console.error('Error fetching calendar data:', error)
+				if (error instanceof Error && error.message.includes('401')) {
+					handleAuthError()
+				}
 			}
 		}
 		fetchMeetings()
