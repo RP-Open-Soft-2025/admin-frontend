@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from '@/components/ui/sonner'
 
-const page: React.FC = () => {
+const Page = () => {
 	const router = useRouter()
 
 	useEffect(() => {
@@ -18,4 +18,4 @@ const page: React.FC = () => {
 	return null
 }
 
-export default page
+export default Page
