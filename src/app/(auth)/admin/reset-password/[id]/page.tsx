@@ -33,6 +33,8 @@ const ResetPasswordPage = () => {
 				})
 				router.push('/login')
 				setIsLoad(false)
+			}else{
+				setIsLoad(false);
 			}
 		})
 	}, [])
