@@ -15,6 +15,7 @@ import {
 import { API_URL } from '@/constants'
 import { Meeting } from '@/types/meets'
 import { SessionType } from '@/types/sessions'
+import { SessionStatus } from '@/types/sessions'
 
 interface CalendarEvent extends EventInput {
 	extendedProps: {
@@ -56,7 +57,8 @@ const Calendar: React.FC = () => {
 		const fetchMeetings = async () => {
 			if (!auth.user || !auth.user.accessToken) return
 			try {
-				const response1 = await fetch(
+				// Fetch meetings
+				const meetingsResponse = await fetch(
 					`${API_URL}/${auth.user.userRole}/meets`,
 					{
 						headers: {
@@ -64,21 +66,43 @@ const Calendar: React.FC = () => {
 						},
 					}
 				)
-				const response2 = await fetch(
-					`${API_URL}/${auth.user.userRole}/sessions`,
-					{
+
+				// Fetch all session types
+				const [activeResponse, completedResponse, pendingResponse] = await Promise.all([
+					fetch(`${API_URL}/${auth.user.userRole}/sessions/active`, {
 						headers: {
 							Authorization: `Bearer ${auth.user.accessToken}`,
 						},
-					}
-				)
-				const data1 = await response1.json()
-				const data2 = await response2.json()
-				const formattedEvents1 = data1.map((meet: Meeting) => {
+					}),
+					fetch(`${API_URL}/${auth.user.userRole}/sessions/completed`, {
+						headers: {
+							Authorization: `Bearer ${auth.user.accessToken}`,
+						},
+					}),
+					fetch(`${API_URL}/${auth.user.userRole}/sessions/pending`, {
+						headers: {
+							Authorization: `Bearer ${auth.user.accessToken}`,
+						},
+					}),
+				])
+
+				if (!meetingsResponse.ok || !activeResponse.ok || !completedResponse.ok || !pendingResponse.ok) {
+					throw new Error('Failed to fetch calendar data')
+				}
+
+				const meetingsData = await meetingsResponse.json()
+				const [activeSessions, completedSessions, pendingSessions] = await Promise.all([
+					activeResponse.json(),
+					completedResponse.json(),
+					pendingResponse.json(),
+				])
+
+				// Format meetings
+				const formattedMeetings = meetingsData.map((meet: Meeting) => {
 					const time = meet.scheduled_at.split('T')[1].split('+')[0].trim()
 					return {
 						id: meet.meet_id,
-						title: ` meet at ${time}`,
+						title: `Meeting at ${time}`,
 						start: meet.scheduled_at,
 						url: meet.meeting_link,
 						extendedProps: {
@@ -87,23 +111,37 @@ const Calendar: React.FC = () => {
 						},
 					}
 				})
-				const formattedEvents2 = data2.map((meet: SessionType) => {
-					const time = meet.scheduled_at.split('T')[1].split('+')[0].trim()
+
+				// Format sessions with different colors based on status
+				const formatSession = (session: SessionType, status: SessionStatus) => {
+					const time = session.scheduled_at.split('T')[1].split('+')[0].trim()
+					const colorMap: Record<SessionStatus, string> = {
+						[SessionStatus.ACTIVE]: 'success',
+						[SessionStatus.COMPLETED]: 'info',
+						[SessionStatus.PENDING]: 'warning',
+						[SessionStatus.CANCELLED]: 'error',
+					}
 					return {
-						id: meet.session_id,
-						title: ` session at ${time}`,
-						start: meet.scheduled_at,
-						url: meet.employee_id,
+						id: session.session_id,
+						title: `Session at ${time}`,
+						start: session.scheduled_at,
+						url: session.employee_id,
 						extendedProps: {
-							calendar: 'Success',
-							redirectUrl: `/chat-page/${meet.chat_id}`,
+							calendar: colorMap[status],
+							redirectUrl: `/chat-page/${session.chat_id}`,
 						},
 					}
-				})
+				}
 
-				setEvents([...formattedEvents1, ...formattedEvents2])
+				const formattedSessions = [
+					...activeSessions.map((session: SessionType) => formatSession(session, SessionStatus.ACTIVE)),
+					...completedSessions.map((session: SessionType) => formatSession(session, SessionStatus.COMPLETED)),
+					...pendingSessions.map((session: SessionType) => formatSession(session, SessionStatus.PENDING)),
+				]
+
+				setEvents([...formattedMeetings, ...formattedSessions])
 			} catch (error) {
-				console.error('Error fetching meetings:', error)
+				console.error('Error fetching calendar data:', error)
 			}
 		}
 		fetchMeetings()
@@ -116,13 +154,11 @@ const Calendar: React.FC = () => {
 	}
 
 	const handleEventClick = (clickInfo: EventClickArg) => {
-		// const event = clickInfo.event
-		// setSelectedEvent(event as unknown as CalendarEvent)
-		// setEventTitle(event.title.replace(/\d{1,2}\.\d{2}[ap]\s?/, ''))
-		// setEventStartDate(event.start?.toISOString().split('T')[0] || '')
-		// setEventLevel(event.extendedProps.calendar)
-		// openModal()
-		console.log(clickInfo)
+		const event = clickInfo.event
+		const redirectUrl = event.extendedProps.redirectUrl
+		if (redirectUrl) {
+			window.location.href = redirectUrl
+		}
 	}
 
 	const resetModalFields = () => {
