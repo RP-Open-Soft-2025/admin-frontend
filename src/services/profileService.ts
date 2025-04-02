@@ -2,6 +2,7 @@ import store from '@/redux/store'
 import { API_URL } from '@/constants'
 import { CompanyData } from '@/types/employee'
 import { EmployeeAPI } from '@/types/UserProfile'
+import { SessionType } from '@/types/sessions'
 
 // Define the API response type based on the backend structure
 export interface ProfileApiResponse {
@@ -232,4 +233,32 @@ export function getOnboardingData(profileData: EmployeeAPI) {
 	return profileData.company_data.onboarding.length > 0
 		? profileData.company_data.onboarding[0]
 		: null
+}
+
+export const getSessionsData = async (
+	employeeId: string
+): Promise<SessionType[]> => {
+	const { auth } = store.getState()
+	try {
+		const response = await fetch(`${API_URL}/admin/sessions`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${auth.user?.accessToken}`,
+			},
+		})
+
+		if (!response.ok) {
+			throw new Error('Failed to fetch sessions data')
+		}
+
+		const data = await response.json()
+		// Filter sessions for the specific employee
+		return data.filter(
+			(session: SessionType) => session.employee_id === employeeId
+		)
+	} catch (error) {
+		console.error('Error fetching sessions:', error)
+		throw error
+	}
 }
