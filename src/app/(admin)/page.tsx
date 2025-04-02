@@ -7,9 +7,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import {
 	StatsOverview,
-	UserManagement,
 	HRManagement,
-	MeetingsOverview,
 	CreateUserForm,
 } from '@/components/dashboard'
 import {
@@ -201,6 +199,7 @@ function AdminDashboard() {
 	}, [auth.isAuthenticated, router])
 
 	// Handlers for actions
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const handleOpenCreateUserModal = () => {
 		setShowCreateUserModal(true)
 	}
@@ -233,6 +232,7 @@ function AdminDashboard() {
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const handleDeleteUser = async (userId: string) => {
 		try {
 			await deleteUser(userId)
@@ -254,6 +254,7 @@ function AdminDashboard() {
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const handleCreateSession = async (userId: string) => {
 		try {
 			const newSession = await createSession(userId)

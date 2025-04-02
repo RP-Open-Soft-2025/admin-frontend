@@ -17,6 +17,7 @@ type SortConfig = {
 
 function Page() {
 	const [allData, setAllData] = useState<Employee[]>([])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [currData, setCurrData] = useState<Employee[]>([])
 	const [paginatedData, setPaginatedData] = useState<Employee[]>([])
 	const [currPage, setCurrentPage] = useState<number>(1)
