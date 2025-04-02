@@ -176,6 +176,7 @@ const Calendar: React.FC = () => {
 	const [eventLevel, setEventLevel] = useState('')
 	const [events, setEvents] = useState<CalendarEvent[]>([])
 	const [allEvents, setAllEvents] = useState<CalendarEvent[]>([])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [activeFilter, setActiveFilter] = useState<FilterType>('all')
 	const calendarRef = useRef<FullCalendar>(null)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -190,21 +191,6 @@ const Calendar: React.FC = () => {
 		router.push('/login')
 	}
 
-	// Custom toolbar component for filter dropdown
-	const CustomToolbar = () => {
-		return (
-			<div className="filter-dropdown">
-				<select 
-					value={activeFilter}
-					onChange={(e) => setActiveFilter(e.target.value as FilterType)}
-				>
-					<option value="all">All Events</option>
-					<option value="meetings">Meetings Only</option>
-					<option value="sessions">Sessions Only</option>
-				</select>
-			</div>
-		)
-	}
 
 	useEffect(() => {
 		const fetchMeetings = async () => {
