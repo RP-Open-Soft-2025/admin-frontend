@@ -404,7 +404,6 @@ export async function blockUser(
 ): Promise<{ success: boolean; message: string }> {
 	try {
 		const token = await getAuthToken()
-		const role = store.getState().auth.user?.userRole
 
 		const response = await fetch(`${API_URL}/admin-hr/block-user`, {
 			method: 'POST',
@@ -423,9 +422,9 @@ export async function blockUser(
 		}
 
 		const data = await response.json()
-		return { 
-			success: true, 
-			message: typeof data === 'string' ? data : 'User blocked successfully' 
+		return {
+			success: true,
+			message: typeof data === 'string' ? data : 'User blocked successfully',
 		}
 	} catch (error) {
 		console.error('Failed to block user:', error)
@@ -439,7 +438,6 @@ export async function unblockUser(
 ): Promise<{ success: boolean; message: string }> {
 	try {
 		const token = await getAuthToken()
-		const role = store.getState().auth.user?.userRole
 
 		const response = await fetch(`${API_URL}/admin-hr/unblock-user`, {
 			method: 'POST',
@@ -458,9 +456,9 @@ export async function unblockUser(
 		}
 
 		const data = await response.json()
-		return { 
-			success: true, 
-			message: typeof data === 'string' ? data : 'User unblocked successfully' 
+		return {
+			success: true,
+			message: typeof data === 'string' ? data : 'User unblocked successfully',
 		}
 	} catch (error) {
 		console.error('Failed to unblock user:', error)
