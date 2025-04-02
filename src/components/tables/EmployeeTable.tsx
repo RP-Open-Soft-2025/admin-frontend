@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 import Badge from '../ui/badge/Badge'
 import { User } from 'lucide-react'
@@ -14,22 +14,17 @@ type SortConfig = {
 
 export default function EmployeeTable({
 	tableData,
+	onSort,
 }: {
 	tableData: Employee[]
+	onSort: (sortConfig: SortConfig) => void
 }) {
-	const [employees, setEmployees] = useState<Employee[]>([])
 	const [sortConfig, setSortConfig] = useState<SortConfig>({
 		key: 'name',
 		direction: 'asc',
 	})
 
 	const router = useRouter()
-
-	useEffect(() => {
-		if (tableData) {
-			setEmployees([...tableData])
-		}
-	}, [tableData])
 
 	const handleSort = (key: keyof Employee) => {
 		let direction: SortDirection = 'asc'
@@ -38,26 +33,10 @@ export default function EmployeeTable({
 			direction = 'desc'
 		}
 
-		setSortConfig({ key, direction })
+		const newSortConfig = { key, direction }
+		setSortConfig(newSortConfig)
+		onSort(newSortConfig)
 	}
-
-	const sortedEmployees = useMemo(() => {
-		const sortableEmployees = [...employees]
-
-		sortableEmployees.sort((a, b) => {
-			const aValue = a[sortConfig.key] || ''
-			const bValue = b[sortConfig.key] || ''
-
-			if (typeof aValue === 'string' && typeof bValue === 'string') {
-				const comparison = aValue.localeCompare(bValue)
-				return sortConfig.direction === 'asc' ? comparison : -comparison
-			}
-
-			return 0
-		})
-
-		return sortableEmployees
-	}, [employees, sortConfig])
 
 	const getSortIndicator = (key: keyof Employee) => {
 		if (sortConfig.key === key) {
@@ -117,8 +96,8 @@ export default function EmployeeTable({
 						</TableRow>
 					</TableHeader>
 					<TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-						{sortedEmployees.length > 0 ? (
-							sortedEmployees.map(employee => (
+						{tableData.length > 0 ? (
+							tableData.map(employee => (
 								<TableRow
 									key={employee.userId}
 									onClick={() => router.push(`/profile/${employee.userId}`)}
