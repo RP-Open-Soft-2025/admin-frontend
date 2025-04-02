@@ -60,15 +60,13 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 							<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
 								Account Status
 							</p>
-							<p
-								className={`text-sm font-medium ${
-									userData.is_blocked
-										? 'text-red-600 dark:text-red-400'
-										: userData.account_activated
-											? 'text-green-600 dark:text-green-400'
-											: 'text-yellow-600 dark:text-yellow-400'
-								}`}
-							>
+							<p className={`text-sm font-medium ${
+								userData.is_blocked
+									? 'text-red-600 dark:text-red-400'
+									: userData.account_activated
+									? 'text-green-600 dark:text-green-400'
+									: 'text-yellow-600 dark:text-yellow-400'
+							}`}>
 								{userData.is_blocked
 									? 'Blocked'
 									: userData.account_activated

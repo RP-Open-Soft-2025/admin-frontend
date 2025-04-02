@@ -70,37 +70,37 @@ export default function UserPerformanceCard({
 		<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
 			<div className="flex flex-col gap-6">
 				<div>
-					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
+					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4 2xl:text-lg xl:text-base lg:text-sm md:text-sm">
 						Performance Overview
 					</h4>
 
-					<div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-							<p className="text-sm text-gray-500 dark:text-gray-400">
+					<div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+						<div className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+							<p className="text-sm text-gray-500 dark:text-gray-400 2xl:text-sm xl:text-xs lg:text-xs md:text-xs">
 								Latest Rating
 							</p>
 							<div className="mt-2 flex items-end">
-								<p className="text-3xl font-bold text-gray-800 dark:text-white">
+								<p className="text-3xl font-bold text-gray-800 dark:text-white 2xl:text-2xl xl:text-xl lg:text-base md:text-lg">
 									{latestPerformance.Performance_Rating.toFixed(1)}
 								</p>
-								<p className="ml-1 mb-1 text-sm text-gray-500 dark:text-gray-400">
+								<p className="ml-1 mb-1 text-sm text-gray-500 dark:text-gray-400 2xl:text-xs xl:text-xs lg:text-xs md:text-xs">
 									/5.0
 								</p>
 							</div>
-							<p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+							<p className="mt-1 text-xs text-gray-500 dark:text-gray-400 2xl:text-xs xl:text-[10px] lg:text-[9px] md:text-[10px]">
 								{latestPerformance.Review_Period}
 							</p>
 						</div>
 
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-							<p className="text-sm text-gray-500 dark:text-gray-400">
+						<div className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+							<p className="text-sm text-gray-500 dark:text-gray-400 2xl:text-sm xl:text-xs lg:text-xs md:text-xs">
 								Average Rating
 							</p>
 							<div className="mt-2 flex items-end">
-								<p className="text-3xl font-bold text-gray-800 dark:text-white">
+								<p className="text-3xl font-bold text-gray-800 dark:text-white 2xl:text-2xl xl:text-xl lg:text-base md:text-lg">
 									{averageRating.toFixed(1)}
 								</p>
-								<p className="ml-1 mb-1 text-sm text-gray-500 dark:text-gray-400">
+								<p className="ml-1 mb-1 text-sm text-gray-500 dark:text-gray-400 2xl:text-xs xl:text-xs lg:text-xs md:text-xs">
 									/5.0
 								</p>
 							</div>
@@ -108,7 +108,7 @@ export default function UserPerformanceCard({
 								{[1, 2, 3, 4, 5].map(star => (
 									<svg
 										key={star}
-										className={`h-4 w-4 ${star <= Math.round(averageRating) ? 'text-yellow-500' : 'text-gray-300 dark:text-gray-600'}`}
+										className={`h-4 w-4 2xl:h-3.5 2xl:w-3.5 xl:h-3 xl:w-3 lg:h-2 lg:w-2 md:h-2.5 md:w-2.5 ${star <= Math.round(averageRating) ? 'text-yellow-500' : 'text-gray-300 dark:text-gray-600'}`}
 										fill="currentColor"
 										viewBox="0 0 20 20"
 									>
@@ -118,18 +118,18 @@ export default function UserPerformanceCard({
 							</div>
 						</div>
 
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-							<p className="text-sm text-gray-500 dark:text-gray-400">
+						<div className="rounded-lg border border-gray-200 bg-white p-2.5 dark:border-gray-700 dark:bg-gray-800 sm:col-span-2 lg:col-span-1">
+							<p className="text-sm text-gray-500 dark:text-gray-400 2xl:text-sm xl:text-xs lg:text-xs md:text-xs">
 								Manager Feedback
 							</p>
 							<p
-								className={`mt-2 text-base font-semibold ${getFeedbackColor(latestPerformance.Manager_Feedback)}`}
+								className={`mt-2 text-base font-semibold 2xl:text-sm xl:text-xs lg:text-[10px] md:text-xs truncate ${getFeedbackColor(latestPerformance.Manager_Feedback)}`}
 							>
 								{latestPerformance.Manager_Feedback}
 							</p>
 							<div className="mt-2">
 								<span
-									className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${latestPerformance.Promotion_Consideration ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+									className={`inline-flex rounded-full px-1.5 py-0.5 text-xs font-semibold 2xl:text-[10px] xl:text-[9px] lg:text-[8px] md:text-[8px] ${latestPerformance.Promotion_Consideration ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
 								>
 									{latestPerformance.Promotion_Consideration
 										? 'Promotion Considered'
@@ -140,7 +140,7 @@ export default function UserPerformanceCard({
 					</div>
 
 					<div className="mt-6">
-						<h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+						<h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300 2xl:text-sm xl:text-xs lg:text-xs md:text-xs">
 							Performance History
 						</h5>
 						<div className="mt-4 flex items-end space-x-2 h-32">
@@ -164,11 +164,11 @@ export default function UserPerformanceCard({
 												height: `${performance.Performance_Rating * 20}px`,
 											}}
 										></div>
-										<div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-700 dark:text-gray-300">
+										<div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-medium text-gray-700 dark:text-gray-300 2xl:text-[10px] xl:text-[10px] lg:text-[8px] md:text-[8px]">
 											{performance.Performance_Rating.toFixed(1)}
 										</div>
 									</div>
-									<span className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+									<span className="mt-2 text-xs text-gray-500 dark:text-gray-400 2xl:text-[10px] xl:text-[10px] lg:text-[8px] md:text-[8px]">
 										{performance.Review_Period}
 									</span>
 								</div>
