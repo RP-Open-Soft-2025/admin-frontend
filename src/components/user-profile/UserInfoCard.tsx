@@ -2,7 +2,14 @@
 import React from 'react'
 import { EmployeeAPI } from '@/types/UserProfile'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Clock, UserCircle, Shield, Info, CreditCard } from 'lucide-react'
+import {
+	Calendar,
+	Clock,
+	UserCircle,
+	Shield,
+	Info,
+	CreditCard,
+} from 'lucide-react'
 
 // Props interface
 interface UserInfoCardProps {
@@ -72,15 +79,15 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 									userData.is_blocked
 										? 'danger'
 										: userData.account_activated
-										? 'success'
-										: 'warning'
+											? 'success'
+											: 'warning'
 								}
 							>
 								{userData.is_blocked
 									? 'Blocked'
 									: userData.account_activated
-									? 'Active'
-									: 'Pending'}
+										? 'Active'
+										: 'Pending'}
 							</Badge>
 						</div>
 
