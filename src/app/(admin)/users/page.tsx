@@ -10,7 +10,13 @@ type Response = {
 	users: Employee[]
 }
 
+type SortConfig = {
+	key: keyof Employee
+	direction: 'asc' | 'desc'
+}
+
 function Page() {
+	const [allData, setAllData] = useState<Employee[]>([])
 	const [currData, setCurrData] = useState<Employee[]>([])
 	const [paginatedData, setPaginatedData] = useState<Employee[]>([])
 	const [currPage, setCurrentPage] = useState<number>(1)
@@ -19,6 +25,10 @@ function Page() {
 	const [selectedRole, setSelectedRole] = useState<string>('')
 	const [availableRoles, setAvailableRoles] = useState<string[]>([])
 	const [historyLoading, setHistoryLoading] = useState<boolean>(true)
+	const [sortConfig, setSortConfig] = useState<SortConfig>({
+		key: 'name',
+		direction: 'asc',
+	})
 
 	useEffect(() => {
 		const { auth } = store.getState()
@@ -36,23 +46,12 @@ function Page() {
 			}).then(resp => {
 				if (resp.ok) {
 					resp.json().then((res: Response) => {
-						const sort_user = res.users.sort((a: Employee, b: Employee) => {
-							const da = new Date(a.lastPing)
-							const db = new Date(b.lastPing)
-							return db.getTime() - da.getTime()
-						})
-						setCurrData(sort_user)
-
+						setAllData(res.users)
 						// Extract unique roles from the data
-						const roles = [...new Set(sort_user.map(user => user.role))].filter(
+						const roles = [...new Set(res.users.map(user => user.role))].filter(
 							Boolean
 						)
 						setAvailableRoles(roles)
-
-						const pages = Math.ceil(res.users.length / MAX_PER_PAGE_USER)
-						console.log(pages)
-						setTotalPages(pages)
-						setCurrentPage(1)
 						setHistoryLoading(false)
 					})
 				}
@@ -69,11 +68,23 @@ function Page() {
 	}, [])
 
 	useEffect(() => {
-		// First filter the data
-		let filteredData = currData
+		// First sort all data
+		let sortedData = [...allData]
+		sortedData.sort((a, b) => {
+			const aValue = a[sortConfig.key] || ''
+			const bValue = b[sortConfig.key] || ''
 
+			if (typeof aValue === 'string' && typeof bValue === 'string') {
+				const comparison = aValue.localeCompare(bValue)
+				return sortConfig.direction === 'asc' ? comparison : -comparison
+			}
+
+			return 0
+		})
+
+		// Then filter the sorted data
 		if (searchTerm) {
-			filteredData = filteredData.filter(
+			sortedData = sortedData.filter(
 				user =>
 					user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
 					user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,11 +93,13 @@ function Page() {
 		}
 
 		if (selectedRole) {
-			filteredData = filteredData.filter(user => user.role === selectedRole)
+			sortedData = sortedData.filter(user => user.role === selectedRole)
 		}
 
+		setCurrData(sortedData)
+
 		// Calculate total pages based on filtered data
-		const pages = Math.ceil(filteredData.length / MAX_PER_PAGE_USER)
+		const pages = Math.ceil(sortedData.length / MAX_PER_PAGE_USER)
 		setTotalPages(pages || 1)
 
 		// Ensure current page is valid with new filter results
@@ -97,8 +110,8 @@ function Page() {
 		// Apply pagination to filtered data
 		const start = (currPage - 1) * MAX_PER_PAGE_USER
 		const end = start + MAX_PER_PAGE_USER
-		setPaginatedData(filteredData.slice(start, end))
-	}, [currPage, currData, searchTerm, selectedRole])
+		setPaginatedData(sortedData.slice(start, end))
+	}, [currPage, allData, searchTerm, selectedRole, sortConfig])
 
 	if (historyLoading) {
 		return (
@@ -155,7 +168,7 @@ function Page() {
 				</div>
 			</div>
 
-			<BasicTableOne tableData={paginatedData} />
+			<BasicTableOne tableData={paginatedData} onSort={setSortConfig} />
 			<div className="mt-6 w-full flex justify-center items-center">
 				<Pagination
 					totalPages={totalPages}
