@@ -308,18 +308,105 @@ export default function FormLayout() {
 
 							{/* Manager ID Field - Only shown if role is Employee */}
 							{formData.role === Role.EMPLOYEE && (
-								<Select
-									isSearchable
-									options={filterHR.map((hr: LocalHR) => ({
-										value: hr.hrId,
-										label: `${hr.hrId}`,
-									}))}
-									onChange={e => {
-										setFormData({ ...formData, manager_id: e!.value })
-										SetCurrSel(e!.value)
-									}}
-									className="dark:bg-gray-900 bg-white"
-								/>
+								<div>
+									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+										Manager ID*
+									</label>
+									<Select
+										isSearchable
+										options={filterHR.map((hr: LocalHR) => ({
+											value: hr.hrId,
+											label: `${hr.hrId} - ${hr.name}`,
+										}))}
+										onChange={e => {
+											setFormData({ ...formData, manager_id: e!.value })
+											SetCurrSel(e!.value)
+										}}
+										value={
+											filterHR
+												.filter(hr => hr.hrId === formData.manager_id)
+												.map(hr => ({
+													value: hr.hrId,
+													label: `${hr.hrId} - ${hr.name}`,
+												}))[0]
+										}
+										styles={{
+											control: (base, state) => ({
+												...base,
+												background: 'rgb(255, 255, 255)',
+												borderColor: state.isFocused
+													? 'rgb(99, 102, 241)'
+													: 'rgb(229, 231, 235)',
+												boxShadow: state.isFocused
+													? '0 0 0 2px rgba(99, 102, 241, 0.2)'
+													: 'none',
+												'&:hover': {
+													borderColor: 'rgb(99, 102, 241)',
+												},
+												'.dark &': {
+													background: 'rgb(17, 24, 39)',
+													borderColor: state.isFocused
+														? 'rgb(99, 102, 241)'
+														: 'rgb(55, 65, 81)',
+												},
+											}),
+											menu: base => ({
+												...base,
+												background: 'rgb(255, 255, 255)',
+												border: '1px solid rgb(229, 231, 235)',
+												'.dark &': {
+													background: 'rgb(17, 24, 39)',
+													border: '1px solid rgb(55, 65, 81)',
+												},
+											}),
+											option: (base, state) => ({
+												...base,
+												backgroundColor: state.isFocused
+													? 'rgba(99, 102, 241, 0.2)'
+													: 'transparent',
+												color: 'rgb(31, 41, 55)',
+												'&:hover': {
+													backgroundColor: 'rgba(99, 102, 241, 0.2)',
+												},
+												'.dark &': {
+													color: 'rgb(243, 244, 246)',
+												},
+											}),
+											singleValue: base => ({
+												...base,
+												color: 'rgb(31, 41, 55)',
+												'.dark &': {
+													color: 'rgb(243, 244, 246)',
+												},
+											}),
+											input: base => ({
+												...base,
+												color: 'rgb(31, 41, 55)',
+												'.dark &': {
+													color: 'rgb(243, 244, 246)',
+												},
+											}),
+										}}
+										theme={theme => ({
+											...theme,
+											colors: {
+												...theme.colors,
+												primary: 'rgb(99, 102, 241)',
+												primary75: 'rgba(99, 102, 241, 0.75)',
+												primary50: 'rgba(99, 102, 241, 0.5)',
+												primary25: 'rgba(99, 102, 241, 0.25)',
+											},
+										})}
+										className={`w-full ${
+											errors.manager_id ? 'border-error-500' : ''
+										}`}
+									/>
+									{errors.manager_id && (
+										<p className="mt-1 text-sm text-error-500">
+											{errors.manager_id}
+										</p>
+									)}
+								</div>
 							)}
 
 							<div className="col-span-full pt-4 flex gap-4">
