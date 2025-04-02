@@ -146,7 +146,9 @@ const ChatPage = () => {
 				msg => msg.sender === SenderType.SYSTEM && msg.text === selectedChatId
 			)
 			if (systemMessage) {
-				const messageElement = document.querySelector(`[data-chat-id="${selectedChatId}"]`)
+				const messageElement = document.querySelector(
+					`[data-chat-id="${selectedChatId}"]`
+				)
 				if (messageElement) {
 					messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
 				}
