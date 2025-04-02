@@ -20,7 +20,7 @@ import {
 	getOnboardingData,
 } from '@/services/profileService'
 import { useParams, useRouter } from 'next/navigation'
-import store, { RootState } from '@/redux/store'
+import store from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 import { EmployeeAPI } from '@/types/UserProfile'
 
@@ -164,10 +164,10 @@ export default function Profile() {
 					)}
 
 					{/* Sessions Section */}
-					<UserSessionsCard
+					{auth.user && <UserSessionsCard
 						employeeId={profileData.employee_id}
-						role={auth.user?.userRole!}
-					/>
+						role={auth.user.userRole!}
+					/>}
 				</div>
 			</div>
 		</div>

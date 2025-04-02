@@ -96,9 +96,6 @@ export default function UserSessionsCard({
 	const completedSessions = sessionsData.filter(
 		session => session.status === SessionStatus.COMPLETED
 	)
-	const cancelledSessions = sessionsData.filter(
-		session => session.status === SessionStatus.CANCELLED
-	)
 	const pendingSessions = sessionsData.filter(
 		session => session.status === SessionStatus.PENDING
 	)
