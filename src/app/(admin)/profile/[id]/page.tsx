@@ -20,8 +20,7 @@ import {
 	getOnboardingData,
 } from '@/services/profileService'
 import { useParams, useRouter } from 'next/navigation'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/redux/store'
+import store, { RootState } from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 import { EmployeeAPI } from '@/types/UserProfile'
 
@@ -32,7 +31,7 @@ export default function Profile() {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const router = useRouter()
-	const auth = useSelector((state: RootState) => state.auth)
+	const { auth } = store.getState()
 
 	useEffect(() => {
 		// Check if user is authenticated
@@ -165,7 +164,10 @@ export default function Profile() {
 					)}
 
 					{/* Sessions Section */}
-					<UserSessionsCard employeeId={profileData.employee_id} />
+					<UserSessionsCard
+						employeeId={profileData.employee_id}
+						role={auth.user?.userRole!}
+					/>
 				</div>
 			</div>
 		</div>

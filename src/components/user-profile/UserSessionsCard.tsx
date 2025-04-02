@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 // Props interface
 interface UserSessionsCardProps {
 	employeeId: string
+	role: string
 }
 
 // Helper function to format dates consistently
@@ -39,6 +40,7 @@ const getSessionStatusColor = (status: SessionStatus) => {
 
 export default function UserSessionsCard({
 	employeeId,
+	role,
 }: UserSessionsCardProps) {
 	const [sessionsData, setSessionsData] = useState<SessionType[] | null>(null)
 	const [loading, setLoading] = useState(true)
@@ -110,8 +112,11 @@ export default function UserSessionsCard({
 					</h4>
 
 					{/* Session Summary */}
-					<div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105">
+					<div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						<div
+							onClick={() => router.push(`/${role}/sessions/active`)}
+							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
+						>
 							<p className="text-sm text-gray-500 dark:text-gray-400">
 								Active Sessions
 							</p>
@@ -119,7 +124,10 @@ export default function UserSessionsCard({
 								{activeSessions.length}
 							</p>
 						</div>
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105">
+						<div
+							onClick={() => router.push(`/${role}/sessions/completed`)}
+							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
+						>
 							<p className="text-sm text-gray-500 dark:text-gray-400">
 								Completed Sessions
 							</p>
@@ -127,15 +135,10 @@ export default function UserSessionsCard({
 								{completedSessions.length}
 							</p>
 						</div>
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105">
-							<p className="text-sm text-gray-500 dark:text-gray-400">
-								Cancelled Sessions
-							</p>
-							<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-								{cancelledSessions.length}
-							</p>
-						</div>
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105">
+						<div
+							onClick={() => router.push(`/${role}/sessions/pending`)}
+							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
+						>
 							<p className="text-sm text-gray-500 dark:text-gray-400">
 								Pending Sessions
 							</p>

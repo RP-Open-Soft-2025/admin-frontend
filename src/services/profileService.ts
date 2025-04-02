@@ -240,21 +240,47 @@ export const getSessionsData = async (
 ): Promise<SessionType[]> => {
 	const { auth } = store.getState()
 	try {
-		const response = await fetch(`${API_URL}/admin/sessions`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${auth.user?.accessToken}`,
-			},
-		})
+		// Fetch from all three endpoints
+		const [activeResponse, completedResponse, pendingResponse] =
+			await Promise.all([
+				fetch(`${API_URL}/admin/sessions/active`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+					},
+				}),
+				fetch(`${API_URL}/admin/sessions/completed`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+					},
+				}),
+				fetch(`${API_URL}/admin/sessions/pending`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+					},
+				}),
+			])
 
-		if (!response.ok) {
+		// Check if any of the responses failed
+		if (!activeResponse.ok || !completedResponse.ok || !pendingResponse.ok) {
 			throw new Error('Failed to fetch sessions data')
 		}
 
-		const data = await response.json()
-		// Filter sessions for the specific employee
-		return data.filter(
+		// Parse all responses
+		const [activeData, completedData, pendingData] = await Promise.all([
+			activeResponse.json(),
+			completedResponse.json(),
+			pendingResponse.json(),
+		])
+
+		// Combine all sessions and filter by employee_id
+		const allSessions = [...activeData, ...completedData, ...pendingData]
+		return allSessions.filter(
 			(session: SessionType) => session.employee_id === employeeId
 		)
 	} catch (error) {
