@@ -175,37 +175,43 @@ export default function UserSessionsCard({
 									</tr>
 								</thead>
 								<tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-									{sessionsData.map(session => (
-										<tr
-											key={session.session_id}
-											onClick={() =>
-												router.push(`/chat-page/${session.chat_id}`)
-											}
-											onMouseEnter={() => setHoveredRow(session.session_id)}
-											onMouseLeave={() => setHoveredRow(null)}
-											className={`cursor-pointer transition-all duration-200 ${
-												hoveredRow === session.session_id
-													? 'bg-gray-50 dark:bg-gray-800 shadow-sm'
-													: 'hover:bg-gray-50 dark:hover:bg-gray-800'
-											}`}
-										>
-											<td className="px-6 py-4 whitespace-nowrap text-sm">
-												<span
-													className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getSessionStatusColor(
-														session.status as SessionStatus
-													)}`}
-												>
-													{session.status}
-												</span>
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-												{formatDate(session.scheduled_at)}
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-												{session.chat_id}
-											</td>
-										</tr>
-									))}
+									{sessionsData
+										.sort(
+											(a: SessionType, b: SessionType) =>
+												new Date(b.scheduled_at).getTime() -
+												new Date(a.scheduled_at).getTime()
+										)
+										.map(session => (
+											<tr
+												key={session.session_id}
+												onClick={() =>
+													router.push(`/chat-page/${session.chat_id}`)
+												}
+												onMouseEnter={() => setHoveredRow(session.session_id)}
+												onMouseLeave={() => setHoveredRow(null)}
+												className={`cursor-pointer transition-all duration-200 ${
+													hoveredRow === session.session_id
+														? 'bg-gray-50 dark:bg-gray-800 shadow-sm'
+														: 'hover:bg-gray-50 dark:hover:bg-gray-800'
+												}`}
+											>
+												<td className="px-6 py-4 whitespace-nowrap text-sm">
+													<span
+														className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getSessionStatusColor(
+															session.status as SessionStatus
+														)}`}
+													>
+														{session.status}
+													</span>
+												</td>
+												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+													{formatDate(session.scheduled_at)}
+												</td>
+												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+													{session.chat_id}
+												</td>
+											</tr>
+										))}
 								</tbody>
 							</table>
 						</div>
