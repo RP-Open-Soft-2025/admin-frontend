@@ -12,11 +12,8 @@ import UserVibeMeterCard from '@/components/user-profile/UserVibeMeterCard'
 import React, { useEffect, useState } from 'react'
 import {
 	getUserProfileData,
-	getUserMetaData,
-	getUserInfoData,
 	getVibeMeterData,
 	getActivityData,
-	getLeaveData,
 	getPerformanceData,
 	getRewardsData,
 	getOnboardingData,
@@ -57,6 +54,7 @@ export default function Profile() {
 					performance: data.company_data.performance,
 					rewards: data.company_data.rewards,
 					vibemeter: data.company_data.vibemeter,
+					leave: data.company_data.leave,
 				})
 
 				// Debug logs for transformed data
@@ -128,10 +126,8 @@ export default function Profile() {
 					Profile
 				</h3>
 				<div className="space-y-6">
-					<UserMetaCard userData={getUserMetaData(profileData)} />
-					<UserInfoCard userData={getUserInfoData(profileData)} />
-					{/* No address data in API response, but keeping component with dummy data */}
-					{/* <UserAddressCard /> */}
+					<UserMetaCard userData={profileData} />
+					<UserInfoCard userData={profileData} />
 
 					{/* Only render components with data */}
 					{profileData.company_data.onboarding.length > 0 && (
@@ -155,7 +151,9 @@ export default function Profile() {
 						)}
 					</div>
 
-					<UserLeaveCard leaveData={getLeaveData(profileData)} />
+					{profileData.company_data.leave.length > 0 && (
+						<UserLeaveCard leaveData={profileData.company_data.leave} />
+					)}
 
 					{profileData.company_data.vibemeter.length > 0 && (
 						<UserVibeMeterCard vibeMeterData={getVibeMeterData(profileData)} />

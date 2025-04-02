@@ -1,46 +1,10 @@
 'use client'
 import React from 'react'
-import { LeaveRequest } from '@/types/employee'
+import { Leave, LeaveType } from '@/types/UserProfile'
 
 // Props interface
 interface UserLeaveCardProps {
-	leaveData?: {
-		usedLeave: number
-		totalLeave: number
-		requests: LeaveRequest[]
-	}
-}
-
-// Dummy data for development
-const dummyLeaveData = {
-	usedLeave: 12,
-	totalLeave: 30,
-	requests: [
-		{
-			id: 'leave1',
-			type: 'Vacation',
-			startDate: '2023-06-10',
-			endDate: '2023-06-15',
-			status: 'Approved',
-			requestDate: '2023-05-15',
-		},
-		{
-			id: 'leave2',
-			type: 'Sick Leave',
-			startDate: '2023-03-22',
-			endDate: '2023-03-23',
-			status: 'Approved',
-			requestDate: '2023-03-21',
-		},
-		{
-			id: 'leave3',
-			type: 'Personal',
-			startDate: '2023-07-05',
-			endDate: '2023-07-07',
-			status: 'Pending',
-			requestDate: '2023-06-20',
-		},
-	],
+	leaveData?: Leave[] | null
 }
 
 // Helper function to format dates consistently
@@ -49,79 +13,106 @@ const formatDate = (dateString: string) => {
 	return date.toLocaleDateString('en-GB') // Use consistent locale (DD/MM/YYYY)
 }
 
-export default function UserLeaveCard({ leaveData }: UserLeaveCardProps) {
-	// Use provided data or fall back to dummy data
-	const displayData = leaveData || dummyLeaveData
+// Helper function to calculate total leave days
+const calculateTotalLeaveDays = (leaves: Leave[]) => {
+	return leaves.reduce((total, leave) => total + leave.Leave_Days, 0)
+}
 
-	// Calculate leave percentages
+// Helper function to get leave type color
+const getLeaveTypeColor = (type: LeaveType) => {
+	switch (type) {
+		case LeaveType.ANNUAL:
+			return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+		case LeaveType.CASUAL:
+			return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+		case LeaveType.SICK:
+			return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+		case LeaveType.UNPAID:
+			return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+		default:
+			return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+	}
+}
+
+export default function UserLeaveCard({ leaveData }: UserLeaveCardProps) {
+	if (!leaveData || leaveData.length === 0) return null
+
+	const totalLeaveDays = calculateTotalLeaveDays(leaveData)
 
 	return (
 		<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
 			<div className="flex flex-col gap-6">
 				<div>
 					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-4">
-						Leave Management
+						Leave History
 					</h4>
 
-					{displayData.requests.length > 0 && (
-						<div>
-							<h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-								Recent Leave Requests
-							</h5>
-							<div className="overflow-x-auto">
-								<table className="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-									<thead className="bg-gray-50 dark:bg-gray-800">
-										<tr>
-											<th
-												scope="col"
-												className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-											>
-												Type
-											</th>
-											<th
-												scope="col"
-												className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-											>
-												Duration
-											</th>
-											<th
-												scope="col"
-												className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-											>
-												Status
-											</th>
-										</tr>
-									</thead>
-									<tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-										{displayData.requests.map(request => (
-											<tr key={request.id}>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-													{request.type}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-													{formatDate(request.startDate)} -{' '}
-													{formatDate(request.endDate)}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm">
-													<span
-														className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-															request.status === 'Approved'
-																? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-																: request.status === 'Pending'
-																	? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-																	: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-														}`}
-													>
-														{request.status}
-													</span>
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							</div>
+					{/* Leave Summary */}
+					<div className="mb-6">
+						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+							<p className="text-sm text-gray-500 dark:text-gray-400">
+								Total Leave Days
+							</p>
+							<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
+								{totalLeaveDays} days
+							</p>
 						</div>
-					)}
+					</div>
+
+					{/* Leave Records */}
+					<div>
+						<h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+							Leave Records
+						</h5>
+						<div className="overflow-x-auto">
+							<table className="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+								<thead className="bg-gray-50 dark:bg-gray-800">
+									<tr>
+										<th
+											scope="col"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+										>
+											Type
+										</th>
+										<th
+											scope="col"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+										>
+											Days
+										</th>
+										<th
+											scope="col"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+										>
+											Duration
+										</th>
+									</tr>
+								</thead>
+								<tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+									{leaveData.map((leave, index) => (
+										<tr key={index}>
+											<td className="px-6 py-4 whitespace-nowrap text-sm">
+												<span
+													className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getLeaveTypeColor(
+														leave.Leave_Type
+													)}`}
+												>
+													{leave.Leave_Type}
+												</span>
+											</td>
+											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+												{leave.Leave_Days} days
+											</td>
+											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+												{formatDate(leave.Leave_Start_Date)} -{' '}
+												{formatDate(leave.Leave_End_Date)}
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
