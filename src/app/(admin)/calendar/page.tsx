@@ -63,12 +63,44 @@ const calendarStyles = `
 	border-radius: 4px;
 	padding: 2px 4px;
 	margin-bottom: 2px;
+	max-width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .event-fc-color {
 	display: flex;
 	align-items: center;
 	gap: 4px;
 	cursor: pointer;
+	max-width: 100%;
+	overflow: hidden;
+}
+
+/* Text styling for event titles */
+.fc-event-title {
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    display: block !important;
+}
+
+/* Fix popover scrolling */
+.fc-more-popover {
+    max-height: 400px !important;
+    overflow-y: auto !important;
+}
+
+.fc-popover-body {
+    max-height: 350px !important;
+    overflow-y: auto !important;
+}
+
+/* Prevent body scrolling when popover is open */
+body.fc-popover-open {
+    overflow: hidden !important;
 }
 
 /* Custom filter dropdown styles */
@@ -146,18 +178,18 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 	if (isTimeGridView) {
 		return (
 			<div className={`fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full h-full`}>
-				<div className="text-white font-medium">{eventInfo.event.title}</div>
+				<div className="text-white font-medium text-xs overflow-hidden text-ellipsis whitespace-nowrap">{eventInfo.event.title}</div>
 			</div>
 		)
 	}
 	
 	return (
 		<a
-			className={`event-fc-color flex fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full`}
+			className={`event-fc-color fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full`}
 			href={eventInfo.event.extendedProps.redirectUrl}
 		>
-			<div className="fc-daygrid-event-dot"></div>
-			<div className="text-white">{eventInfo.event.title}</div>
+			<div className="fc-daygrid-event-dot flex-shrink-0"></div>
+			<div className="text-white text-xs overflow-hidden text-ellipsis whitespace-nowrap">{eventInfo.event.title}</div>
 		</a>
 	)
 }
@@ -190,7 +222,6 @@ const Calendar: React.FC = () => {
 		})
 		router.push('/login')
 	}
-
 
 	useEffect(() => {
 		const fetchMeetings = async () => {
@@ -350,6 +381,101 @@ const Calendar: React.FC = () => {
 		setSelectedEvent(null)
 	}
 
+	useEffect(() => {
+		// Skip if calendarRef isn't available
+		if (!calendarRef.current) return;
+		
+		// Access the DOM element
+		const calendarEl = document.querySelector('.fc');
+		if (!calendarEl) return;
+		
+		// Get the toolbar container
+		const toolbarContainer = calendarEl.querySelector('.fc-toolbar-chunk:first-child');
+		if (!toolbarContainer) return;
+		
+		// Create filter dropdown
+		const select = document.createElement('select');
+		select.className = 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 ml-2 text-sm text-gray-700 dark:text-gray-200';
+		
+		// Add options
+		const options = [
+			{ value: 'all', label: 'All Events' },
+			{ value: 'meetings', label: 'Meetings Only' },
+			{ value: 'sessions', label: 'Sessions Only' }
+		];
+		
+		options.forEach(option => {
+			const optionEl = document.createElement('option');
+			optionEl.value = option.value;
+			optionEl.text = option.label;
+			optionEl.selected = activeFilter === option.value;
+			select.appendChild(optionEl);
+		});
+		
+		// Add change event listener
+		select.addEventListener('change', (e) => {
+			setActiveFilter((e.target as HTMLSelectElement).value as FilterType);
+		});
+		
+		// Add the select to the toolbar
+		toolbarContainer.appendChild(select);
+		
+		// Cleanup function
+		return () => {
+			if (toolbarContainer.contains(select)) {
+				toolbarContainer.removeChild(select);
+			}
+		};
+	}, [activeFilter, events]);
+
+	// Add this useEffect to handle body scrolling when popover opens/closes
+	useEffect(() => {
+		// Skip if calendarRef isn't available
+		if (!calendarRef.current) return;
+		
+		const handlePopoverOpen = () => {
+			document.body.classList.add('fc-popover-open');
+		};
+		
+		const handlePopoverClose = () => {
+			document.body.classList.remove('fc-popover-open');
+		};
+		
+		// Check for popover elements
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach((mutation) => {
+				if (mutation.addedNodes.length) {
+					// Check if a popover was added
+					const popover = document.querySelector('.fc-more-popover');
+					if (popover) {
+						handlePopoverOpen();
+						
+						// Add a click event listener to the close button
+						const closeButton = popover.querySelector('.fc-popover-close');
+						if (closeButton) {
+							closeButton.addEventListener('click', handlePopoverClose);
+						}
+						
+						// Also handle clicking outside the popover
+						document.addEventListener('click', (e) => {
+							if (e.target instanceof Element && !popover.contains(e.target)) {
+								handlePopoverClose();
+							}
+						}, { once: true });
+					}
+				}
+			});
+		});
+		
+		// Start observing the document for popover elements
+		observer.observe(document.body, { childList: true, subtree: true });
+		
+		return () => {
+			observer.disconnect();
+			handlePopoverClose(); // Clean up when component unmounts
+		};
+	}, []);
+
 	return (
 		<div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
 			<style>{calendarStyles}</style>
@@ -360,7 +486,7 @@ const Calendar: React.FC = () => {
 					plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
 					initialView="dayGridMonth"
 					headerToolbar={{
-						left: 'prev,next customFilterContainer',
+						left: 'prev,next',
 						center: 'title',
 						right: 'dayGridMonth,timeGridWeek,timeGridDay',
 					}}
@@ -369,18 +495,11 @@ const Calendar: React.FC = () => {
 					select={handleDateSelect}
 					eventClick={handleEventClick}
 					eventContent={RenderEventContent}
-					dayMaxEvents={5}
+					dayMaxEvents={3}
 					moreLinkClick="popover"
-					customButtons={{
-						customFilterContainer: {
-							text: '',
-							click: function() {
-								// This function is needed but will not be used
-							},
-							// We'll use the DOM API to create our dropdown in the componentDidMount lifecycle
-							// Remove the 'render' property and handle the dropdown creation after the calendar mounts
-						}
-					}}
+					height="auto"
+					displayEventEnd={false}
+					eventDisplay="block"
 				/>
 			</div>
 
