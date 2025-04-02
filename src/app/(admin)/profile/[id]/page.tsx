@@ -164,10 +164,12 @@ export default function Profile() {
 					)}
 
 					{/* Sessions Section */}
-					{auth.user && <UserSessionsCard
-						employeeId={profileData.employee_id}
-						role={auth.user.userRole!}
-					/>}
+					{auth.user && (
+						<UserSessionsCard
+							employeeId={profileData.employee_id}
+							role={auth.user.userRole!}
+						/>
+					)}
 				</div>
 			</div>
 		</div>
