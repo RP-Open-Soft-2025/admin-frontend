@@ -19,10 +19,12 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 	return (
 		<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
 			<div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-				<div>
-					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
-						Employee Information
-					</h4>
+				<div className="w-full">
+					<div className="flex items-center justify-between mb-4 lg:mb-6">
+						<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+							Employee Information
+						</h4>
+					</div>
 
 					<div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
 						<div>
@@ -58,7 +60,13 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 							<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
 								Account Status
 							</p>
-							<p className="text-sm font-medium text-gray-800 dark:text-white/90">
+							<p className={`text-sm font-medium ${
+								userData.is_blocked
+									? 'text-red-600 dark:text-red-400'
+									: userData.account_activated
+									? 'text-green-600 dark:text-green-400'
+									: 'text-yellow-600 dark:text-yellow-400'
+							}`}>
 								{userData.is_blocked
 									? 'Blocked'
 									: userData.account_activated
