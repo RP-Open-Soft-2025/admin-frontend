@@ -108,10 +108,19 @@ export default function UserSessionsCard({
 					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-4">
 						Session History
 					</h4>
+					{activeSessions.length > 0 && (
+					<div 
+						onClick={() => router.push('/chat-page/'+activeSessions[0].chat_id)} 
+						className="mt-2 mb-4 p-3 bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all duration-200 flex items-center"
+					>
+						<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+						<span>You have an active session pending to join</span>
+					</div>
+					)}
 
 					{/* Session Summary */}
 					<div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						<div
+						{/* <div
 							onClick={() => router.push(`/${role}/sessions/active`)}
 							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
 						>
@@ -121,8 +130,8 @@ export default function UserSessionsCard({
 							<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
 								{activeSessions.length}
 							</p>
-						</div>
-						<div
+						</div> */}
+						{/* <div
 							onClick={() => router.push(`/${role}/sessions/completed`)}
 							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
 						>
@@ -132,7 +141,7 @@ export default function UserSessionsCard({
 							<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
 								{completedSessions.length}
 							</p>
-						</div>
+						</div> */}
 						<div
 							onClick={() => router.push(`/${role}/sessions/pending`)}
 							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
