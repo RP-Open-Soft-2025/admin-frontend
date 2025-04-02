@@ -9,7 +9,7 @@ import { Role } from '@/types/employee'
 type SessionHist = {
 	chat_id: string
 	last_message: string
-	last_message_time: string // ISO timestamp
+	last_message_time: string | null // ISO timestamp
 	unread_count: number
 	total_messages: number
 	chat_mode: 'BOT' | 'HUMAN' // Assuming only these two modes
@@ -206,9 +206,15 @@ const ChatPage = () => {
 					const data: SessionHist[] = await resp.json()
 					const updtData: SessionHist[] = data.sort(
 						(a: SessionHist, b: SessionHist) => {
+							if (!a.last_message) {
+								return 1
+							}
+							if (!b.last_message) {
+								return -1
+							}
 							return (
-								new Date(a.created_at).getTime() -
-								new Date(b.created_at).getTime()
+								new Date(a.last_message).getTime() -
+								new Date(b.last_message).getTime()
 							)
 						}
 					)
