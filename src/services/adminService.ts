@@ -397,3 +397,73 @@ export async function reassignHR(
 		throw error
 	}
 }
+
+export async function blockUser(
+	employeeId: string,
+	reason: string
+): Promise<{ success: boolean; message: string }> {
+	try {
+		const token = await getAuthToken()
+		const role = store.getState().auth.user?.userRole
+
+		const response = await fetch(`${API_URL}/admin-hr/block-user`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				employee_id: employeeId,
+				reason: reason,
+			}),
+		})
+
+		if (!response.ok) {
+			throw new Error(`Error blocking user: ${response.statusText}`)
+		}
+
+		const data = await response.json()
+		return { 
+			success: true, 
+			message: typeof data === 'string' ? data : 'User blocked successfully' 
+		}
+	} catch (error) {
+		console.error('Failed to block user:', error)
+		throw error
+	}
+}
+
+export async function unblockUser(
+	employeeId: string,
+	reason: string
+): Promise<{ success: boolean; message: string }> {
+	try {
+		const token = await getAuthToken()
+		const role = store.getState().auth.user?.userRole
+
+		const response = await fetch(`${API_URL}/admin-hr/unblock-user`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				employee_id: employeeId,
+				reason: reason,
+			}),
+		})
+
+		if (!response.ok) {
+			throw new Error(`Error unblocking user: ${response.statusText}`)
+		}
+
+		const data = await response.json()
+		return { 
+			success: true, 
+			message: typeof data === 'string' ? data : 'User unblocked successfully' 
+		}
+	} catch (error) {
+		console.error('Failed to unblock user:', error)
+		throw error
+	}
+}
