@@ -127,9 +127,10 @@ const ChatPage = () => {
 	const { auth } = store.getState()
 	const [isLoading, setIsLoading] = useState(true)
 	const [takeOver, setTakeOver] = useState<boolean>(false)
-	const [sidebarOpen, setSidebarOpen] = useState(true) // Default to open to match UI
+	const [sidebarOpen, setSidebarOpen] = useState(true)
 	const [sessions, setSessions] = useState<SessionHist[]>([])
 	const [historyLoading, setHistoryLoading] = useState(false)
+	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
 
 	// Scroll to latest message
 	useEffect(() => {
@@ -137,6 +138,21 @@ const ChatPage = () => {
 			chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
 		}
 	}, [messages])
+
+	// Scroll to selected chat's system message
+	useEffect(() => {
+		if (selectedChatId && messagesContainerRef.current) {
+			const systemMessage = messages.find(
+				msg => msg.sender === SenderType.SYSTEM && msg.text === selectedChatId
+			)
+			if (systemMessage) {
+				const messageElement = document.querySelector(`[data-chat-id="${selectedChatId}"]`)
+				if (messageElement) {
+					messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+				}
+			}
+		}
+	}, [selectedChatId, messages])
 
 	// Get sidebar state from localStorage on component mount
 	useEffect(() => {
@@ -187,15 +203,15 @@ const ChatPage = () => {
 				if (resp.ok) {
 					const data: SessionHist[] = await resp.json()
 					data.sort((a: SessionHist, b: SessionHist) => {
-						if (a.last_message_time === null) {
+						if (a.created_at === null) {
 							return 1
 						}
-						if (b.last_message_time === null) {
+						if (b.created_at === null) {
 							return -1
 						}
 						return (
-							new Date(a.last_message_time).getTime() -
-							new Date(b.last_message_time).getTime()
+							new Date(a.created_at).getTime() -
+							new Date(b.created_at).getTime()
 						)
 					})
 					setSessions(data)
@@ -281,8 +297,8 @@ const ChatPage = () => {
 	}
 
 	const navigateToChat = (chatId: string) => {
-		// Here you would typically use a router to navigate
-		window.location.href = `/chat-page/${chatId}`
+		setSelectedChatId(chatId)
+		// window.location.href = `/chat-page/${chatId}`
 	}
 
 	const toggleSidebar = () => {
@@ -374,7 +390,9 @@ const ChatPage = () => {
 							<>
 								{messages.length > 0 ? (
 									messages.map((message, index) => (
-										<MessageComp key={index} message={message} />
+										<div key={index} data-chat-id={message.text}>
+											<MessageComp message={message} />
+										</div>
 									))
 								) : (
 									<p className="text-center p-2 dark:text-gray-400 text-sm text-gray-700">
