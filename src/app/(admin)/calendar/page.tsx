@@ -208,6 +208,7 @@ const Calendar: React.FC = () => {
 	const [eventLevel, setEventLevel] = useState('')
 	const [events, setEvents] = useState<CalendarEvent[]>([])
 	const [allEvents, setAllEvents] = useState<CalendarEvent[]>([])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [activeFilter, setActiveFilter] = useState<FilterType>('all')
 	const calendarRef = useRef<FullCalendar>(null)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
