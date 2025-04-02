@@ -31,8 +31,8 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 
 					<div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
 						<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
-							<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-								<CreditCard className="h-3.5 w-3.5" />
+							<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+								<CreditCard className="h-3.5 w-3.5 text-2xl" />
 								Employee ID
 							</p>
 							<p className="text-sm font-medium text-gray-800 dark:text-white/90 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -41,7 +41,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 						</div>
 
 						<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
-							<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+							<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 								<Shield className="h-3.5 w-3.5" />
 								Role
 							</p>
@@ -52,7 +52,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 
 						{userData.manager_id && (
 							<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
-								<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+								<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 									<UserCircle className="h-3.5 w-3.5" />
 									Manager ID
 								</p>
@@ -63,7 +63,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 						)}
 
 						<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
-							<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+							<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 								<Shield className="h-3.5 w-3.5" />
 								Account Status
 							</p>
@@ -86,7 +86,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 
 						{userData.blocked_at && (
 							<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
-								<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+								<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 									<Calendar className="h-3.5 w-3.5" />
 									Blocked At
 								</p>
@@ -98,7 +98,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 
 						{userData.blocked_by && (
 							<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
-								<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+								<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 									<UserCircle className="h-3.5 w-3.5" />
 									Blocked By
 								</p>
@@ -110,7 +110,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 
 						{userData.blocked_reason && (
 							<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
-								<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+								<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 									<Info className="h-3.5 w-3.5" />
 									Block Reason
 								</p>
@@ -121,7 +121,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 						)}
 
 						<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
-							<p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+							<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 								<Clock className="h-3.5 w-3.5" />
 								Last Active
 							</p>
