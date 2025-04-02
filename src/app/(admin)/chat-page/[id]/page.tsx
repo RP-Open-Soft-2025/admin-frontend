@@ -100,12 +100,16 @@ const ChatHistoryItem = ({
 		>
 			<div className="flex justify-between items-center">
 				<h3 className="font-medium dark:text-white text-gray-900 text-sm">
-					{chat.chat_id}
+					{new Date(chat.created_at).toLocaleDateString('en-GB', {
+						day: 'numeric',
+						month: 'long',
+						year: '2-digit',
+					})}
 				</h3>
 				<span className="text-xs dark:text-gray-400 text-gray-600">
 					{chat.last_message_time
-						? new Date(chat.last_message_time).toLocaleDateString()
-						: new Date(chat.created_at).toLocaleDateString()}
+						? new Date(chat.last_message_time).toLocaleTimeString()
+						: new Date(chat.created_at).toLocaleTimeString()}
 				</span>
 			</div>
 			{chat.last_message && (
