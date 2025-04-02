@@ -22,7 +22,6 @@ export default function Page() {
 	)
 	const error = useSelector((state: RootState) => state.auth.error)
 	console.log(error)
-
 	// Check authentication status on component mount
 	useEffect(() => {
 		dispatch(checkAuth())
@@ -57,9 +56,7 @@ export default function Page() {
 			// );
 			// console.log("Logged in successfully");
 
-			console.log(API_URL)
-
-			const response = await fetch(`${API_URL}/auth/login`, {
+			const response = await fetch(`${API_URL}/auth/admin/login`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -73,43 +70,44 @@ export default function Page() {
 
 			if (response.ok) {
 				if (result.access_token) {
-					if (result.role == 'admin' || result.role == 'hr') {
-						const accessToken = result.access_token.access_token
-						const refreshToken = result.refresh_token
-						const role = result.role
-						dispatch(
-							loginSuccess({
-								role,
-								employee_id: data.employee_id,
-								accessToken,
-								refreshToken,
-							})
-						)
-						console.log('Logged in successfully')
-						setIsSuccessful(true)
-					} else {
-						toast({
-							type: 'error',
-							description: "User dosen't have access to website!",
+					const accessToken = result.access_token.access_token
+					const refreshToken = result.refresh_token
+					const role = result.role
+					dispatch(
+						loginSuccess({
+							role,
+							employee_id: data.employee_id,
+							accessToken,
+							refreshToken,
 						})
-						dispatch(loginFailure({ error: 'Invalid login' }))
-					}
+					)
+					console.log('Logged in successfully')
+					setIsSuccessful(true)
 					// The isAuthenticated effect will handle redirecting
 				} else {
 					console.error('Login failed: No access token received')
 					toast({
 						type: 'error',
-						description: 'Invalid credentials!',
+						description: result.detail,
 					})
 					dispatch(loginFailure({ error: 'Invalid login' }))
 				}
 			} else if (response.status === 403) {
-				console.error('Login failed: Invalid credentials')
+				console.error('Login failed: ', result.detail)
 				dispatch(loginFailure({ error: 'Invalid login' }))
 				toast({
 					type: 'error',
-					description: 'Invalid credentials!',
+					description: result.detail,
 				})
+			} else if (response.status === 307) {
+				console.log('First time login - redirecting to password reset')
+				toast({
+					type: 'error',
+					description: 'First time login - Please reset your password',
+				})
+				const redirectUrl = result.redirect_url
+				router.push(redirectUrl)
+				return
 			} else {
 				console.error('Login failed: Server error')
 				toast({

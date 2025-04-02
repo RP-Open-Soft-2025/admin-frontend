@@ -3,19 +3,18 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from '@/components/ui/sonner'
 import { SubmitButton } from '@/components/auth-form/button'
-import DeloitteLogo from '../../login/deloitte-logo.png' // Adjust path for the nested folder structure
+import DeloitteLogo from '../../../login/deloitte-logo.png' // Adjust path for the nested folder structure
 import { API_URL } from '@/constants'
 
 // Use environment variable for API URL with fallback
-
-export default function ResetPasswordPage() {
+const ResetPasswordPage = () => {
 	const router = useRouter()
 	const params = useParams()
-	const token = params.token as string
 	const [isSuccessful, setIsSuccessful] = useState(false)
+	const token = params?.id as string | undefined
 	const [isLoad, setIsLoad] = useState<boolean>(true)
 
 	useEffect(() => {
@@ -26,17 +25,22 @@ export default function ResetPasswordPage() {
 					description: 'Reset token is not valid',
 				})
 				router.push('/login')
+				setIsLoad(false)
 			} else if (resp.status == 410) {
 				toast({
 					type: 'error',
 					description: 'Reset token is expired',
 				})
 				router.push('/login')
+				setIsLoad(false)
 			}
-
-			setIsLoad(false)
 		})
 	}, [])
+
+	if (!token) {
+		router.push('/login')
+		return null
+	}
 
 	const handleSubmit = async (formData: FormData) => {
 		const password = formData.get('password') as string
@@ -59,13 +63,16 @@ export default function ResetPasswordPage() {
 		}
 
 		try {
-			const response = await fetch(`${API_URL}/auth/reset-password/${token}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ new_password: password }),
-			})
+			const response = await fetch(
+				`${API_URL}/auth/admin/reset-password/${token}`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ new_password: password }),
+				}
+			)
 
 			const result = await response.json()
 
@@ -75,10 +82,8 @@ export default function ResetPasswordPage() {
 					type: 'success',
 					description: result.message || 'Password reset successful',
 				})
-				// Redirect to login page after a delay
-				setTimeout(() => {
-					router.push('/login')
-				}, 2000)
+				// Redirect to login page
+				router.push('/login')
 			} else if (response.status === 400) {
 				toast({
 					type: 'error',
@@ -87,8 +92,9 @@ export default function ResetPasswordPage() {
 			} else if (response.status === 404) {
 				toast({
 					type: 'error',
-					description: 'Invalid reset token',
+					description: 'Invalid reset password link',
 				})
+				router.push('/login')
 			} else {
 				toast({
 					type: 'error',
@@ -188,3 +194,5 @@ export default function ResetPasswordPage() {
 		</div>
 	)
 }
+
+export default ResetPasswordPage

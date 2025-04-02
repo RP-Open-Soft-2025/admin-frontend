@@ -2,6 +2,7 @@ export enum SenderType {
 	BOT = 'bot',
 	EMPLOYEE = 'emp',
 	HR = 'hr',
+	SYSTEM = 'system',
 }
 
 export enum ChatMode {

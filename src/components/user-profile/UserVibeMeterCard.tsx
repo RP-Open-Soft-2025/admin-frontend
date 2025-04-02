@@ -1,258 +1,131 @@
 'use client'
 import React from 'react'
-import { VibeMeter, EmotionZone } from '@/types/employee'
+import { VibeMeter } from '@/types/UserProfile'
 
 // Props interface
 interface UserVibeMeterCardProps {
-	vibeMeterData?: VibeMeter[]
+	vibeMeterData: VibeMeter[]
 }
-
-// Dummy data for development
-const dummyVibeMeterData: VibeMeter[] = [
-	{
-		responseDate: '2023-01-05',
-		vibeScore: 85,
-		emotionZone: EmotionZone.HAPPY,
-	},
-	{
-		responseDate: '2023-01-12',
-		vibeScore: 72,
-		emotionZone: EmotionZone.LEANING_HAPPY,
-	},
-	{
-		responseDate: '2023-01-19',
-		vibeScore: 67,
-		emotionZone: EmotionZone.LEANING_HAPPY,
-	},
-	{
-		responseDate: '2023-01-26',
-		vibeScore: 55,
-		emotionZone: EmotionZone.NEUTRAL,
-	},
-	{
-		responseDate: '2023-02-02',
-		vibeScore: 45,
-		emotionZone: EmotionZone.NEUTRAL,
-	},
-	{
-		responseDate: '2023-02-09',
-		vibeScore: 38,
-		emotionZone: EmotionZone.LEANING_SAD,
-	},
-	{
-		responseDate: '2023-02-16',
-		vibeScore: 60,
-		emotionZone: EmotionZone.NEUTRAL,
-	},
-	{
-		responseDate: '2023-02-23',
-		vibeScore: 78,
-		emotionZone: EmotionZone.LEANING_HAPPY,
-	},
-	{
-		responseDate: '2023-03-02',
-		vibeScore: 92,
-		emotionZone: EmotionZone.EXCITED,
-	},
-]
 
 // Helper function to format dates consistently
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString)
-	return date.toLocaleDateString('en-GB') // Use consistent locale (DD/MM/YYYY)
-}
-
-// Helper function to get emotion color
-const getEmotionColor = (emotionZone: EmotionZone) => {
-	switch (emotionZone) {
-		case EmotionZone.EXCITED:
-			return 'text-purple-600 dark:text-purple-400'
-		case EmotionZone.HAPPY:
-			return 'text-green-600 dark:text-green-400'
-		case EmotionZone.LEANING_HAPPY:
-			return 'text-teal-600 dark:text-teal-400'
-		case EmotionZone.NEUTRAL:
-			return 'text-blue-600 dark:text-blue-400'
-		case EmotionZone.LEANING_SAD:
-			return 'text-yellow-600 dark:text-yellow-400'
-		case EmotionZone.SAD:
-			return 'text-orange-600 dark:text-orange-400'
-		case EmotionZone.FRUSTRATED:
-			return 'text-red-600 dark:text-red-400'
-		default:
-			return 'text-gray-600 dark:text-gray-400'
-	}
-}
-
-// Helper function to get background color
-const getEmotionBgColor = (emotionZone: EmotionZone) => {
-	switch (emotionZone) {
-		case EmotionZone.EXCITED:
-			return 'bg-purple-500'
-		case EmotionZone.HAPPY:
-			return 'bg-green-500'
-		case EmotionZone.LEANING_HAPPY:
-			return 'bg-teal-500'
-		case EmotionZone.NEUTRAL:
-			return 'bg-blue-500'
-		case EmotionZone.LEANING_SAD:
-			return 'bg-yellow-500'
-		case EmotionZone.SAD:
-			return 'bg-orange-500'
-		case EmotionZone.FRUSTRATED:
-			return 'bg-red-500'
-		default:
-			return 'bg-gray-500'
-	}
+	return date.toLocaleDateString('en-GB', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+	})
 }
 
 export default function UserVibeMeterCard({
 	vibeMeterData,
 }: UserVibeMeterCardProps) {
-	// Use provided data or fall back to dummy data
-	const displayData =
-		vibeMeterData && vibeMeterData.length > 0
-			? vibeMeterData
-			: dummyVibeMeterData
+	if (!vibeMeterData || vibeMeterData.length === 0) return null
 
-	// Get most recent vibe data
-	const latestVibe = displayData[displayData.length - 1]
+	// Get the latest vibe meter entry
+	const latestVibe = vibeMeterData.reduce((latest, current) => {
+		return new Date(current.Response_Date) > new Date(latest.Response_Date)
+			? current
+			: latest
+	})
+
+	// Calculate average vibe score
+	const averageVibeScore =
+		vibeMeterData.reduce((sum, entry) => sum + entry.Vibe_Score, 0) /
+		vibeMeterData.length
 
 	return (
-		<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+		<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 transition-all duration-300 hover:shadow-lg">
 			<div className="flex flex-col gap-6">
 				<div>
-					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
-						Employee Mood & Wellbeing
+					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-4">
+						Employee Wellbeing & Vibe Meter
 					</h4>
 
-					<div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+					{/* Current Wellbeing Status */}
+					<div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md">
 							<p className="text-sm text-gray-500 dark:text-gray-400">
-								Current Mood
+								Latest Vibe Score
 							</p>
-							<p
-								className={`mt-1 text-xl font-semibold ${getEmotionColor(latestVibe.emotionZone)}`}
-							>
-								{latestVibe.emotionZone}
-							</p>
+							<div className="mt-2 flex items-baseline">
+								<p className="text-3xl font-bold text-gray-800 dark:text-white/90">
+									{latestVibe.Vibe_Score}
+								</p>
+								<p className="ml-1 text-sm text-gray-500 dark:text-gray-400">
+									/10
+								</p>
+							</div>
 							<p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-								Last updated: {formatDate(latestVibe.responseDate)}
+								Last updated: {formatDate(latestVibe.Response_Date)}
 							</p>
 						</div>
-
-						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md">
 							<p className="text-sm text-gray-500 dark:text-gray-400">
-								Vibe Score
+								Average Vibe Score
 							</p>
-							<div className="flex items-end">
-								<p className="text-3xl font-bold text-gray-800 dark:text-white">
-									{latestVibe.vibeScore}
+							<div className="mt-2 flex items-baseline">
+								<p className="text-3xl font-bold text-gray-800 dark:text-white/90">
+									{averageVibeScore.toFixed(1)}
 								</p>
-								<p className="ml-1 mb-1 text-sm text-gray-500 dark:text-gray-400">
-									/100
+								<p className="ml-1 text-sm text-gray-500 dark:text-gray-400">
+									/10
 								</p>
 							</div>
-							<div className="mt-2 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-								<div
-									className={`h-2 rounded-full ${getEmotionBgColor(latestVibe.emotionZone)}`}
-									style={{ width: `${latestVibe.vibeScore}%` }}
-								></div>
-							</div>
+							<p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+								Based on {vibeMeterData.length} responses
+							</p>
 						</div>
-
-						{displayData.length > 1 && (
-							<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-								<p className="text-sm text-gray-500 dark:text-gray-400">
-									Mood Trend
-								</p>
-								<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-									{latestVibe.vibeScore >
-									displayData[displayData.length - 2].vibeScore
-										? 'Improving'
-										: 'Declining'}
-								</p>
-								<div className="mt-2 flex items-center">
-									{latestVibe.vibeScore >
-									displayData[displayData.length - 2].vibeScore ? (
-										<svg
-											className="h-5 w-5 text-green-500"
-											fill="currentColor"
-											viewBox="0 0 20 20"
-										>
-											<path
-												fillRule="evenodd"
-												d="M12 7a1 1 0 01-1 1H9a1 1 0 01-1-1V6a1 1 0 011-1h2a1 1 0 011 1v1zm-6 6a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1zm-8-4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z"
-												clipRule="evenodd"
-											/>
-										</svg>
-									) : (
-										<svg
-											className="h-5 w-5 text-red-500"
-											fill="currentColor"
-											viewBox="0 0 20 20"
-										>
-											<path
-												fillRule="evenodd"
-												d="M12 13a1 1 0 01-1 1H9a1 1 0 01-1-1v-1a1 1 0 011-1h2a1 1 0 011 1v1zm-6-6a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1h-2a1 1 0 00-1 1v1zm-8 4a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1H7a1 1 0 00-1 1v1zm8 0a1 1 0 001 1h2a1 1 0 001-1v-1a1 1 0 00-1-1h-2a1 1 0 00-1 1v1z"
-												clipRule="evenodd"
-											/>
-										</svg>
-									)}
-									<span
-										className={`ml-1 text-sm ${
-											latestVibe.vibeScore >
-											displayData[displayData.length - 2].vibeScore
-												? 'text-green-600 dark:text-green-400'
-												: 'text-red-600 dark:text-red-400'
-										}`}
-									>
-										{Math.abs(
-											latestVibe.vibeScore -
-												displayData[displayData.length - 2].vibeScore
-										)}
-										%
-									</span>
-								</div>
-							</div>
-						)}
 					</div>
 
+					{/* Recent Responses */}
 					<div className="mt-6">
 						<h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-							Mood History
+							Recent Responses
 						</h5>
-						<div className="mt-4 flex h-40 items-end space-x-2">
-							{displayData.map((vibe, index) => (
-								<div key={index} className="flex flex-1 flex-col items-center">
-									<div
-										className={`w-full rounded-t-sm ${getEmotionBgColor(vibe.emotionZone)}`}
-										style={{ height: `${vibe.vibeScore * 0.35}px` }} // Scale to fit in container
-									></div>
-									<div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-										{new Date(vibe.responseDate).getDate()}/
-										{new Date(vibe.responseDate).getMonth() + 1}
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-
-					<div className="mt-8">
-						<h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-							Emotion Zones Legend
-						</h5>
-						<div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
-							{Object.values(EmotionZone).map((zone, index) => (
-								<div key={index} className="flex items-center">
-									<div
-										className={`h-3 w-3 rounded-full ${getEmotionBgColor(zone as EmotionZone)}`}
-									></div>
-									<span className="ml-2 text-xs text-gray-600 dark:text-gray-400">
-										{zone}
-									</span>
-								</div>
-							))}
+						<div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+							<table className="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+								<thead className="bg-gray-50 dark:bg-gray-800">
+									<tr>
+										<th
+											scope="col"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+										>
+											Date
+										</th>
+										<th
+											scope="col"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+										>
+											Vibe Score
+										</th>
+									</tr>
+								</thead>
+								<tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+									{vibeMeterData
+										.sort(
+											(a, b) =>
+												new Date(b.Response_Date).getTime() -
+												new Date(a.Response_Date).getTime()
+										)
+										.slice(0, 5)
+										.map(vibe => (
+											<tr
+												key={vibe.Response_Date}
+												className="transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+											>
+												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+													{formatDate(vibe.Response_Date)}
+												</td>
+												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+													{vibe.Vibe_Score}/10
+												</td>
+											</tr>
+										))}
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>

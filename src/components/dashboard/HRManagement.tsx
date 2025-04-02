@@ -74,12 +74,12 @@ const HRManagement = ({
 								>
 									Assigned Users
 								</th>
-								<th
+								{/* <th
 									scope="col"
 									className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
 								>
 									Workload
-								</th>
+								</th> */}
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
@@ -93,7 +93,9 @@ const HRManagement = ({
 									</td>
 								</tr>
 							) : (
-								hrUsers.map(hr => (
+								[...hrUsers]
+  								.sort((a, b) => a.name.localeCompare(b.name)) // Sorting alphabetically by name
+  								.map(hr => (
 									<tr
 										key={hr.hrId}
 										className="hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -104,10 +106,10 @@ const HRManagement = ({
 										<td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
 											{hr.name}
 										</td>
-										<td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+										<td className="whitespace-nowrap px-6 py-4 pl-1 text-sm text-gray-500 dark:text-gray-400">
 											{hr.currentAssignedUsers}
 										</td>
-										<td className="whitespace-nowrap px-6 py-4 text-sm">
+										{/* <td className="whitespace-nowrap px-6 py-4 text-sm">
 											<div className="flex items-center">
 												<div className="relative h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700">
 													<div
@@ -127,7 +129,7 @@ const HRManagement = ({
 													{hr.currentAssignedUsers}%
 												</span>
 											</div>
-										</td>
+										</td> */}
 									</tr>
 								))
 							)}

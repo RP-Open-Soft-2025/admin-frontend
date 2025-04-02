@@ -9,7 +9,7 @@ interface Meet {
 	user_id: string
 	with_user_id: string
 	duration: number
-	status: string
+	// status: string
 	scheduled_at: string
 	meeting_link: string
 	location: string
@@ -126,7 +126,7 @@ const MeetsList = ({ meets }: { meets: Meet[] }) => {
 									</span>{' '}
 									{meet.location}
 								</p>
-								<p>
+								{/* <p>
 									<span className="font-semibold text-gray-900 dark:text-white">
 										Status:
 									</span>{' '}
@@ -139,7 +139,7 @@ const MeetsList = ({ meets }: { meets: Meet[] }) => {
 									>
 										{meet.status}
 									</span>
-								</p>
+								</p> */}
 								<p>
 									<span className="font-semibold text-gray-900 dark:text-white">
 										Scheduled At:

@@ -8,9 +8,8 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDispatch } from 'react-redux'
-import { User, LogOut, ChevronDown } from 'lucide-react'
+import { LogOut, ChevronDown } from 'lucide-react'
 import { logout } from '@/redux/features/auth'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getProfileData } from '@/services/profileService'
 import store from '@/redux/store'
@@ -67,7 +66,7 @@ const UserDropdown = () => {
 				className="w-56 p-1.5 mt-2 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl shadow-lg dark:bg-gray-800/95 dark:border-gray-700/50 z-[99999] transition-all duration-200"
 				align="end"
 			>
-				<Link href="/profile/edit" className="block">
+				{/* <Link href="/profile/edit" className="block">
 					<DropdownMenuItem className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-lg dark:text-gray-200 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 cursor-pointer transition-all duration-200">
 						<User className="w-4 h-4 text-blue-500 dark:text-blue-300" />
 						<div>
@@ -77,7 +76,7 @@ const UserDropdown = () => {
 							</p>
 						</div>
 					</DropdownMenuItem>
-				</Link>
+				</Link> */}
 
 				<DropdownMenuItem
 					onClick={handleLogout}

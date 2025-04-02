@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { Activity } from '@/types/employee'
+import { Activity } from '@/types/UserProfile'
 
 // Props interface
 interface UserActivityCardProps {
@@ -10,39 +10,39 @@ interface UserActivityCardProps {
 // Dummy data for development
 const dummyActivityData: Activity[] = [
 	{
-		date: '2023-01-15',
-		teamsMessagesSent: 45,
-		emailsSent: 23,
-		meetingsAttended: 5,
-		workHours: 8.5,
+		Date: '2023-01-15',
+		Teams_Messages_Sent: 45,
+		Emails_Sent: 23,
+		Meetings_Attended: 5,
+		Work_Hours: 8.5,
 	},
 	{
-		date: '2023-01-16',
-		teamsMessagesSent: 32,
-		emailsSent: 18,
-		meetingsAttended: 3,
-		workHours: 9,
+		Date: '2023-01-16',
+		Teams_Messages_Sent: 32,
+		Emails_Sent: 18,
+		Meetings_Attended: 3,
+		Work_Hours: 9,
 	},
 	{
-		date: '2023-01-17',
-		teamsMessagesSent: 51,
-		emailsSent: 27,
-		meetingsAttended: 4,
-		workHours: 8,
+		Date: '2023-01-17',
+		Teams_Messages_Sent: 51,
+		Emails_Sent: 27,
+		Meetings_Attended: 4,
+		Work_Hours: 8,
 	},
 	{
-		date: '2023-01-18',
-		teamsMessagesSent: 38,
-		emailsSent: 15,
-		meetingsAttended: 6,
-		workHours: 8.5,
+		Date: '2023-01-18',
+		Teams_Messages_Sent: 38,
+		Emails_Sent: 15,
+		Meetings_Attended: 6,
+		Work_Hours: 8.5,
 	},
 	{
-		date: '2023-01-19',
-		teamsMessagesSent: 42,
-		emailsSent: 22,
-		meetingsAttended: 2,
-		workHours: 7.5,
+		Date: '2023-01-19',
+		Teams_Messages_Sent: 42,
+		Emails_Sent: 22,
+		Meetings_Attended: 2,
+		Work_Hours: 7.5,
 	},
 ]
 
@@ -107,19 +107,19 @@ export default function UserActivityCard({
 								{displayData.map((activity, index) => (
 									<tr key={index}>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-											{formatDate(activity.date)}
+											{formatDate(activity.Date)}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-											{activity.teamsMessagesSent}
+											{activity.Teams_Messages_Sent}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-											{activity.emailsSent}
+											{activity.Emails_Sent}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-											{activity.meetingsAttended}
+											{activity.Meetings_Attended}
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-											{activity.workHours}
+											{activity.Work_Hours}
 										</td>
 									</tr>
 								))}
@@ -139,10 +139,10 @@ export default function UserActivityCard({
 								>
 									<div
 										className="w-8 bg-blue-500 dark:bg-blue-600 rounded-t-sm"
-										style={{ height: `${activity.teamsMessagesSent / 2}px` }}
+										style={{ height: `${activity.Teams_Messages_Sent / 2}px` }}
 									></div>
 									<span className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-										{new Date(activity.date).getDate()}
+										{new Date(activity.Date).getDate()}
 									</span>
 								</div>
 							))}
