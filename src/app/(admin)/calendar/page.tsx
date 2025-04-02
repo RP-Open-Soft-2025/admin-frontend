@@ -190,21 +190,6 @@ const Calendar: React.FC = () => {
 		router.push('/login')
 	}
 
-	// Custom toolbar component for filter dropdown
-	const CustomToolbar = () => {
-		return (
-			<div className="filter-dropdown">
-				<select 
-					value={activeFilter}
-					onChange={(e) => setActiveFilter(e.target.value as FilterType)}
-				>
-					<option value="all">All Events</option>
-					<option value="meetings">Meetings Only</option>
-					<option value="sessions">Sessions Only</option>
-				</select>
-			</div>
-		)
-	}
 
 	useEffect(() => {
 		const fetchMeetings = async () => {
