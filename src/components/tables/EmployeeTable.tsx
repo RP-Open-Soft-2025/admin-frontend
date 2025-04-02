@@ -97,24 +97,22 @@ export default function EmployeeTable({
 								<TableCell
 									key={column.key}
 									isHeader
-									className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 cursor-pointer select-none"
-									aria-sort={
-										sortConfig.key === column.key
-											? sortConfig.direction
-											: undefined
-									}
+									className="px-5 py-3 font-bold text-gray-700 text-start text-theme-xs dark:text-gray-300 cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
 								>
-									<div onClick={() => handleSort(column.key as keyof Employee)}>
-										{column.label}
+									<div
+										className="flex items-center"
+										onClick={() => handleSort(column.key as keyof Employee)}
+									>
+										{column.label.toUpperCase()}
 										{getSortIndicator(column.key as keyof Employee)}
 									</div>
 								</TableCell>
 							))}
 							<TableCell
 								isHeader
-								className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+								className="px-5 py-3 font-bold text-gray-700 text-start text-theme-xs dark:text-gray-300"
 							>
-								Status
+								STATUS
 							</TableCell>
 						</TableRow>
 					</TableHeader>
