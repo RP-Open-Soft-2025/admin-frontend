@@ -34,7 +34,6 @@ export default function FormLayout() {
 		employee_id: '',
 		name: '',
 		email: '',
-		password: '',
 		role: '',
 		manager_id: '',
 	})
@@ -60,10 +59,10 @@ export default function FormLayout() {
 			manager_id: formData.manager_id.trim(),
 		}
 
-		// Employee ID validation - improved regex
-		if (!trimmedData.employee_id.match(/^EMP\d{3,}$/)) {
+		// Employee ID validation - updated to require exactly 4 digits
+		if (!trimmedData.employee_id.match(/^EMP\d{4}$/)) {
 			newErrors.employee_id =
-				'Employee ID must start with EMP followed by at least 3 numbers'
+				'Employee ID must be in format EMP followed by 4 digits (e.g., EMP0001)'
 		}
 
 		// Name validation - improved with regex
@@ -79,14 +78,6 @@ export default function FormLayout() {
 			newErrors.email = 'Please enter a valid email address'
 		}
 
-		// Password validation - more secure requirements
-		if (
-			!formData.password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/)
-		) {
-			newErrors.password =
-				'Password must be at least 6 characters and contain both letters and numbers'
-		}
-
 		// Role validation
 		if (
 			!formData.role ||
@@ -97,9 +88,9 @@ export default function FormLayout() {
 
 		// Manager ID validation
 		if (formData.role === Role.EMPLOYEE) {
-			if (!trimmedData.manager_id.match(/^EMP\d{3,}$/)) {
+			if (!trimmedData.manager_id.match(/^EMP\d{4}$/)) {
 				newErrors.manager_id =
-					'Manager ID must be in valid format (e.g., EMP123)'
+					'Manager ID must be in format EMP followed by 4 digits (e.g., EMP0001)'
 			}
 		}
 
@@ -128,19 +119,36 @@ export default function FormLayout() {
 				body: JSON.stringify(formData),
 			})
 
-			const errorData = await response.json()
+			const data = await response.json()
 
 			if (response.ok) {
 				toast({
-					type: 'error',
-					description: errorData,
+					type: 'success',
+					description: 'User created successfully',
 				})
 				resetForm()
 			} else {
-				toast({
-					type: 'error',
-					description: errorData,
-				})
+				// Handle specific error status codes
+				if (response.status === 401) {
+					toast({
+						type: 'error',
+						description: 'Your session has expired. Please login again.',
+					})
+				} else if (response.status === 400) {
+					// Handle validation errors from backend
+					toast({
+						type: 'error',
+						description: typeof data === 'string' ? data : 
+							(data.detail || 'Invalid form data. Please check your inputs.'),
+					})
+				} else {
+					// Generic error handling
+					toast({
+						type: 'error',
+						description: typeof data === 'string' ? data : 
+							(data.detail || 'Failed to create user'),
+					})
+				}
 			}
 		} catch (error) {
 			console.error('Error creating user:', error)
@@ -158,7 +166,6 @@ export default function FormLayout() {
 			employee_id: '',
 			name: '',
 			email: '',
-			password: '',
 			role: '',
 			manager_id: '',
 		})
@@ -213,7 +220,7 @@ export default function FormLayout() {
 								<input
 									ref={employeeIdRef}
 									type="text"
-									placeholder="Enter employee ID (e.g., EMP001)"
+									placeholder="Enter employee ID (e.g., EMP0001)"
 									value={formData.employee_id}
 									onChange={e =>
 										setFormData({ ...formData, employee_id: e.target.value })
