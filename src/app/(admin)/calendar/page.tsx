@@ -174,33 +174,27 @@ body.fc-popover-open {
 const RenderEventContent = (eventInfo: EventContentArg) => {
 	const calendarType = eventInfo.event.extendedProps.calendar.toLowerCase()
 	const isTimeGridView = eventInfo.view.type.includes('timeGrid')
-
+	
 	if (isTimeGridView) {
 		return (
-			<div
-				className={`fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full h-full`}
-			>
-				<div className="text-white font-medium text-xs overflow-hidden text-ellipsis whitespace-nowrap">
-					{eventInfo.event.title}
-				</div>
+			<div className={`fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full h-full`}>
+				<div className="text-white font-medium text-xs overflow-hidden text-ellipsis whitespace-nowrap">{eventInfo.event.title}</div>
 			</div>
 		)
 	}
-
+	
 	return (
 		<a
 			className={`event-fc-color fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full`}
 			href={eventInfo.event.extendedProps.redirectUrl}
 		>
 			<div className="fc-daygrid-event-dot flex-shrink-0"></div>
-			<div className="text-white text-xs overflow-hidden text-ellipsis whitespace-nowrap">
-				{eventInfo.event.title}
-			</div>
+			<div className="text-white text-xs overflow-hidden text-ellipsis whitespace-nowrap">{eventInfo.event.title}</div>
 		</a>
 	)
 }
 
-type FilterType = 'all' | 'meetings' | 'sessions'
+type FilterType = 'all' | 'meetings' | 'sessions';
 
 const Calendar: React.FC = () => {
 	const router = useRouter()
@@ -214,7 +208,6 @@ const Calendar: React.FC = () => {
 	const [eventLevel, setEventLevel] = useState('')
 	const [events, setEvents] = useState<CalendarEvent[]>([])
 	const [allEvents, setAllEvents] = useState<CalendarEvent[]>([])
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [activeFilter, setActiveFilter] = useState<FilterType>('all')
 	const calendarRef = useRef<FullCalendar>(null)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -354,21 +347,17 @@ const Calendar: React.FC = () => {
 		}
 		fetchMeetings()
 	}, [auth.user])
-
+	
 	// Filter events when activeFilter changes
 	useEffect(() => {
 		if (activeFilter === 'all') {
-			setEvents(allEvents)
+			setEvents(allEvents);
 		} else if (activeFilter === 'meetings') {
-			setEvents(
-				allEvents.filter(event => event.extendedProps.eventType === 'meeting')
-			)
+			setEvents(allEvents.filter(event => event.extendedProps.eventType === 'meeting'));
 		} else if (activeFilter === 'sessions') {
-			setEvents(
-				allEvents.filter(event => event.extendedProps.eventType === 'session')
-			)
+			setEvents(allEvents.filter(event => event.extendedProps.eventType === 'session'));
 		}
-	}, [activeFilter, allEvents])
+	}, [activeFilter, allEvents]);
 
 	const handleDateSelect = (selectInfo: DateSelectArg) => {
 		resetModalFields()
@@ -393,113 +382,103 @@ const Calendar: React.FC = () => {
 
 	useEffect(() => {
 		// Skip if calendarRef isn't available
-		if (!calendarRef.current) return
-
+		if (!calendarRef.current) return;
+		
 		// Access the DOM element
-		const calendarEl = document.querySelector('.fc')
-		if (!calendarEl) return
-
+		const calendarEl = document.querySelector('.fc');
+		if (!calendarEl) return;
+		
 		// Get the toolbar container
-		const toolbarContainer = calendarEl.querySelector(
-			'.fc-toolbar-chunk:first-child'
-		)
-		if (!toolbarContainer) return
-
+		const toolbarContainer = calendarEl.querySelector('.fc-toolbar-chunk:first-child');
+		if (!toolbarContainer) return;
+		
 		// Create filter dropdown
-		const select = document.createElement('select')
-		select.className =
-			'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 ml-2 text-sm text-gray-700 dark:text-gray-200'
-
+		const select = document.createElement('select');
+		select.className = 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 ml-2 text-sm text-gray-700 dark:text-gray-200';
+		
 		// Add options
 		const options = [
 			{ value: 'all', label: 'All Events' },
 			{ value: 'meetings', label: 'Meetings Only' },
-			{ value: 'sessions', label: 'Sessions Only' },
-		]
-
+			{ value: 'sessions', label: 'Sessions Only' }
+		];
+		
 		options.forEach(option => {
-			const optionEl = document.createElement('option')
-			optionEl.value = option.value
-			optionEl.text = option.label
-			optionEl.selected = activeFilter === option.value
-			select.appendChild(optionEl)
-		})
-
+			const optionEl = document.createElement('option');
+			optionEl.value = option.value;
+			optionEl.text = option.label;
+			optionEl.selected = activeFilter === option.value;
+			select.appendChild(optionEl);
+		});
+		
 		// Add change event listener
-		select.addEventListener('change', e => {
-			setActiveFilter((e.target as HTMLSelectElement).value as FilterType)
-		})
-
+		select.addEventListener('change', (e) => {
+			setActiveFilter((e.target as HTMLSelectElement).value as FilterType);
+		});
+		
 		// Add the select to the toolbar
-		toolbarContainer.appendChild(select)
-
+		toolbarContainer.appendChild(select);
+		
 		// Cleanup function
 		return () => {
 			if (toolbarContainer.contains(select)) {
-				toolbarContainer.removeChild(select)
+				toolbarContainer.removeChild(select);
 			}
-		}
-	}, [activeFilter, events])
+		};
+	}, [activeFilter, events]);
 
 	// Add this useEffect to handle body scrolling when popover opens/closes
 	useEffect(() => {
 		// Skip if calendarRef isn't available
-		if (!calendarRef.current) return
-
+		if (!calendarRef.current) return;
+		
 		const handlePopoverOpen = () => {
-			document.body.classList.add('fc-popover-open')
-		}
-
+			document.body.classList.add('fc-popover-open');
+		};
+		
 		const handlePopoverClose = () => {
-			document.body.classList.remove('fc-popover-open')
-		}
-
+			document.body.classList.remove('fc-popover-open');
+		};
+		
 		// Check for popover elements
-		const observer = new MutationObserver(mutations => {
-			mutations.forEach(mutation => {
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach((mutation) => {
 				if (mutation.addedNodes.length) {
 					// Check if a popover was added
-					const popover = document.querySelector('.fc-more-popover')
+					const popover = document.querySelector('.fc-more-popover');
 					if (popover) {
-						handlePopoverOpen()
-
+						handlePopoverOpen();
+						
 						// Add a click event listener to the close button
-						const closeButton = popover.querySelector('.fc-popover-close')
+						const closeButton = popover.querySelector('.fc-popover-close');
 						if (closeButton) {
-							closeButton.addEventListener('click', handlePopoverClose)
+							closeButton.addEventListener('click', handlePopoverClose);
 						}
-
+						
 						// Also handle clicking outside the popover
-						document.addEventListener(
-							'click',
-							e => {
-								if (
-									e.target instanceof Element &&
-									!popover.contains(e.target)
-								) {
-									handlePopoverClose()
-								}
-							},
-							{ once: true }
-						)
+						document.addEventListener('click', (e) => {
+							if (e.target instanceof Element && !popover.contains(e.target)) {
+								handlePopoverClose();
+							}
+						}, { once: true });
 					}
 				}
-			})
-		})
-
+			});
+		});
+		
 		// Start observing the document for popover elements
-		observer.observe(document.body, { childList: true, subtree: true })
-
+		observer.observe(document.body, { childList: true, subtree: true });
+		
 		return () => {
-			observer.disconnect()
-			handlePopoverClose() // Clean up when component unmounts
-		}
-	}, [])
+			observer.disconnect();
+			handlePopoverClose(); // Clean up when component unmounts
+		};
+	}, []);
 
 	return (
 		<div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
 			<style>{calendarStyles}</style>
-
+			
 			<div className="custom-calendar">
 				<FullCalendar
 					ref={calendarRef}
