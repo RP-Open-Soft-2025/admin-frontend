@@ -124,7 +124,7 @@ export default function FormLayout() {
 			if (response.ok) {
 				toast({
 					type: 'success',
-					description: 'User created successfully',
+					description: 'Employee created successfully',
 				})
 				resetForm()
 			} else {
@@ -138,23 +138,27 @@ export default function FormLayout() {
 					// Handle validation errors from backend
 					toast({
 						type: 'error',
-						description: typeof data === 'string' ? data : 
-							(data.detail || 'Invalid form data. Please check your inputs.'),
+						description:
+							typeof data === 'string'
+								? data
+								: data.detail || 'Invalid form data. Please check your inputs.',
 					})
 				} else {
 					// Generic error handling
 					toast({
 						type: 'error',
-						description: typeof data === 'string' ? data : 
-							(data.detail || 'Failed to create user'),
+						description:
+							typeof data === 'string'
+								? data
+								: data.detail || 'Failed to create Employee',
 					})
 				}
 			}
 		} catch (error) {
-			console.error('Error creating user:', error)
+			console.error('Error creating Employee:', error)
 			toast({
 				type: 'error',
-				description: 'Failed to create user, contact system admins',
+				description: 'Failed to create Employee, contact system admins',
 			})
 		} finally {
 			setIsSubmitting(false)
@@ -204,7 +208,7 @@ export default function FormLayout() {
 
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-			<PageBreadcrumb pageTitle="Add New User" />
+			<PageBreadcrumb pageTitle="Add New Employee" />
 			<div className="max-w-2xl mx-auto py-8 px-4">
 				<div className="bg-white dark:bg-gray-800 rounded-lg shadow-theme-lg p-6">
 					<h2 className="text-2xl font-semibold text-gray-900 dark:text-white/90 mb-6">
@@ -460,10 +464,10 @@ export default function FormLayout() {
 													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 												/>
 											</svg>
-											Creating User...
+											Creating Employee...
 										</div>
 									) : (
-										'Create New User'
+										'Create New Employee'
 									)}
 								</button>
 							</div>

@@ -34,12 +34,13 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 	const [showUnblockModal, setShowUnblockModal] = useState(false)
 	const [reason, setReason] = useState('')
 	const { auth } = store.getState()
-	
+
 	// Check if current user can modify users
-	const canModifyUsers = auth.user?.userRole === 'admin' || auth.user?.userRole === 'hr'
-	
+	const canModifyUsers =
+		auth.user?.userRole === 'admin' || auth.user?.userRole === 'hr'
+
 	if (!userData) return null
-	
+
 	const handleBlock = async () => {
 		if (!reason.trim()) {
 			toast({
@@ -48,7 +49,7 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 			})
 			return
 		}
-		
+
 		setIsLoading(true)
 		try {
 			const result = await blockUser(userData.employee_id, reason)
@@ -62,15 +63,16 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 		} catch (error) {
 			toast({
 				type: 'error',
-				description: error instanceof Error 
-					? error.message 
-					: 'Failed to block user. Please try again.',
+				description:
+					error instanceof Error
+						? error.message
+						: 'Failed to block user. Please try again.',
 			})
 		} finally {
 			setIsLoading(false)
 		}
 	}
-	
+
 	const handleUnblock = async () => {
 		if (!reason.trim()) {
 			toast({
@@ -79,7 +81,7 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 			})
 			return
 		}
-		
+
 		setIsLoading(true)
 		try {
 			const result = await unblockUser(userData.employee_id, reason)
@@ -93,20 +95,21 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 		} catch (error) {
 			toast({
 				type: 'error',
-				description: error instanceof Error 
-					? error.message 
-					: 'Failed to unblock user. Please try again.',
+				description:
+					error instanceof Error
+						? error.message
+						: 'Failed to unblock user. Please try again.',
 			})
 		} finally {
 			setIsLoading(false)
 		}
 	}
-	
+
 	const openBlockModal = () => {
 		setReason('')
 		setShowBlockModal(true)
 	}
-	
+
 	const openUnblockModal = () => {
 		setReason('')
 		setShowUnblockModal(true)
@@ -169,22 +172,22 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 									</p>
 								</div>
 							</div>
-							
+
 							{canModifyUsers && (
 								<div className="flex justify-center w-full xl:justify-end">
 									{userData.is_blocked ? (
-										<Button 
+										<Button
 											onClick={openUnblockModal}
-											variant="outline" 
+											variant="outline"
 											className="bg-white dark:bg-gray-800 text-green-600 hover:text-green-700 border-green-200 hover:border-green-300 dark:text-green-500 dark:hover:text-green-400 dark:border-green-800 dark:hover:border-green-700 flex items-center gap-2"
 										>
 											<ShieldCheck size={16} />
 											<span>Unblock User</span>
 										</Button>
 									) : (
-										<Button 
+										<Button
 											onClick={openBlockModal}
-											variant="outline" 
+											variant="outline"
 											className="bg-white dark:bg-gray-800 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 dark:text-red-500 dark:hover:text-red-400 dark:border-red-800 dark:hover:border-red-700 flex items-center gap-2"
 										>
 											<ShieldAlert size={16} />
@@ -197,31 +200,35 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 					</div>
 				</div>
 			</div>
-			
+
 			{/* Block User Modal */}
 			<Dialog open={showBlockModal} onOpenChange={setShowBlockModal}>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Block User</DialogTitle>
 						<DialogDescription>
-							You are about to block {userData.name}. This will prevent them from accessing the system.
+							You are about to block {userData.name}. This will prevent them
+							from accessing the system.
 						</DialogDescription>
 					</DialogHeader>
-					
+
 					<div className="py-4">
-						<label htmlFor="reason" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+						<label
+							htmlFor="reason"
+							className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+						>
 							Reason for blocking
 						</label>
 						<Textarea
 							id="reason"
 							value={reason}
-							onChange={(e) => setReason(e.target.value)}
+							onChange={e => setReason(e.target.value)}
 							placeholder="Please provide a reason for blocking this user"
 							className="w-full bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
 							rows={4}
 						/>
 					</div>
-					
+
 					<DialogFooter>
 						<Button
 							type="button"
@@ -244,31 +251,35 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-			
+
 			{/* Unblock User Modal */}
 			<Dialog open={showUnblockModal} onOpenChange={setShowUnblockModal}>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Unblock User</DialogTitle>
 						<DialogDescription>
-							You are about to unblock {userData.name}. This will allow them to access the system again.
+							You are about to unblock {userData.name}. This will allow them to
+							access the system again.
 						</DialogDescription>
 					</DialogHeader>
-					
+
 					<div className="py-4">
-						<label htmlFor="reason" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+						<label
+							htmlFor="reason"
+							className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+						>
 							Reason for unblocking
 						</label>
 						<Textarea
 							id="reason"
 							value={reason}
-							onChange={(e) => setReason(e.target.value)}
+							onChange={e => setReason(e.target.value)}
 							placeholder="Please provide a reason for unblocking this user"
 							className="w-full bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
 							rows={4}
 						/>
 					</div>
-					
+
 					<DialogFooter>
 						<Button
 							type="button"

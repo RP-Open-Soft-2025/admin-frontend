@@ -25,17 +25,17 @@ export default function ResetPasswordPage() {
 					type: 'error',
 					description: 'Reset token is not valid',
 				})
-				router.push('/login');
-				setIsLoad(false);
+				router.push('/login')
+				setIsLoad(false)
 			} else if (resp.status == 410) {
 				toast({
 					type: 'error',
 					description: 'Reset token is expired',
 				})
-				router.push('/login');
-				setIsLoad(false);
-			}else{
-				setIsLoad(false);
+				router.push('/login')
+				setIsLoad(false)
+			} else {
+				setIsLoad(false)
 			}
 
 			setIsLoad(false)

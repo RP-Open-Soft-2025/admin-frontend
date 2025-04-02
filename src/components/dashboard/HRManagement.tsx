@@ -94,22 +94,22 @@ const HRManagement = ({
 								</tr>
 							) : (
 								[...hrUsers]
-  								.sort((a, b) => a.name.localeCompare(b.name)) // Sorting alphabetically by name
-  								.map(hr => (
-									<tr
-										key={hr.hrId}
-										className="hover:bg-gray-50 dark:hover:bg-gray-800"
-									>
-										<td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-											{hr.hrId}
-										</td>
-										<td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-											{hr.name}
-										</td>
-										<td className="whitespace-nowrap px-6 py-4  text-sm text-gray-500 dark:text-gray-400">
-											{hr.currentAssignedUsers}
-										</td>
-										{/* <td className="whitespace-nowrap px-6 py-4 text-sm">
+									.sort((a, b) => a.name.localeCompare(b.name)) // Sorting alphabetically by name
+									.map(hr => (
+										<tr
+											key={hr.hrId}
+											className="hover:bg-gray-50 dark:hover:bg-gray-800"
+										>
+											<td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+												{hr.hrId}
+											</td>
+											<td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+												{hr.name}
+											</td>
+											<td className="whitespace-nowrap px-6 py-4  text-sm text-gray-500 dark:text-gray-400">
+												{hr.currentAssignedUsers}
+											</td>
+											{/* <td className="whitespace-nowrap px-6 py-4 text-sm">
 											<div className="flex items-center">
 												<div className="relative h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700">
 													<div
@@ -130,8 +130,8 @@ const HRManagement = ({
 												</span>
 											</div>
 										</td> */}
-									</tr>
-								))
+										</tr>
+									))
 							)}
 						</tbody>
 					</table>
