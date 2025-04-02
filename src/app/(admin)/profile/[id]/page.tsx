@@ -9,6 +9,7 @@ import UserRewardsCard from '@/components/user-profile/UserRewardsCard'
 import UserPerformanceCard from '@/components/user-profile/UserPerformanceCard'
 import UserOnboardingCard from '@/components/user-profile/UserOnboardingCard'
 import UserVibeMeterCard from '@/components/user-profile/UserVibeMeterCard'
+import UserSessionsCard from '@/components/user-profile/UserSessionsCard'
 import React, { useEffect, useState } from 'react'
 import {
 	getUserProfileData,
@@ -156,8 +157,15 @@ export default function Profile() {
 					)}
 
 					{profileData.company_data.vibemeter.length > 0 && (
-						<UserVibeMeterCard vibeMeterData={getVibeMeterData(profileData)} />
+						<>
+							<UserVibeMeterCard
+								vibeMeterData={getVibeMeterData(profileData)}
+							/>
+						</>
 					)}
+
+					{/* Sessions Section */}
+					<UserSessionsCard employeeId={profileData.employee_id} />
 				</div>
 			</div>
 		</div>
