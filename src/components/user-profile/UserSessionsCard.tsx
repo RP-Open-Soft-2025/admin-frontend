@@ -97,9 +97,9 @@ export default function UserSessionsCard({
 	const completedSessions = sessionsData.filter(
 		session => session.status === SessionStatus.COMPLETED
 	)
-	const pendingSessions = sessionsData.filter(
-		session => session.status === SessionStatus.PENDING
-	)
+	// const pendingSessions = sessionsData.filter(
+	// 	session => session.status === SessionStatus.PENDING
+	// )
 
 	return (
 		<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 transition-all duration-300 hover:shadow-lg">
@@ -120,19 +120,9 @@ export default function UserSessionsCard({
 
 					{/* Session Summary */}
 					<div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						{/* <div
-							onClick={() => router.push(`/${role}/sessions/active`)}
-							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
-						>
-							<p className="text-sm text-gray-500 dark:text-gray-400">
-								Active Sessions
-							</p>
-							<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-								{activeSessions.length}
-							</p>
-						</div> */}
-						{/* <div
-							onClick={() => router.push(`/${role}/sessions/completed`)}
+						
+						<div
+							onClick={() => router.push(`/${role}/sessions/pending`)}
 							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
 						>
 							<p className="text-sm text-gray-500 dark:text-gray-400">
@@ -140,17 +130,6 @@ export default function UserSessionsCard({
 							</p>
 							<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
 								{completedSessions.length}
-							</p>
-						</div> */}
-						<div
-							onClick={() => router.push(`/${role}/sessions/pending`)}
-							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
-						>
-							<p className="text-sm text-gray-500 dark:text-gray-400">
-								Pending Sessions
-							</p>
-							<p className="mt-1 text-base font-medium text-gray-800 dark:text-white/90">
-								{pendingSessions.length}
 							</p>
 						</div>
 					</div>
