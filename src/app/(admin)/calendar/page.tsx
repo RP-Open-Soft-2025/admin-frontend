@@ -67,6 +67,12 @@ const calendarStyles = `
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+	transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.fc-event:hover {
+	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	transform: translateY(-1px);
 }
 .event-fc-color {
 	display: flex;
@@ -89,13 +95,22 @@ const calendarStyles = `
 
 /* Fix popover scrolling */
 .fc-more-popover {
-    max-height: 400px !important;
+    max-height: 80vh !important;
     overflow-y: auto !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
 }
 
 .fc-popover-body {
-    max-height: 350px !important;
+    max-height: calc(80vh - 40px) !important;
     overflow-y: auto !important;
+    padding: 8px !important;
+}
+
+.fc-popover-header {
+    padding: 8px !important;
+    font-weight: 600 !important;
 }
 
 /* Prevent body scrolling when popover is open */
@@ -138,27 +153,125 @@ body.fc-popover-open {
 	box-shadow: 0 0 0 1px #4f46e5;
 }
 
-/* Fix for time grid views */
+/* Enhanced timegrid styles */
 .fc-timegrid-event {
-	border-radius: 4px !important;
+	border-radius: 6px !important;
 	padding: 2px !important;
+	border: none !important;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;
+	transition: box-shadow 0.2s ease, opacity 0.2s ease !important;
+	opacity: 0.9 !important;
+}
+
+.fc-timegrid-event:hover {
+	box-shadow: 0 4px 8px rgba(0,0,0,0.12) !important;
+	opacity: 1 !important;
+	z-index: 10 !important;
 }
 
 .fc-timegrid-event .fc-event-main {
-	padding: 2px 4px !important;
+	padding: 3px 6px !important;
 }
 
 .fc-timegrid-event .fc-event-title {
 	font-weight: 500 !important;
+	line-height: 1.2 !important;
+}
+
+/* Handle overlapping events better */
+.fc-timegrid-col-events {
+	margin: 0 2px !important;
 }
 
 .fc-v-event {
 	border: none !important;
+	background-color: transparent !important;
+}
+
+/* Better day headers */
+.fc-col-header-cell {
+	padding: 8px 0 !important;
+	font-weight: 600 !important;
+}
+
+.fc-col-header-cell-cushion {
+	padding: 6px !important;
+	color: #4b5563 !important;
+}
+
+.dark .fc-col-header-cell-cushion {
+	color: #e5e7eb !important;
+}
+
+/* Improve the time slots */
+.fc-timegrid-slot {
+	height: 48px !important;
+	border-color: rgba(0,0,0,0.06) !important;
+}
+
+.dark .fc-timegrid-slot {
+	border-color: rgba(255,255,255,0.06) !important;
+}
+
+.fc-timegrid-slot-label {
+	color: #6b7280 !important;
+}
+
+.dark .fc-timegrid-slot-label {
+	color: #9ca3af !important;
 }
 
 /* Override header toolbar buttons */
+.fc-toolbar {
+	margin-bottom: 1.5rem !important;
+	flex-wrap: wrap !important;
+	gap: 8px !important;
+}
+
+.fc-toolbar-chunk {
+	display: flex !important;
+	align-items: center !important;
+	flex-wrap: wrap !important;
+	gap: 8px !important;
+}
+
 .fc-toolbar button {
 	text-transform: capitalize !important;
+	border-radius: 6px !important;
+	padding: 6px 12px !important;
+	font-weight: 500 !important;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+	border: 1px solid #e5e7eb !important;
+	background-color: white !important;
+	color: #374151 !important;
+	transition: all 0.2s ease !important;
+}
+
+.dark .fc-toolbar button {
+	background-color: #1f2937 !important;
+	border-color: #374151 !important;
+	color: #e5e7eb !important;
+}
+
+.fc-toolbar button:hover {
+	background-color: #f9fafb !important;
+	border-color: #d1d5db !important;
+}
+
+.dark .fc-toolbar button:hover {
+	background-color: #374151 !important;
+	border-color: #4b5563 !important;
+}
+
+.fc-toolbar button.fc-button-active {
+	background-color: #4f46e5 !important;
+	border-color: #4f46e5 !important;
+	color: white !important;
+}
+
+.dark .fc-toolbar button.fc-button-active {
+	background-color: #6366f1 !important;
+	border-color: #6366f1 !important;
 }
 
 .fc-today-button {
@@ -169,19 +282,44 @@ body.fc-popover-open {
 .fc-filterEvents-button {
 	position: relative !important;
 }
+
+/* Improve today highlighting */
+.fc-day-today {
+	background-color: rgba(79, 70, 229, 0.06) !important;
+}
+
+.dark .fc-day-today {
+	background-color: rgba(99, 102, 241, 0.08) !important;
+}
+
+/* Improve cell hover effect */
+.fc-daygrid-day:hover {
+	background-color: rgba(0,0,0,0.02) !important;
+}
+
+.dark .fc-daygrid-day:hover {
+	background-color: rgba(255,255,255,0.02) !important;
+}
 `
 
 const RenderEventContent = (eventInfo: EventContentArg) => {
 	const calendarType = eventInfo.event.extendedProps.calendar.toLowerCase()
 	const isTimeGridView = eventInfo.view.type.includes('timeGrid')
+	const timeText = eventInfo.timeText || ''
+	const title = eventInfo.event.title
 
 	if (isTimeGridView) {
 		return (
 			<div
 				className={`fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full h-full`}
 			>
+				{timeText && (
+					<div className="text-white text-[10px] opacity-90 font-medium mb-0.5 overflow-hidden text-ellipsis whitespace-nowrap">
+						{timeText}
+					</div>
+				)}
 				<div className="text-white font-medium text-xs overflow-hidden text-ellipsis whitespace-nowrap">
-					{eventInfo.event.title}
+					{title}
 				</div>
 			</div>
 		)
@@ -194,7 +332,7 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 		>
 			<div className="fc-daygrid-event-dot flex-shrink-0"></div>
 			<div className="text-white text-xs overflow-hidden text-ellipsis whitespace-nowrap">
-				{eventInfo.event.title}
+				{title}
 			</div>
 		</a>
 	)
@@ -506,7 +644,7 @@ const Calendar: React.FC = () => {
 	}, [])
 
 	return (
-		<div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+		<div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
 			<style>{calendarStyles}</style>
 
 			<div className="custom-calendar">
@@ -529,6 +667,11 @@ const Calendar: React.FC = () => {
 					height="auto"
 					displayEventEnd={false}
 					eventDisplay="block"
+					slotDuration="00:30:00"
+					slotLabelInterval="01:00"
+					slotEventOverlap={false}
+					allDaySlot={false}
+					nowIndicator={true}
 				/>
 			</div>
 

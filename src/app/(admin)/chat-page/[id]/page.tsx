@@ -206,19 +206,83 @@ const ChatPage = () => {
 				console.log('Fetching session history for ID:', id);
 				console.log('Authorization token:', auth.user?.accessToken ? 'Token exists' : 'Token missing');
 				
-				const resp = await fetch(`${API_URL}/llm/chat/history/${id}`, {
-					method: 'GET',
-					headers: { 
-						'Authorization': `Bearer ${auth.user?.accessToken}`,
-						'Content-Type': 'application/json'
-					},
-					credentials: 'include' // Include cookies if your API uses cookie-based auth
-				});
+				// Check if token exists
+				if (!auth.user?.accessToken) {
+					toast({
+						type: 'error',
+						description: 'Authentication token is missing. Please log in again.'
+					});
+					throw new Error('Authentication token is missing');
+				}
 
-				if (!resp.ok) {
-					const errorText = await resp.text();
-					console.error(`API Error (${resp.status}): ${errorText}`);
-					throw new Error(`API request failed with status: ${resp.status}`);
+				// Retry logic with exponential backoff
+				let retries = 0;
+				const maxRetries = 3;
+				let resp;
+
+				while (retries < maxRetries) {
+					try {
+						const controller = new AbortController();
+						const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+						
+						resp = await fetch(`${API_URL}/chat/history/${id}`, {
+							method: 'GET',
+							headers: { 
+								'Authorization': `Bearer ${auth.user?.accessToken}`,
+								'Content-Type': 'application/json'
+							},
+							credentials: 'include', // Include cookies if your API uses cookie-based auth
+							signal: controller.signal
+						});
+						
+						clearTimeout(timeoutId);
+						
+						if (resp.ok) {
+							break; // Success, exit retry loop
+						} else if (resp.status === 401) {
+							toast({
+								type: 'error',
+								description: 'Your session has expired. Please login again.'
+							});
+							throw new Error('Authentication failed');
+						} else if (resp.status >= 500) {
+							// Server error, retry
+							retries++;
+							const delay = Math.pow(2, retries) * 1000; // Exponential backoff
+							console.log(`Retrying in ${delay}ms... (Attempt ${retries} of ${maxRetries})`);
+							await new Promise(resolve => setTimeout(resolve, delay));
+						} else {
+							// Other client errors (400, 404, etc)
+							const errorText = await resp.text();
+							console.error(`API Error (${resp.status}): ${errorText}`);
+							throw new Error(`API request failed with status: ${resp.status}`);
+						}
+					} catch (error: unknown) {
+						const err = error as Error;
+						if (err.name === 'AbortError') {
+							console.error('Request timed out');
+							toast({
+								type: 'error',
+								description: 'Request timed out. Please check your connection and try again.'
+							});
+							retries++;
+							continue;
+						}
+						
+						if (retries >= maxRetries - 1) {
+							throw error; // Re-throw if we've exhausted retries
+						}
+						
+						retries++;
+						const delay = Math.pow(2, retries) * 1000;
+						console.log(`Error occurred. Retrying in ${delay}ms... (Attempt ${retries} of ${maxRetries})`);
+						console.error('Fetch error:', error);
+						await new Promise(resolve => setTimeout(resolve, delay));
+					}
+				}
+
+				if (!resp || !resp.ok) {
+					throw new Error('Failed to fetch session history after multiple attempts');
 				}
 				
 				const data: SessionHist[] = await resp.json();

@@ -1,10 +1,9 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { SessionType, SessionStatus } from '@/types/sessions'
 import { ChainType, ChainStatus } from '@/types/chains'
-import { getSessionsData, getEmployeeChains } from '@/services/profileService'
+import { getEmployeeChains } from '@/services/profileService'
 import { useRouter } from 'next/navigation'
-import { CalendarIcon, Clock, Plus, ChevronDown, ChevronRight } from 'lucide-react'
+import { CalendarIcon, Plus, ChevronRight, Clock } from 'lucide-react'
 import { toast } from '@/components/ui/sonner'
 import { 
 	Dialog, 
@@ -13,18 +12,15 @@ import {
 	DialogTitle, 
 	DialogDescription,
 	DialogFooter, 
-	DialogTrigger,
-	DialogClose
+	DialogTrigger
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import store from '@/redux/store'
-import { API_URL } from '@/constants'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '../../components/ui/calendar'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
+import { createSession } from '../../lib/api/session'
 
 // Props interface
 interface UserSessionsCardProps {
@@ -33,6 +29,7 @@ interface UserSessionsCardProps {
 }
 
 // Helper function to format dates consistently
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const convertToIST = (dateString: string) => {
 	const date = new Date(dateString)
 	// Add 5 hours and 30 minutes to convert to IST
@@ -68,37 +65,6 @@ const getChainStatusColor = (status: ChainStatus) => {
 			return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
 		default:
 			return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
-	}
-}
-
-// Create a new session 
-const createSession = async (userId: string, data: { scheduled_at: string, notes: string }, role: string) => {
-	try {
-		// Get auth token from Redux store
-		const { auth } = store.getState()
-		const token = auth.user?.accessToken
-
-		if (!token) {
-			throw new Error('Authentication token not found')
-		}
-
-		const response = await fetch(`${API_URL}/${role}/session/${userId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-			body: JSON.stringify(data),
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error creating session: ${response.statusText}`)
-		}
-
-		return await response.json()
-	} catch (error) {
-		console.error('Failed to create session:', error)
-		throw error
 	}
 }
 
