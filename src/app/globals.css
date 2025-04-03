@@ -592,3 +592,132 @@ layer(base);
 	opacity: 0.8;
 	cursor: grabbing; /* Changes the cursor to indicate dragging */
 }
+
+/* Calendar styles for React Day Picker */
+.rdp {
+	--rdp-cell-size: 40px;
+	--rdp-accent-color: #3b82f6;
+	--rdp-background-color: #e5edff;
+	--rdp-accent-color-dark: #1d4ed8;
+	--rdp-background-color-dark: #172554;
+	--rdp-outline: 2px solid var(--rdp-accent-color);
+	--rdp-outline-selected: 2px solid var(--rdp-accent-color);
+	margin: 0;
+}
+
+/* Fix layout */
+.rdp-caption {
+	position: relative;
+	padding: 8px 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+
+.rdp-caption_label {
+	font-weight: 600;
+	font-size: 16px;
+	color: #111827;
+	margin: 0 auto;
+	position: relative;
+	z-index: 1;
+}
+
+.dark .rdp-caption_label {
+	color: #f9fafb;
+}
+
+/* Fix navigation buttons */
+.rdp-nav {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	padding: 0 4px;
+	pointer-events: none; /* Allow clicking through to month label */
+}
+
+.rdp-nav_button {
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	background-color: #ffffff;
+	border: 1px solid #e4e7ec;
+	color: #475467;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	pointer-events: auto; /* Make buttons clickable */
+	z-index: 2;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+	transition: all 0.2s ease;
+}
+
+.rdp-nav_button:hover {
+	background-color: #f9fafb;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .rdp-nav_button {
+	background-color: #1f2937;
+	border-color: #374151;
+	color: #e4e7ec;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dark .rdp-nav_button:hover {
+	background-color: #374151;
+	border-color: #4b5563;
+}
+
+/* Day styling */
+.rdp-day_selected, 
+.rdp-day_selected:focus, 
+.rdp-day_selected:hover {
+	background-color: var(--rdp-accent-color);
+	color: white;
+	font-weight: 500;
+}
+
+.dark .rdp-day_selected, 
+.dark .rdp-day_selected:focus, 
+.dark .rdp-day_selected:hover {
+	background-color: var(--rdp-accent-color-dark);
+	color: white;
+}
+
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+	background-color: #e5e7eb;
+}
+
+.dark .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+	background-color: #334155;
+}
+
+.rdp-month {
+	background-color: white;
+	border-radius: 8px;
+	padding: 8px;
+}
+
+.dark .rdp-month {
+	background-color: #1f2937;
+}
+
+.rdp-head_cell {
+	font-weight: 500;
+	color: #6b7280;
+	font-size: 13px;
+	padding-bottom: 12px;
+}
+
+.dark .rdp-head_cell {
+	color: #9ca3af;
+}
