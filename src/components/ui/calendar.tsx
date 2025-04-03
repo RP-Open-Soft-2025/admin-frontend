@@ -1,13 +1,20 @@
 'use client'
 
-import * as React from 'react'
+import React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { DayPicker } from 'react-day-picker'
 import { cn } from '@/lib/utils'
+import dynamic from 'next/dynamic'
 
+// Dynamic import of DayPicker with SSR disabled
+const DayPickerWithNoSSR = dynamic(
+  () => import('react-day-picker').then((mod) => mod.DayPicker),
+  { ssr: false } // This ensures the component only loads on the client side
+)
+
+// Import styles directly in the client component
 import 'react-day-picker/dist/style.css'
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type CalendarProps = React.ComponentProps<typeof DayPickerWithNoSSR>
 
 function Calendar({
   className,
@@ -16,7 +23,7 @@ function Calendar({
   ...props
 }: CalendarProps) {
   return (
-    <DayPicker
+    <DayPickerWithNoSSR
       showOutsideDays={showOutsideDays}
       className={cn("p-3 w-full", className)}
       classNames={{

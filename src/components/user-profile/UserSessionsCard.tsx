@@ -33,14 +33,25 @@ interface UserSessionsCardProps {
 }
 
 // Helper function to format dates consistently
+const convertToIST = (dateString: string) => {
+	const date = new Date(dateString)
+	// Add 5 hours and 30 minutes to convert to IST
+	date.setHours(date.getHours() + 5)
+	date.setMinutes(date.getMinutes() + 30)
+	return date
+}
+
+// Modify the formatDate function to use IST timezone
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString)
 	return date.toLocaleDateString('en-US', {
+		month: 'short',
 		day: 'numeric',
-		month: 'long',
 		year: '2-digit',
 		hour: '2-digit',
 		minute: '2-digit',
+		hour12: true,
+		timeZone: 'Asia/Kolkata'
 	})
 }
 
@@ -145,11 +156,11 @@ export default function UserSessionsCard({
 		try {
 			setIsSubmitting(true)
 			// Combine date and time
-			const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString()
+			const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}:00`)
 			
 			// Call API to create session
 			await createSession(employeeId, {
-				scheduled_at: scheduledAt,
+				scheduled_at: scheduledAt.toISOString(),
 				notes: notes
 			}, role)
 
@@ -749,21 +760,21 @@ export default function UserSessionsCard({
 									<tr>
 										<th
 											scope="col"
-											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[200px]"
 										>
 											Status
 										</th>
 										<th
 											scope="col"
-											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[300px]"
 										>
-											Created At
+											Scheduled At
 										</th>
 										<th
 											scope="col"
-											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[200px]"
 										>
-											Chain ID
+											Chat ID
 										</th>
 									</tr>
 								</thead>
@@ -786,7 +797,7 @@ export default function UserSessionsCard({
 															: 'hover:bg-gray-50 dark:hover:bg-gray-800'
 													}`}
 												>
-													<td className="px-6 py-4 whitespace-nowrap text-sm">
+													<td className="px-6 py-4 whitespace-nowrap text-sm w-[200px]">
 														<span
 															className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getChainStatusColor(
 																chain.status
@@ -795,16 +806,11 @@ export default function UserSessionsCard({
 															{chain.status}
 														</span>
 													</td>
-													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[300px]">
 														{formatDate(chain.created_at)}
 													</td>
-													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 flex items-center justify-between">
-														<span>{chain.chain_id}</span>
-														{chain.isExpanded ? (
-															<ChevronDown className="h-4 w-4" />
-														) : (
-															<ChevronRight className="h-4 w-4" />
-														)}
+													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[200px]">
+														{chain.chain_id}
 													</td>
 												</tr>
 												{chain.isExpanded && chain.session_ids.length > 0 && (

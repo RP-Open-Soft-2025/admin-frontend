@@ -202,6 +202,16 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 
 type FilterType = 'all' | 'meetings' | 'sessions'
 
+const formatTimeInIST = (dateString: string) => {
+	const date = new Date(dateString)
+	return date.toLocaleTimeString('en-US', {
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: true,
+		timeZone: 'Asia/Kolkata'
+	})
+}
+
 const Calendar: React.FC = () => {
 	const router = useRouter()
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -293,7 +303,7 @@ const Calendar: React.FC = () => {
 
 				// Format meetings
 				const formattedMeetings = meetingsData.map((meet: Meeting) => {
-					const time = meet.scheduled_at.split('T')[1].split('+')[0].trim()
+					const time = formatTimeInIST(meet.scheduled_at)
 					return {
 						id: meet.meet_id,
 						title: `Meeting at ${time}`,
@@ -309,7 +319,7 @@ const Calendar: React.FC = () => {
 
 				// Format sessions with different colors based on status
 				const formatSession = (session: SessionType, status: SessionStatus) => {
-					const time = session.scheduled_at.split('T')[1].split('+')[0].trim()
+					const time = formatTimeInIST(session.scheduled_at)
 					const colorMap: Record<SessionStatus, string> = {
 						[SessionStatus.ACTIVE]: 'success',
 						[SessionStatus.COMPLETED]: 'info',
