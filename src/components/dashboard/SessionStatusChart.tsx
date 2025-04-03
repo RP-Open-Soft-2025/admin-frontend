@@ -170,16 +170,23 @@ const SessionStatusChart = ({
 
 	if (isLoading) {
 		return (
-			<div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
-				<div className="mb-4 flex items-center justify-between">
-					<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-						Session Status Distribution
-					</h3>
-				</div>
-				<div className="flex h-80 items-center justify-center">
-					<div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-500" />
-				</div>
-			</div>
+			<div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-gray-900">
+  {/* Header */}
+  <div className="mb-4 flex items-center justify-between">
+    <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+      Session Status Distribution
+    </h3>
+  </div>
+
+  {/* Loading Animation */}
+  <div className="flex h-80 items-center justify-center">
+    <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600 dark:border-gray-600 dark:border-t-blue-400"></div>
+  </div>
+
+  {/* Decorative Glow Effect */}
+  <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl blur-lg opacity-0 transition-opacity duration-500 hover:opacity-50"></div>
+</div>
+
 		)
 	}
 
