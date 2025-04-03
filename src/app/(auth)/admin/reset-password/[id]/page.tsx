@@ -15,33 +15,47 @@ const ResetPasswordPage = () => {
 	const params = useParams()
 	const [isSuccessful, setIsSuccessful] = useState(false)
 	const token = params?.id as string | undefined
-	const [isLoad, setIsLoad] = useState<boolean>(true)
+	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
-		fetch(`${API_URL}/auth/admin/validate-reset-token/${token}`).then(resp => {
-			if (resp.status == 404) {
-				toast({
-					type: 'error',
-					description: 'Reset token is not valid',
+		// Verify token before allowing password reset
+		async function verifyToken() {
+			try {
+				const response = await fetch(`${API_URL}/auth/verify-token/${token}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
 				})
-				router.push('/login')
-				setIsLoad(false)
-			} else if (resp.status == 410) {
-				toast({
-					type: 'error',
-					description: 'Reset token is expired',
-				})
-				router.push('/login')
-				setIsLoad(false)
-			} else {
-				setIsLoad(false)
+
+				if (!response.ok) {
+					setTimeout(() => {
+						router.push('/login')
+					}, 3000)
+				}
+			} catch {
+				setTimeout(() => {
+					router.push('/login')
+				}, 3000)
+			} finally {
+				setIsLoading(false)
 			}
-		})
-	}, [])
+		}
+
+		verifyToken()
+	}, [token, router])
 
 	if (!token) {
 		router.push('/login')
 		return null
+	}
+
+	if (isLoading) {
+		return (
+			<div className="flex justify-center items-center h-full">
+				<div className="animate-spin rounded-full h-10 w-10 border-t-3 border-indigo-500"></div>
+			</div>
+		)
 	}
 
 	const handleSubmit = async (formData: FormData) => {
@@ -114,7 +128,7 @@ const ResetPasswordPage = () => {
 		}
 	}
 
-	return !isLoad ? (
+	return !isLoading ? (
 		<div className="w-full h-screen md:min-h-screen flex flex-col md:flex-row">
 			{/* Left Section (Green) */}
 			<div className="h-[50vh] md:h-auto w-full md:w-1/2 flex items-center justify-center bg-[#66872B] dark:bg-[#334016] relative">

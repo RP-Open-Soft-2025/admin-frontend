@@ -240,25 +240,27 @@ export const getSessionsData = async (
 	employeeId: string
 ): Promise<SessionType[]> => {
 	const { auth } = store.getState()
+	const userRole = auth.user?.userRole || 'admin'
+	
 	try {
-		// Fetch from all three endpoints
+		// Fetch from all three endpoints using the correct role-based path
 		const [activeResponse, completedResponse, pendingResponse] =
 			await Promise.all([
-				fetch(`${API_URL}/admin/sessions/active`, {
+				fetch(`${API_URL}/${userRole}/sessions/active`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${auth.user?.accessToken}`,
 					},
 				}),
-				fetch(`${API_URL}/admin/sessions/completed`, {
+				fetch(`${API_URL}/${userRole}/sessions/completed`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${auth.user?.accessToken}`,
 					},
 				}),
-				fetch(`${API_URL}/admin/sessions/pending`, {
+				fetch(`${API_URL}/${userRole}/sessions/pending`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { toast } from '@/components/ui/sonner'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
@@ -33,6 +33,8 @@ import UserRoleChart from '@/components/dashboard/UserRoleChart'
 function AdminDashboard() {
 	const router = useRouter()
 	const auth = useSelector((state: RootState) => state.auth)
+	const isHR = auth.user?.userRole === 'hr'
+	const isAdmin = auth.user?.userRole === 'admin'
 
 	// State for all data
 	const [users, setUsers] = useState<User[] | 'UNAVAILABLE'>([])
@@ -68,126 +70,235 @@ function AdminDashboard() {
 		labels: [] as string[],
 	})
 
-	// Fetch data function for refresh capability
-	const fetchAllData = async () => {
+	// Calculate stats
+	const totalUsers = Array.isArray(users) ? users.length : 'UNAVAILABLE'
+	const activeUsers = Array.isArray(users)
+		? users.filter(user => !user.is_blocked).length
+		: 'UNAVAILABLE'
+
+	const totalSessions =
+		Array.isArray(activeSessions) &&
+		Array.isArray(pendingSessions) &&
+		Array.isArray(completedSessions)
+			? activeSessions.length +
+				pendingSessions.length +
+				completedSessions.length
+			: 'UNAVAILABLE'
+
+	const activeSessionsCount = Array.isArray(activeSessions)
+		? activeSessions.length
+		: 'UNAVAILABLE'
+
+	const pendingSessionsCount = Array.isArray(pendingSessions)
+		? pendingSessions.length
+		: 'UNAVAILABLE'
+
+	const totalMeets = Array.isArray(meetings) ? meetings.length : 'UNAVAILABLE'
+
+	// Process session data for chart based on actual session counts
+	const processSessionData = useCallback(() => {
+		if (
+			activeSessionsCount === 'UNAVAILABLE' ||
+			pendingSessionsCount === 'UNAVAILABLE'
+		) {
+			return
+		}
+
+		// Generate dates for a week (we'll simply use the next 7 days)
+		const startDate = new Date()
+		startDate.setHours(0, 0, 0, 0)
+
+		// Generate 7 consecutive days
+		const chartDates = Array.from({ length: 7 }, (_, i) => {
+			const date = new Date(startDate)
+			date.setDate(date.getDate() + i)
+			return date
+		})
+
+		// Generate labels for the chart
+		const labels = chartDates.map(date =>
+			date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+		)
+
+		// For the chart data, use actual counts from the API
+		// Create an array where all days have the actual session count
+		// First day shows actual count, other days zero to emphasize current state
+		const activeSessionsArray = [
+			typeof activeSessionsCount === 'number' ? activeSessionsCount : 0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+		]
+
+		const pendingSessionsArray = [
+			typeof pendingSessionsCount === 'number' ? pendingSessionsCount : 0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+		]
+
+		// Since we don't have a completedSessionsCount prop in the StatsOverview,
+		// we'll calculate it from the total if available
+		let completedCount = 0
+		if (
+			typeof totalSessions === 'number' &&
+			typeof activeSessionsCount === 'number' &&
+			typeof pendingSessionsCount === 'number'
+		) {
+			completedCount =
+				totalSessions - activeSessionsCount - pendingSessionsCount
+		}
+
+		const completedSessionsArray = [completedCount, 0, 0, 0, 0, 0, 0]
+
+		// Update chart data
+		setSessionChartData({
+			labels: labels,
+			active: activeSessionsArray,
+			pending: pendingSessionsArray,
+			completed: completedSessionsArray,
+		})
+
+		console.log('Updated chart data with actual session counts:', {
+			labels,
+			activeSessionsArray,
+			pendingSessionsArray,
+			completedSessionsArray,
+		})
+	}, [activeSessionsCount, pendingSessionsCount, totalSessions])
+
+	// Wrap getUsersData in useCallback
+	const getUsersData = useCallback(async () => {
 		try {
-			setLoading({
-				users: true,
-				hr: true,
-				sessions: true,
-				meetings: true,
-			})
-
+			setLoading(prev => ({ ...prev, users: true }))
+			
 			// Fetch users
-			try {
-				const userData = await fetchUsers()
-				setUsers(userData)
-			} catch (error) {
-				console.error('Failed to fetch users:', error)
-				setUsers('UNAVAILABLE')
-				toast({
-					type: 'error',
-					description: 'Failed to load users. Please try again later.',
-				})
-			} finally {
-				setLoading(prev => ({ ...prev, users: false }))
-			}
-
-			// Fetch HR users
-			try {
-				const hrData = await fetchHRList()
-				setHRUsers(hrData)
-			} catch (error) {
-				console.error('Failed to fetch HR users:', error)
-				setHRUsers('UNAVAILABLE')
-				toast({
-					type: 'error',
-					description: 'Failed to load HR users. Please try again later.',
-				})
-			} finally {
-				setLoading(prev => ({ ...prev, hr: false }))
-			}
-
-			// Fetch sessions - Try fetching combined first, fallback to individual endpoints
-			try {
-				try {
-					// First try fetching all sessions using the combined endpoint
-					const sessionData = await fetchSessions()
-					setActiveSessions(sessionData.active)
-					setPendingSessions(sessionData.pending)
-
-					// Still need to fetch completed sessions separately
-					const completed = await fetchCompletedSessions()
-					setCompletedSessions(completed)
-
-					console.log('Session data:', {
-						active: sessionData.active.length,
-						pending: sessionData.pending.length,
-						completed: completed.length,
-					})
-				} catch (error) {
-					console.error(
-						'Failed to fetch combined sessions, trying individual endpoints:',
-						error
-					)
-
-					// Fallback to individual endpoints
-					const [active, pending, completed] = await Promise.all([
-						fetchActiveSessions(),
-						fetchPendingSessions(),
-						fetchCompletedSessions(),
-					])
-
-					setActiveSessions(active)
-					setPendingSessions(pending)
-					setCompletedSessions(completed)
-
-					console.log('Session data from individual endpoints:', {
-						active: active.length,
-						pending: pending.length,
-						completed: completed.length,
-					})
-				}
-
-				// Process chart data based on actual session dates
-				processSessionData()
-			} catch (error) {
-				console.error('Failed to fetch sessions:', error)
-				setActiveSessions('UNAVAILABLE')
-				setPendingSessions('UNAVAILABLE')
-				setCompletedSessions('UNAVAILABLE')
-				toast({
-					type: 'error',
-					description: 'Failed to load sessions. Please try again later.',
-				})
-			} finally {
-				setLoading(prev => ({ ...prev, sessions: false }))
-			}
-
-			// Fetch meetings
-			try {
-				const meetData = await fetchMeets()
-				setMeetings(meetData)
-				console.log('Meetings fetched successfully:', meetData.length)
-			} catch (error) {
-				console.error('Failed to fetch meetings:', error)
-				setMeetings('UNAVAILABLE')
-				toast({
-					type: 'error',
-					description: 'Failed to load meetings. Please try again later.',
-				})
-			} finally {
-				setLoading(prev => ({ ...prev, meetings: false }))
-			}
+			const userData = await fetchUsers()
+			setUsers(userData)
 		} catch (error) {
-			console.error('Error fetching dashboard data:', error)
+			console.error('Failed to fetch users:', error)
+			setUsers('UNAVAILABLE')
 			toast({
 				type: 'error',
-				description: 'Failed to load dashboard data. Please try again later.',
+				description: 'Failed to load users. Please try again later.',
 			})
+		} finally {
+			setLoading(prev => ({ ...prev, users: false }))
 		}
-	}
+	}, [])
 
+	// Wrap getSessionsData in useCallback
+	const getSessionsData = useCallback(async () => {
+		try {
+			setLoading(prev => ({ ...prev, sessions: true }))
+			
+			// Fetch sessions - Try fetching combined first, fallback to individual endpoints
+			try {
+				// First try fetching all sessions using the combined endpoint
+				const sessionData = await fetchSessions()
+				setActiveSessions(sessionData.active)
+				setPendingSessions(sessionData.pending)
+
+				// Still need to fetch completed sessions separately
+				const completed = await fetchCompletedSessions()
+				setCompletedSessions(completed)
+			} catch (error) {
+				console.error(
+					'Failed to fetch combined sessions, trying individual endpoints:',
+					error
+				)
+
+				// Fallback to individual endpoints
+				const [active, pending, completed] = await Promise.all([
+					fetchActiveSessions(),
+					fetchPendingSessions(),
+					fetchCompletedSessions(),
+				])
+
+				setActiveSessions(active)
+				setPendingSessions(pending)
+				setCompletedSessions(completed)
+			}
+
+			// Process chart data based on actual session dates
+			processSessionData()
+		} catch (error) {
+			console.error('Failed to fetch sessions:', error)
+			setActiveSessions('UNAVAILABLE')
+			setPendingSessions('UNAVAILABLE')
+			setCompletedSessions('UNAVAILABLE')
+			toast({
+				type: 'error',
+				description: 'Failed to load sessions. Please try again later.',
+			})
+		} finally {
+			setLoading(prev => ({ ...prev, sessions: false }))
+		}
+	}, [processSessionData])
+
+	// Wrap getMeetingsData in useCallback
+	const getMeetingsData = useCallback(async () => {
+		try {
+			setLoading(prev => ({ ...prev, meetings: true }))
+			
+			// Fetch meetings
+			const meetData = await fetchMeets()
+			setMeetings(meetData)
+		} catch (error) {
+			console.error('Failed to fetch meetings:', error)
+			setMeetings('UNAVAILABLE')
+			toast({
+				type: 'error',
+				description: 'Failed to load meetings. Please try again later.',
+			})
+		} finally {
+			setLoading(prev => ({ ...prev, meetings: false }))
+		}
+	}, [])
+
+	// Wrap getHRData in useCallback
+	const getHRData = useCallback(async () => {
+		try {
+			setLoading(prev => ({ ...prev, hr: true }))
+			
+			// Fetch HR users
+			const hrData = await fetchHRList()
+			setHRUsers(hrData)
+		} catch (error) {
+			console.error('Failed to fetch HR users:', error)
+			setHRUsers('UNAVAILABLE')
+			toast({
+				type: 'error',
+				description: 'Failed to load HR users. Please try again later.',
+			})
+		} finally {
+			setLoading(prev => ({ ...prev, hr: false }))
+		}
+	}, [])
+
+	// Functions to get data - wrap in useCallback
+	const fetchAllData = useCallback(async () => {
+		// Only fetch data the user should have access to
+		if (isAdmin || isHR) {
+			await getUsersData()
+		}
+		
+		await getSessionsData()
+		await getMeetingsData()
+		
+		// Only admin needs HR data
+		if (isAdmin) {
+			await getHRData()
+		}
+	}, [isAdmin, isHR, getUsersData, getSessionsData, getMeetingsData, getHRData])
+
+	// First useEffect
 	useEffect(() => {
 		if (!auth.isAuthenticated) {
 			console.log('User is not authenticated, redirecting to login')
@@ -196,16 +307,12 @@ function AdminDashboard() {
 		}
 
 		fetchAllData()
-	}, [auth.isAuthenticated, router])
+	}, [auth.isAuthenticated, router, fetchAllData])
 
 	// Handlers for actions
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const handleOpenCreateUserModal = () => {
 		setShowCreateUserModal(true)
-	}
-
-	const handleCloseCreateUserModal = () => {
-		setShowCreateUserModal(false)
 	}
 
 	const handleCreateUser = async (userData: {
@@ -290,120 +397,17 @@ function AdminDashboard() {
 		}
 	}
 
-	// Process session data for chart based on actual session counts
-	const processSessionData = () => {
-		if (
-			activeSessionsCount === 'UNAVAILABLE' ||
-			pendingSessionsCount === 'UNAVAILABLE'
-		) {
-			return
-		}
-
-		// Generate dates for a week (we'll simply use the next 7 days)
-		const startDate = new Date()
-		startDate.setHours(0, 0, 0, 0)
-
-		// Generate 7 consecutive days
-		const chartDates = Array.from({ length: 7 }, (_, i) => {
-			const date = new Date(startDate)
-			date.setDate(date.getDate() + i)
-			return date
-		})
-
-		// Generate labels for the chart
-		const labels = chartDates.map(date =>
-			date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-		)
-
-		// For the chart data, use actual counts from the API
-		// Create an array where all days have the actual session count
-		// First day shows actual count, other days zero to emphasize current state
-		const activeSessionsArray = [
-			typeof activeSessionsCount === 'number' ? activeSessionsCount : 0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-		]
-
-		const pendingSessionsArray = [
-			typeof pendingSessionsCount === 'number' ? pendingSessionsCount : 0,
-			0,
-			0,
-			0,
-			0,
-			0,
-			0,
-		]
-
-		// Since we don't have a completedSessionsCount prop in the StatsOverview,
-		// we'll calculate it from the total if available
-		let completedCount = 0
-		if (
-			typeof totalSessions === 'number' &&
-			typeof activeSessionsCount === 'number' &&
-			typeof pendingSessionsCount === 'number'
-		) {
-			completedCount =
-				totalSessions - activeSessionsCount - pendingSessionsCount
-		}
-
-		const completedSessionsArray = [completedCount, 0, 0, 0, 0, 0, 0]
-
-		// Update chart data
-		setSessionChartData({
-			labels: labels,
-			active: activeSessionsArray,
-			pending: pendingSessionsArray,
-			completed: completedSessionsArray,
-		})
-
-		console.log('Updated chart data with actual session counts:', {
-			labels,
-			activeSessionsArray,
-			pendingSessionsArray,
-			completedSessionsArray,
-		})
-	}
-
-	// Calculate stats
-	const totalUsers = Array.isArray(users) ? users.length : 'UNAVAILABLE'
-	const activeUsers = Array.isArray(users)
-		? users.filter(user => !user.is_blocked).length
-		: 'UNAVAILABLE'
-
-	const totalSessions =
-		Array.isArray(activeSessions) &&
-		Array.isArray(pendingSessions) &&
-		Array.isArray(completedSessions)
-			? activeSessions.length +
-				pendingSessions.length +
-				completedSessions.length
-			: 'UNAVAILABLE'
-
-	const activeSessionsCount = Array.isArray(activeSessions)
-		? activeSessions.length
-		: 'UNAVAILABLE'
-
-	const pendingSessionsCount = Array.isArray(pendingSessions)
-		? pendingSessions.length
-		: 'UNAVAILABLE'
-
-	const totalMeets = Array.isArray(meetings) ? meetings.length : 'UNAVAILABLE'
-
-	// Update chart whenever session stats change
+	// Second useEffect - fix processSessionData dependency
 	useEffect(() => {
 		processSessionData()
-	}, [activeSessionsCount, pendingSessionsCount, totalSessions])
+	}, [activeSessionsCount, pendingSessionsCount, totalSessions, processSessionData])
 
 	return (
 		<div className="space-y-6">
 			{/* Stats Overview */}
 			<StatsOverview
-				totalUsers={totalUsers}
-				activeUsers={activeUsers}
+				totalUsers={isHR ? 'UNAVAILABLE' : totalUsers}
+				activeUsers={isHR ? 'UNAVAILABLE' : activeUsers}
 				totalSessions={totalSessions}
 				activeSessions={activeSessionsCount}
 				pendingSessions={pendingSessionsCount}
@@ -411,7 +415,7 @@ function AdminDashboard() {
 				isLoading={loading.sessions}
 			/>
 
-			{/* Sessions Chart & Meetings */}
+			{/* Sessions Chart & User Distribution */}
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 				{totalSessions !== 'UNAVAILABLE' && (
 					<SessionStatusChart
@@ -430,61 +434,51 @@ function AdminDashboard() {
 					/>
 				)}
 
-				<UserRoleChart users={users} isLoading={loading.users} />
+				{!isHR && users !== 'UNAVAILABLE' && (
+					<UserRoleChart users={users} isLoading={loading.users} />
+				)}
 			</div>
 
-			{/* User Management */}
-			{/* <UserManagement
-				users={users}
-				onDeleteUser={handleDeleteUser}
-				onCreateSession={handleCreateSession}
-				onCreateUser={handleOpenCreateUserModal}
-				onRefresh={fetchAllData}
-				isLoading={loading.users}
-			/> */}
-
-			{/* Meetings Overview */}
-			{/* <MeetingsOverview meetings={meetings} isLoading={loading.meetings} /> */}
-
-			{/* HR Management */}
-			<HRManagement
-				hrUsers={hrUsers}
-				onReassignHR={handleReassignHR}
-				isLoading={loading.hr}
-			/>
+			{/* HR Management - Admin Only */}
+			{isAdmin && (
+				<HRManagement
+					hrUsers={hrUsers}
+					onReassignHR={handleReassignHR}
+					isLoading={loading.hr}
+				/>
+			)}
 
 			{/* Create User Modal */}
 			{showCreateUserModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-					<div className="relative w-full max-w-md">
-						<div className="relative rounded-lg bg-white shadow dark:bg-gray-800">
-							<div className="flex items-center justify-between rounded-t border-b p-4 dark:border-gray-600">
-								<h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-									Create New User
-								</h3>
-								<button
-									type="button"
-									className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
-									onClick={handleCloseCreateUserModal}
+					<div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+						<div className="mb-4 flex items-center justify-between">
+							<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+								Create New User
+							</h3>
+							<button
+								type="button"
+								className="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"
+								onClick={() => setShowCreateUserModal(false)}
+							>
+								<svg
+									className="h-6 w-6"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
 								>
-									<svg
-										className="h-5 w-5"
-										fill="currentColor"
-										viewBox="0 0 20 20"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											fillRule="evenodd"
-											d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-											clipRule="evenodd"
-										></path>
-									</svg>
-								</button>
-							</div>
-							<div className="p-6">
-								<CreateUserForm onCreateUser={handleCreateUser} />
-							</div>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth="2"
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								</svg>
+							</button>
 						</div>
+						<CreateUserForm
+							onCreateUser={handleCreateUser}
+						/>
 					</div>
 				</div>
 			)}

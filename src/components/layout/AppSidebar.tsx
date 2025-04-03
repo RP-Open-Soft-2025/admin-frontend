@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
@@ -19,6 +19,7 @@ import DeloitteLogo from './deloitte-logo.png'
 import DeloitteLogoDark from './deloitte-logo-dark.png'
 import { logout } from '@/redux/features/auth'
 import { useDispatch } from 'react-redux'
+import store from '@/redux/store'
 
 type NavItem = {
 	name: string
@@ -27,7 +28,8 @@ type NavItem = {
 	subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[]
 }
 
-const navItems: NavItem[] = [
+// Static base navigation items
+const baseNavItems: NavItem[] = [
 	{
 		icon: <Gauge />,
 		name: 'Dashboard',
@@ -39,16 +41,6 @@ const navItems: NavItem[] = [
 		path: '/calendar',
 	},
 	{
-		name: 'Add Employee',
-		icon: <PlusCircle />,
-		path: '/form-layout',
-	},
-	{
-		name: 'Users',
-		icon: <Users />,
-		path: '/users',
-	},
-	{
 		name: 'Sessions',
 		icon: <MessageSquare />,
 		path: '/sessions',
@@ -58,17 +50,7 @@ const navItems: NavItem[] = [
 		icon: <Video />,
 		path: '/meets',
 	},
-	// {
-	// 	icon: <PieChartIcon />,
-	// 	name: 'Charts',
-	// 	subItems: [
-	// 		{ name: 'Line Chart', path: '/line-chart', pro: false },
-	// 		{ name: 'Bar Chart', path: '/bar-chart', pro: false },
-	// 	],
-	// },
 ]
-
-const othersItems: NavItem[] = []
 
 const AppSidebar: React.FC = () => {
 	const dispatch = useDispatch()
@@ -76,6 +58,42 @@ const AppSidebar: React.FC = () => {
 	const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
 	const pathname = usePathname()
 	const [isMobileSize, setIsMobileSize] = useState(false)
+	const [navItems, setNavItems] = useState<NavItem[]>(baseNavItems)
+	
+	// Set up navigation items based on user role - client-side only to avoid hydration errors
+	useEffect(() => {
+		const { auth } = store.getState()
+		const userRole = auth.user?.userRole || 'employee'
+		const isAdmin = userRole === 'admin'
+		const isHR = userRole === 'hr'
+		
+		// Create the full navigation set based on user role
+		const fullNavItems = [
+			...baseNavItems.slice(0, 2), // Dashboard and Calendar
+			
+			// Only add Add Employee for admin
+			...(isAdmin ? [{
+				name: 'Add Employee',
+				icon: <PlusCircle />,
+				path: '/form-layout',
+			}] : []),
+			
+			// Add Users for both admin and HR
+			...(isAdmin || isHR ? [{
+				name: 'Users',
+				icon: <Users />,
+				path: '/users',
+			}] : []),
+			
+			// Add the remaining base items
+			...baseNavItems.slice(2)
+		]
+		
+		setNavItems(fullNavItems)
+	}, [])
+
+	// Wrap othersItems in useMemo to prevent unnecessary re-renders
+	const othersItems = useMemo(() => [], [])
 
 	const renderMenuItems = (
 		navItems: NavItem[],
@@ -283,6 +301,34 @@ const AppSidebar: React.FC = () => {
 		router.push('/login')
 	}
 
+	// Calculate heights for all submenus on resize
+	useEffect(() => {
+		// We need to update the submenu heights whenever the window is resized
+		const updateSubMenuHeights = () => {
+			// Get all submenus
+			Object.keys(subMenuRefs.current).forEach(key => {
+				const subMenu = subMenuRefs.current[key]
+				if (subMenu) {
+					// Set the height for each submenu
+					subMenuHeight[key] = subMenu.scrollHeight
+					setSubMenuHeight({ ...subMenuHeight })
+				}
+			})
+		}
+
+		// Initial calculation of submenu heights
+		updateSubMenuHeights()
+
+		// Add event listener for window resize
+		window.addEventListener('resize', updateSubMenuHeights)
+
+		// Cleanup the event listener
+		return () => {
+			window.removeEventListener('resize', updateSubMenuHeights)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [subMenuHeight])
+
 	return (
 		<aside
 			className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 overflow-hidden
@@ -313,6 +359,7 @@ const AppSidebar: React.FC = () => {
 								alt="Logo"
 								width={150}
 								height={40}
+								priority
 							/>
 							<Image
 								className="hidden dark:block"
@@ -320,6 +367,8 @@ const AppSidebar: React.FC = () => {
 								alt="Logo"
 								width={150}
 								height={40}
+								style={{ height: 'auto' }}
+								priority
 							/>
 						</>
 					) : (
@@ -330,6 +379,7 @@ const AppSidebar: React.FC = () => {
 								width={32}
 								height={32}
 								className="dark:hidden"
+								style={{ height: 'auto' }}
 							/>
 							<Image
 								src={DeloitteLogoDark}
@@ -337,6 +387,7 @@ const AppSidebar: React.FC = () => {
 								width={32}
 								height={32}
 								className="hidden dark:block"
+								style={{ height: 'auto' }}
 							/>
 						</>
 					)}

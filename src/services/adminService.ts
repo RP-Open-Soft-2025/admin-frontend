@@ -72,26 +72,37 @@ export async function getAuthToken() {
 }
 
 export async function fetchUsers(): Promise<User[]> {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), 10000);
+
 	try {
-		const token = await getAuthToken()
-
-		const response = await fetch(`${API_URL}/admin/list-users`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error fetching users: ${response.statusText}`)
+		const { auth } = store.getState();
+		if (!auth.isAuthenticated) {
+			throw new Error('User is not authenticated');
 		}
 
-		const data = await response.json()
-		return data.users || []
-	} catch (error) {
-		console.error('Failed to fetch users:', error)
-		throw error
+		const response = await fetch(`${API_URL}/${auth.user?.userRole}/list-users`, {
+			headers: {
+				Authorization: `Bearer ${auth.user?.accessToken}`,
+			},
+			signal: controller.signal
+		});
+
+		if (!response.ok) {
+			throw new Error(`Error fetching users: ${response.status}`);
+		}
+
+		const data = await response.json();
+		return data.users || [];
+	} catch (fetchError) {
+		if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+			console.error('Request timeout fetching users');
+			return []; // Return empty array on timeout
+		}
+		console.error('Error fetching users:', fetchError);
+		throw fetchError;
+	} finally {
+		clearTimeout(timeoutId);
 	}
 }
 
@@ -150,8 +161,10 @@ export async function fetchSessions(): Promise<{
 }> {
 	try {
 		const token = await getAuthToken()
+		const { auth } = store.getState()
+		const userRole = auth.user?.userRole || 'admin'
 
-		const response = await fetch(`${API_URL}/admin/sessions`, {
+		const response = await fetch(`${API_URL}/${userRole}/sessions`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -187,8 +200,10 @@ export async function fetchSessions(): Promise<{
 export async function fetchActiveSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
+		const { auth } = store.getState()
+		const userRole = auth.user?.userRole || 'admin'
 
-		const response = await fetch(`${API_URL}/admin/sessions/active`, {
+		const response = await fetch(`${API_URL}/${userRole}/sessions/active`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -211,8 +226,10 @@ export async function fetchActiveSessions(): Promise<Session[]> {
 export async function fetchPendingSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
+		const { auth } = store.getState()
+		const userRole = auth.user?.userRole || 'admin'
 
-		const response = await fetch(`${API_URL}/admin/sessions/pending`, {
+		const response = await fetch(`${API_URL}/${userRole}/sessions/pending`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -235,8 +252,10 @@ export async function fetchPendingSessions(): Promise<Session[]> {
 export async function fetchCompletedSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
+		const { auth } = store.getState()
+		const userRole = auth.user?.userRole || 'admin'
 
-		const response = await fetch(`${API_URL}/admin/sessions/completed`, {
+		const response = await fetch(`${API_URL}/${userRole}/sessions/completed`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -245,9 +264,7 @@ export async function fetchCompletedSessions(): Promise<Session[]> {
 		})
 
 		if (!response.ok) {
-			throw new Error(
-				`Error fetching completed sessions: ${response.statusText}`
-			)
+			throw new Error(`Error fetching completed sessions: ${response.statusText}`)
 		}
 
 		const sessions: Session[] = await response.json()
@@ -261,8 +278,10 @@ export async function fetchCompletedSessions(): Promise<Session[]> {
 export async function fetchMeets(): Promise<Meet[]> {
 	try {
 		const token = await getAuthToken()
+		const { auth } = store.getState()
+		const userRole = auth.user?.userRole || 'admin'
 
-		const response = await fetch(`${API_URL}/admin/meets`, {
+		const response = await fetch(`${API_URL}/${userRole}/meets`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -342,8 +361,10 @@ export async function deleteUser(
 export async function createSession(userId: string): Promise<Session> {
 	try {
 		const token = await getAuthToken()
+		const { auth } = store.getState()
+		const userRole = auth.user?.userRole || 'admin'
 
-		const response = await fetch(`${API_URL}/admin/session/${userId}`, {
+		const response = await fetch(`${API_URL}/${userRole}/session/${userId}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

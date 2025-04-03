@@ -34,16 +34,20 @@ export default function Profile() {
 	const { auth } = store.getState()
 
 	useEffect(() => {
-		// Check if user is authenticated
-		if (!auth.isAuthenticated) {
-			console.log('User is not authenticated, redirecting to login')
-			router.push('/login')
-			return
-		}
+		const fetchData = async () => {
+			if (!auth.isAuthenticated) {
+				router.push('/login')
+				return
+			}
 
-		async function fetchProfileData() {
+			if (!id) {
+				console.error('No ID provided')
+				return
+			}
+
+			setLoading(true)
 			try {
-				const data: EmployeeAPI = await getUserProfileData(id)
+				const data = await getUserProfileData(id)
 				setProfileData(data)
 				setLoading(false)
 
@@ -92,8 +96,8 @@ export default function Profile() {
 			}
 		}
 
-		fetchProfileData()
-	}, [auth.isAuthenticated, router])
+		fetchData()
+	}, [auth.isAuthenticated, router, id])
 
 	if (loading) {
 		return (

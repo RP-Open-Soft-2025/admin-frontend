@@ -56,7 +56,7 @@ export default function MeetsPage() {
 		}
 
 		fetchMeets()
-	}, [])
+	}, [auth.isAuthenticated, auth.user?.accessToken, auth.user?.userRole])
 
 	if (isLoading) {
 		return (

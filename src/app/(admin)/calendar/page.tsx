@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -368,13 +368,13 @@ const Calendar: React.FC = () => {
 	const { isOpen, openModal, closeModal } = useModal()
 	const { auth } = store.getState()
 
-	const handleAuthError = () => {
+	const handleAuthError = useCallback(() => {
 		toast({
-			type: 'error',
 			description: 'Your session has expired. Please login again.',
+			type: 'error',
 		})
 		router.push('/login')
-	}
+	}, [router])
 
 	useEffect(() => {
 		const fetchMeetings = async () => {
@@ -500,7 +500,7 @@ const Calendar: React.FC = () => {
 			}
 		}
 		fetchMeetings()
-	}, [auth.user])
+	}, [auth.user, handleAuthError])
 
 	// Filter events when activeFilter changes
 	useEffect(() => {
