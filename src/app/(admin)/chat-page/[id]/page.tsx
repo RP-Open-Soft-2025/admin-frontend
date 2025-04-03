@@ -178,139 +178,63 @@ const ChatPage = () => {
 	useEffect(() => {
 		setHistoryLoading(true)
 
-		const fetchChatHistory = async (chatId: string, timestamp: string) => {
-			setIsLoading(true)
-			try {
-				const resp = await fetch(`${API_URL}/chat/history/${chatId}`, {
-					method: 'GET',
-					headers: { Authorization: `Bearer ${auth.user?.accessToken}` },
-				})
-				if (resp.ok) {
-					const data: ChatResp = await resp.json()
-					setMessages(prev => [
-						...prev,
-						{ timestamp: timestamp, text: chatId, sender: SenderType.SYSTEM },
-						...data.messages,
-					])
-				}
-			} catch (error) {
-				console.error('Error fetching chat history:', error)
-			} finally {
-				setIsLoading(false)
-				setHistoryLoading(false)
-			}
-		}
-
 		const fetchSessionHistory = async () => {
 			try {
 				console.log('Fetching session history for ID:', id);
-				console.log('Authorization token:', auth.user?.accessToken ? 'Token exists' : 'Token missing');
 				
-				// Check if token exists
 				if (!auth.user?.accessToken) {
 					toast({
 						type: 'error',
 						description: 'Authentication token is missing. Please log in again.'
 					});
-					throw new Error('Authentication token is missing');
+					return;
 				}
 
-				// Retry logic with exponential backoff
-				let retries = 0;
-				const maxRetries = 3;
-				let resp;
-
-				while (retries < maxRetries) {
-					try {
-						const controller = new AbortController();
-						const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-						
-						resp = await fetch(`${API_URL}/chat/history/${id}`, {
-							method: 'GET',
-							headers: { 
-								'Authorization': `Bearer ${auth.user?.accessToken}`,
-								'Content-Type': 'application/json'
-							},
-							credentials: 'include', // Include cookies if your API uses cookie-based auth
-							signal: controller.signal
-						});
-						
-						clearTimeout(timeoutId);
-						
-						if (resp.ok) {
-							break; // Success, exit retry loop
-						} else if (resp.status === 401) {
-							toast({
-								type: 'error',
-								description: 'Your session has expired. Please login again.'
-							});
-							throw new Error('Authentication failed');
-						} else if (resp.status >= 500) {
-							// Server error, retry
-							retries++;
-							const delay = Math.pow(2, retries) * 1000; // Exponential backoff
-							console.log(`Retrying in ${delay}ms... (Attempt ${retries} of ${maxRetries})`);
-							await new Promise(resolve => setTimeout(resolve, delay));
-						} else {
-							// Other client errors (400, 404, etc)
-							const errorText = await resp.text();
-							console.error(`API Error (${resp.status}): ${errorText}`);
-							throw new Error(`API request failed with status: ${resp.status}`);
-						}
-					} catch (error: unknown) {
-						const err = error as Error;
-						if (err.name === 'AbortError') {
-							console.error('Request timed out');
-							toast({
-								type: 'error',
-								description: 'Request timed out. Please check your connection and try again.'
-							});
-							retries++;
-							continue;
-						}
-						
-						if (retries >= maxRetries - 1) {
-							throw error; // Re-throw if we've exhausted retries
-						}
-						
-						retries++;
-						const delay = Math.pow(2, retries) * 1000;
-						console.log(`Error occurred. Retrying in ${delay}ms... (Attempt ${retries} of ${maxRetries})`);
-						console.error('Fetch error:', error);
-						await new Promise(resolve => setTimeout(resolve, delay));
+				const response = await fetch(`${API_URL}/chat/history/${id}`, {
+					method: 'GET',
+					headers: {
+						'Authorization': `Bearer ${auth.user.accessToken}`,
+						'Content-Type': 'application/json'
 					}
+				});
+
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
 				}
 
-				if (!resp || !resp.ok) {
-					throw new Error('Failed to fetch session history after multiple attempts');
+				const data = await response.json();
+				console.log('Session history data:', data);
+
+				// Handle the new data format with chatId and messages
+				if (data && data.chatId && Array.isArray(data.messages)) {
+					// Create a single session from the chat data
+					const session: SessionHist = {
+						chat_id: data.chatId,
+						last_message: data.messages[data.messages.length - 1]?.text || '',
+						last_message_time: data.messages[data.messages.length - 1]?.timestamp || null,
+						unread_count: 0,
+						total_messages: data.messages.length,
+						chat_mode: 'BOT',
+						is_escalated: false,
+						created_at: data.messages[0]?.timestamp || new Date().toISOString()
+					};
+					
+					setSessions([session]);
+					
+					// Set messages directly since we already have them
+					setMessages(data.messages);
+				} else {
+					console.error('Invalid data format received:', data);
+					toast({
+						type: 'error',
+						description: 'Invalid data format received from server'
+					});
 				}
-				
-				const data: SessionHist[] = await resp.json();
-				const updtData: SessionHist[] = data.sort(
-					(a: SessionHist, b: SessionHist) => {
-						if (!a.last_message) {
-							return 1;
-						}
-						if (!b.last_message) {
-							return -1;
-						}
-						return (
-							new Date(a.last_message).getTime() -
-							new Date(b.last_message).getTime()
-						);
-					}
-				);
-				setSessions(updtData);
-				await Promise.all(
-					updtData.map(session =>
-						fetchChatHistory(session.chat_id, session.created_at)
-					)
-				);
 			} catch (error) {
 				console.error('Error fetching session history:', error);
 				toast({
 					type: 'error',
-					description: 'Failed to load session history. Please try again.'
+					description: 'Failed to load chat history. Please try again.'
 				});
 			} finally {
 				setHistoryLoading(false);
