@@ -5,6 +5,7 @@ import { ChatResp, MessageResp, SenderType } from '@/types/chat'
 import { API_URL, WS_URL } from '@/constants'
 import store from '@/redux/store'
 import { Role } from '@/types/employee'
+import { toast } from '@/components/ui/sonner'
 
 type SessionHist = {
 	chat_id: string
@@ -202,39 +203,56 @@ const ChatPage = () => {
 
 		const fetchSessionHistory = async () => {
 			try {
+				console.log('Fetching session history for ID:', id);
+				console.log('Authorization token:', auth.user?.accessToken ? 'Token exists' : 'Token missing');
+				
 				const resp = await fetch(`${API_URL}/llm/chat/history/${id}`, {
 					method: 'GET',
-					headers: { Authorization: `Bearer ${auth.user?.accessToken}` },
-				})
-				if (resp.ok) {
-					const data: SessionHist[] = await resp.json()
-					const updtData: SessionHist[] = data.sort(
-						(a: SessionHist, b: SessionHist) => {
-							if (!a.last_message) {
-								return 1
-							}
-							if (!b.last_message) {
-								return -1
-							}
-							return (
-								new Date(a.last_message).getTime() -
-								new Date(b.last_message).getTime()
-							)
-						}
-					)
-					setSessions(updtData)
-					await Promise.all(
-						updtData.map(session =>
-							fetchChatHistory(session.chat_id, session.created_at)
-						)
-					)
+					headers: { 
+						'Authorization': `Bearer ${auth.user?.accessToken}`,
+						'Content-Type': 'application/json'
+					},
+					credentials: 'include' // Include cookies if your API uses cookie-based auth
+				});
+
+				if (!resp.ok) {
+					const errorText = await resp.text();
+					console.error(`API Error (${resp.status}): ${errorText}`);
+					throw new Error(`API request failed with status: ${resp.status}`);
 				}
+				
+				const data: SessionHist[] = await resp.json();
+				const updtData: SessionHist[] = data.sort(
+					(a: SessionHist, b: SessionHist) => {
+						if (!a.last_message) {
+							return 1;
+						}
+						if (!b.last_message) {
+							return -1;
+						}
+						return (
+							new Date(a.last_message).getTime() -
+							new Date(b.last_message).getTime()
+						);
+					}
+				);
+				setSessions(updtData);
+				await Promise.all(
+					updtData.map(session =>
+						fetchChatHistory(session.chat_id, session.created_at)
+					)
+				);
 			} catch (error) {
-				console.error('Error fetching session history:', error)
+				console.error('Error fetching session history:', error);
+				toast({
+					type: 'error',
+					description: 'Failed to load session history. Please try again.'
+				});
+			} finally {
+				setHistoryLoading(false);
+				setIsLoading(false);
 			}
-			setHistoryLoading(false)
-			setIsLoading(false)
-		}
+		};
 
 		fetchSessionHistory()
 	}, [auth.user, id])

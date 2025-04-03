@@ -3,6 +3,7 @@ import { API_URL } from '@/constants'
 import { CompanyData } from '@/types/employee'
 import { EmployeeAPI } from '@/types/UserProfile'
 import { SessionType } from '@/types/sessions'
+import { ChainType } from '@/types/chains'
 
 // Define the API response type based on the backend structure
 export interface ProfileApiResponse {
@@ -285,6 +286,35 @@ export const getSessionsData = async (
 		)
 	} catch (error) {
 		console.error('Error fetching sessions:', error)
+		throw error
+	}
+}
+
+// Function to fetch employee chains
+export const getEmployeeChains = async (
+	employeeId: string
+): Promise<ChainType[]> => {
+	const { auth } = store.getState()
+	try {
+		const response = await fetch(`${API_URL}/admin/chains/employee/${employeeId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${auth.user?.accessToken}`,
+			},
+		})
+
+		if (!response.ok) {
+			throw new Error(`Error fetching chains: ${response.statusText}`)
+		}
+
+		const data: ChainType[] = await response.json()
+		return data.map(chain => ({
+			...chain,
+			isExpanded: false // Initialize all chains as collapsed
+		}))
+	} catch (error) {
+		console.error('Failed to fetch employee chains:', error)
 		throw error
 	}
 }
