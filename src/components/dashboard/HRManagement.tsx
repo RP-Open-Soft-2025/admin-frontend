@@ -93,7 +93,7 @@ const HRManagement = ({
 									</td>
 								</tr>
 							) : (
-								[...hrUsers]
+								hrUsers
 									.sort((a, b) => a.name.localeCompare(b.name)) // Sorting alphabetically by name
 									.map(hr => (
 										<tr
@@ -107,7 +107,9 @@ const HRManagement = ({
 												{hr.name}
 											</td>
 											<td className="whitespace-nowrap px-6 py-4  text-sm text-gray-500 dark:text-gray-400">
-												{hr.currentAssignedUsers}
+												{Array.isArray(hr.currentAssignedUsers)
+													? hr.currentAssignedUsers.length
+													: hr.currentAssignedUsers}
 											</td>
 											{/* <td className="whitespace-nowrap px-6 py-4 text-sm">
 											<div className="flex items-center">

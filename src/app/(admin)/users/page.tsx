@@ -34,10 +34,7 @@ function Page() {
 
 	useEffect(() => {
 		const { auth } = store.getState()
-		const route =
-			auth.user?.userRole == 'admin'
-				? '/admin/list-users'
-				: '/hr/list-assigned-users'
+		const route = '/admin/list-users'
 		const getUpdate = () => {
 			setHistoryLoading(true)
 

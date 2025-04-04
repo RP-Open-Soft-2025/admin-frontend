@@ -434,7 +434,7 @@ export async function blockUser(
 	try {
 		const token = await getAuthToken()
 
-		const response = await fetch(`${API_URL}/admin-hr/block-user`, {
+		const response = await fetch(`${API_URL}/admin/block-user`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -468,7 +468,7 @@ export async function unblockUser(
 	try {
 		const token = await getAuthToken()
 
-		const response = await fetch(`${API_URL}/admin-hr/unblock-user`, {
+		const response = await fetch(`${API_URL}/admin/unblock-user`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
