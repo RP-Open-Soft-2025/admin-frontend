@@ -320,19 +320,38 @@ const ChatPage = () => {
 	}
 
 	return (
-		<div className="flex h-[80vh] w-full dark:bg-[#0f172a] bg-white">
+		<div className="flex h-[80vh] w-full dark:bg-[#0f172a] bg-white relative">
 			{/* Left Sidebar - Always present but may be collapsed */}
 			<div
-				className={`transition-all duration-300 ease-in-out border-r border-gray-700 ${
-					sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
-				}`}
+				className={`transition-all duration-300 ease-in-out border-r dark:border-gray-700 border-gray-300 
+				${sidebarOpen ? 'w-[80%] md:w-64' : 'w-0 overflow-hidden'} md:relative
+				fixed top-0 left-0 h-full bg-white dark:bg-[#0f172a] z-[100] md:z-0`}
 			>
 				{/* Sidebar Content */}
-				<div className="h-full dark:bg-[#0f172a] text-white flex flex-col bg-white">
-					<div className="p-2 border-b border-gray-700 flex items-center">
-						<h2 className="text-lg font-bold dark:text-white text-gray-900 items-center flex justify-center">
+				<div className="h-full bg-white dark:bg-[#0f172a] flex flex-col">
+					<div className="p-4 border-b dark:border-gray-700 border-gray-300 flex items-center justify-between">
+						<h2 className="text-lg font-semibold dark:text-white text-gray-900 truncate">
 							Chat History
 						</h2>
+						<button
+							onClick={toggleSidebar}
+							className="md:hidden text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 ml-2"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="h-5 w-5"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
 					</div>
 
 					<div className="overflow-y-auto flex-grow">
@@ -362,12 +381,20 @@ const ChatPage = () => {
 				</div>
 			</div>
 
+			{/* Overlay for mobile when sidebar is open */}
+			{sidebarOpen && (
+				<div 
+					className="fixed inset-0 bg-black/30 dark:bg-black/50 z-[90] md:hidden"
+					onClick={toggleSidebar}
+				/>
+			)}
+
 			{/* Main Chat Area */}
-			<div className="flex flex-col flex-grow overflow-hidden">
+			<div className="flex flex-col flex-grow overflow-hidden dark:bg-[#0f172a] bg-white">
 				{/* Chat Header with Toggle Button */}
-				<div className="flex items-center p-2 dark:bg-[#0f172a] border-b border-gray-700 dark:text-white bg-white text-gray-dark">
+				<div className="flex items-center p-2 dark:bg-[#0f172a] border-b dark:border-gray-700 border-gray-300 dark:text-white text-gray-900">
 					<button
-						className="mr-3 dark:text-gray-300 hover:text-white focus:outline-none text-gray-900"
+						className="mr-3 dark:text-gray-300 text-gray-900"
 						onClick={toggleSidebar}
 					>
 						<svg
@@ -395,7 +422,7 @@ const ChatPage = () => {
 					ref={messagesContainerRef}
 					className="flex-grow overflow-hidden dark:bg-[#0f172a] bg-white"
 				>
-					<div className="h-full overflow-y-auto flex flex-col space-y-2 p-3">
+					<div className="h-full overflow-y-auto flex flex-col space-y-2 p-3 dark:bg-[#0f172a] bg-white">
 						{isLoading ? (
 							<div className="flex justify-center items-center h-full">
 								<div className="animate-spin rounded-full h-10 w-10 border-t-3 border-indigo-500"></div>

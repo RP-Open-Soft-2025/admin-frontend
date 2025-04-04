@@ -8,6 +8,7 @@ import { useModal } from '@/hooks/useModal'
 import store from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 import {
+	EventApi,
 	EventInput,
 	DateSelectArg,
 	EventClickArg,
@@ -534,10 +535,12 @@ const Calendar: React.FC = () => {
 		}
 	}, [activeFilter, allEvents])
 
-	const handleDateSelect = (selectInfo: DateSelectArg) => {
-		const selectedEvents = getEventsForDate(selectInfo.start)
-		setSelectedDateEvents(selectedEvents)
-		setSelectedDate(selectInfo.startStr)
+	const handleDateSelect = (info: DateSelectArg) => {
+		const selectedDate = info.start
+		const formattedDate = selectedDate.toISOString()
+		const events = getEventsForDate(selectedDate)
+		setSelectedDateEvents(events)
+		setSelectedDate(formattedDate)
 		setShowDateModal(true)
 	}
 
@@ -740,6 +743,13 @@ const Calendar: React.FC = () => {
 		}
 	}, [getTodayEvents])
 
+	const handleDateClick = (date: Date) => {
+		const events = getEventsForDate(date)
+		setSelectedDateEvents(events)
+		setSelectedDate(date.toISOString())
+		setShowDateModal(true)
+	}
+
 	return (
 		<div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] relative min-h-[400px] md:min-h-[600px]">
 			<style>{calendarStyles}</style>
@@ -905,6 +915,13 @@ const Calendar: React.FC = () => {
 					slotEventOverlap={false}
 					allDaySlot={false}
 					nowIndicator={true}
+					selectMirror={true}
+					unselectAuto={false}
+					longPressDelay={0}
+					selectLongPressDelay={0}
+					eventLongPressDelay={0}
+					selectMinDistance={0}
+					dateClick={(info) => handleDateClick(info.date)}
 				/>
 			</div>
 		</div>
