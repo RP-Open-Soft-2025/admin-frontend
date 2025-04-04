@@ -236,6 +236,10 @@ body.fc-popover-open {
 	margin-bottom: 1.5rem !important;
 	flex-wrap: wrap !important;
 	gap: 8px !important;
+	display: flex !important;
+	justify-content: center !important;
+	align-items: center !important;
+	position: relative !important;
 }
 
 .fc-toolbar-chunk {
@@ -243,6 +247,34 @@ body.fc-popover-open {
 	align-items: center !important;
 	flex-wrap: wrap !important;
 	gap: 8px !important;
+}
+
+/* Center the title */
+.fc-toolbar-chunk:nth-child(2) {
+	position: absolute !important;
+	left: 50% !important;
+	transform: translateX(-50%) !important;
+	z-index: 1 !important;
+}
+
+.fc-toolbar-title {
+	font-size: 1.25rem !important;
+	font-weight: 600 !important;
+	color: #374151 !important;
+	white-space: nowrap !important;
+}
+
+.dark .fc-toolbar-title {
+	color: #e5e7eb !important;
+}
+
+/* Position the side buttons */
+.fc-toolbar-chunk:first-child {
+	margin-right: auto !important;
+}
+
+.fc-toolbar-chunk:last-child {
+	margin-left: auto !important;
 }
 
 .fc-toolbar button {
