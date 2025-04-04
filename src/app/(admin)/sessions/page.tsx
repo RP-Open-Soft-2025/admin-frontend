@@ -64,13 +64,11 @@ const TableSession = ({ state }: { state: State }) => {
 			</h2>
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">
-				{state != 'active' && (
-					<Pagination
-						totalPages={totalPages}
-						currentPage={currPage}
-						onPageChange={setCurrentPage}
-					/>
-				)}
+				<Pagination
+					totalPages={totalPages}
+					currentPage={currPage}
+					onPageChange={setCurrentPage}
+				/>
 			</div>
 		</div>
 	)

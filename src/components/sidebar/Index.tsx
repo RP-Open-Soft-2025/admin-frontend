@@ -22,7 +22,9 @@ const SidebarLink = ({ href, icon: Icon, children }: SidebarLinkProps) => {
 					: 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300'
 			}`}
 		>
-			<Icon className={`mr-3 h-5 w-5 ${isActive ? 'text-indigo-600 dark:text-indigo-300' : ''}`} />
+			<Icon
+				className={`mr-3 h-5 w-5 ${isActive ? 'text-indigo-600 dark:text-indigo-300' : ''}`}
+			/>
 			{children}
 		</Link>
 	)
@@ -48,7 +50,7 @@ const Sidebar = () => {
 							Dashboard
 						</SidebarLink>
 					</li>
-					
+
 					{(isAdmin || isHR) && (
 						<li>
 							<SidebarLink href="/users" icon={() => <UsersIcon />}>
@@ -56,25 +58,25 @@ const Sidebar = () => {
 							</SidebarLink>
 						</li>
 					)}
-					
+
 					<li>
 						<SidebarLink href="/calendar" icon={() => <CalendarIcon />}>
 							Calendar
 						</SidebarLink>
 					</li>
-					
+
 					<li>
 						<SidebarLink href="/meets" icon={() => <VideoIcon />}>
 							Meets
 						</SidebarLink>
 					</li>
-					
+
 					<li>
 						<SidebarLink href="/sessions" icon={() => <MessageCircleIcon />}>
 							Sessions
 						</SidebarLink>
 					</li>
-					
+
 					{isAdmin && (
 						<li>
 							<SidebarLink href="/form-layout" icon={() => <PlusCircleIcon />}>
@@ -191,4 +193,4 @@ const PlusCircleIcon = () => (
 	</svg>
 )
 
-export default Sidebar 
+export default Sidebar

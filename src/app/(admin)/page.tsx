@@ -177,7 +177,7 @@ function AdminDashboard() {
 	const getUsersData = useCallback(async () => {
 		try {
 			setLoading(prev => ({ ...prev, users: true }))
-			
+
 			// Fetch users
 			const userData = await fetchUsers()
 			setUsers(userData)
@@ -197,7 +197,7 @@ function AdminDashboard() {
 	const getSessionsData = useCallback(async () => {
 		try {
 			setLoading(prev => ({ ...prev, sessions: true }))
-			
+
 			// Fetch sessions - Try fetching combined first, fallback to individual endpoints
 			try {
 				// First try fetching all sessions using the combined endpoint
@@ -246,7 +246,7 @@ function AdminDashboard() {
 	const getMeetingsData = useCallback(async () => {
 		try {
 			setLoading(prev => ({ ...prev, meetings: true }))
-			
+
 			// Fetch meetings
 			const meetData = await fetchMeets()
 			setMeetings(meetData)
@@ -266,7 +266,7 @@ function AdminDashboard() {
 	const getHRData = useCallback(async () => {
 		try {
 			setLoading(prev => ({ ...prev, hr: true }))
-			
+
 			// Fetch HR users
 			const hrData = await fetchHRList()
 			setHRUsers(hrData)
@@ -288,10 +288,10 @@ function AdminDashboard() {
 		if (isAdmin || isHR) {
 			await getUsersData()
 		}
-		
+
 		await getSessionsData()
 		await getMeetingsData()
-		
+
 		// Only admin needs HR data
 		if (isAdmin) {
 			await getHRData()
@@ -307,7 +307,7 @@ function AdminDashboard() {
 		}
 
 		fetchAllData()
-	}, [auth.isAuthenticated, router, fetchAllData])
+	}, [])
 
 	// Handlers for actions
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -400,7 +400,7 @@ function AdminDashboard() {
 	// Second useEffect - fix processSessionData dependency
 	useEffect(() => {
 		processSessionData()
-	}, [activeSessionsCount, pendingSessionsCount, totalSessions, processSessionData])
+	}, [])
 
 	return (
 		<div className="space-y-6">
@@ -476,9 +476,7 @@ function AdminDashboard() {
 								</svg>
 							</button>
 						</div>
-						<CreateUserForm
-							onCreateUser={handleCreateUser}
-						/>
+						<CreateUserForm onCreateUser={handleCreateUser} />
 					</div>
 				</div>
 			)}

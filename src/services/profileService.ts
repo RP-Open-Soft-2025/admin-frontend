@@ -241,7 +241,7 @@ export const getSessionsData = async (
 ): Promise<SessionType[]> => {
 	const { auth } = store.getState()
 	const userRole = auth.user?.userRole || 'admin'
-	
+
 	try {
 		// Fetch from all three endpoints using the correct role-based path
 		const [activeResponse, completedResponse, pendingResponse] =
@@ -298,13 +298,16 @@ export const getEmployeeChains = async (
 ): Promise<ChainType[]> => {
 	const { auth } = store.getState()
 	try {
-		const response = await fetch(`${API_URL}/admin/chains/employee/${employeeId}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${auth.user?.accessToken}`,
-			},
-		})
+		const response = await fetch(
+			`${API_URL}/admin/chains/employee/${employeeId}`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+				},
+			}
+		)
 
 		if (!response.ok) {
 			throw new Error(`Error fetching chains: ${response.statusText}`)
@@ -313,7 +316,7 @@ export const getEmployeeChains = async (
 		const data: ChainType[] = await response.json()
 		return data.map(chain => ({
 			...chain,
-			isExpanded: false // Initialize all chains as collapsed
+			isExpanded: false, // Initialize all chains as collapsed
 		}))
 	} catch (error) {
 		console.error('Failed to fetch employee chains:', error)

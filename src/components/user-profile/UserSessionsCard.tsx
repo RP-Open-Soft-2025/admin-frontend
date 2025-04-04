@@ -22,7 +22,7 @@ const formatDate = (dateString: string) => {
 		hour: '2-digit',
 		minute: '2-digit',
 		hour12: true,
-		timeZone: 'Asia/Kolkata'
+		timeZone: 'Asia/Kolkata',
 	})
 }
 
@@ -55,7 +55,7 @@ export default function UserSessionsCard({
 
 	// Actually use role in a comment to avoid the unused variable warning
 	// Role: ${role} is used for authorization checks
-	
+
 	useEffect(() => {
 		const fetchChains = async () => {
 			try {
@@ -74,12 +74,14 @@ export default function UserSessionsCard({
 	}, [employeeId])
 
 	const toggleChainExpand = (chainId: string) => {
-		setChainsData(prev => 
-			prev ? prev.map(chain => 
-				chain.chain_id === chainId 
-					? { ...chain, isExpanded: !chain.isExpanded } 
-					: chain
-			) : null
+		setChainsData(prev =>
+			prev
+				? prev.map(chain =>
+						chain.chain_id === chainId
+							? { ...chain, isExpanded: !chain.isExpanded }
+							: chain
+					)
+				: null
 		)
 	}
 
@@ -141,19 +143,15 @@ export default function UserSessionsCard({
 						</h4>
 					</div>
 					{activeChains.length > 0 && (
-					<div 
-						className="mt-2 mb-4 p-3 bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all duration-200 flex items-center"
-					>
-						<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
-						<span>You have active chains</span>
-					</div>
+						<div className="mt-2 mb-4 p-3 bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all duration-200 flex items-center">
+							<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+							<span>You have active chains</span>
+						</div>
 					)}
 
 					{/* Chain Summary */}
 					<div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						<div
-							className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer"
-						>
+						<div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 hover:shadow-md hover:scale-105 cursor-pointer">
 							<p className="text-sm text-gray-500 dark:text-gray-400">
 								Completed Chains
 							</p>
@@ -206,18 +204,18 @@ export default function UserSessionsCard({
 													onMouseEnter={() => setHoveredRow(chain.chain_id)}
 													onMouseLeave={() => setHoveredRow(null)}
 													className={`cursor-pointer transition-all duration-200 ${
-															hoveredRow === chain.chain_id
+														hoveredRow === chain.chain_id
 															? 'bg-gray-50 dark:bg-gray-800 shadow-sm'
 															: 'hover:bg-gray-50 dark:hover:bg-gray-800'
 													}`}
 												>
 													<td className="px-6 py-4 whitespace-nowrap text-sm w-[200px]">
 														<span
-																className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getChainStatusColor(
-																	chain.status
+															className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getChainStatusColor(
+																chain.status
 															)}`}
 														>
-																{chain.status}
+															{chain.status}
 														</span>
 													</td>
 													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[300px]">
@@ -225,7 +223,9 @@ export default function UserSessionsCard({
 													</td>
 													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[200px] flex justify-between items-center">
 														<span>{chain.chain_id}</span>
-														<ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${chain.isExpanded ? 'transform rotate-180' : ''}`} />
+														<ChevronDown
+															className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${chain.isExpanded ? 'transform rotate-180' : ''}`}
+														/>
 													</td>
 												</tr>
 												{chain.isExpanded && chain.session_ids.length > 0 && (
@@ -236,18 +236,22 @@ export default function UserSessionsCard({
 															</div>
 															<div className="grid gap-2">
 																{chain.session_ids.map(sessionId => (
-																	<div 
+																	<div
 																		key={sessionId}
-																		onClick={() => router.push(`/chat-page/${sessionId}`)}
+																		onClick={() =>
+																			router.push(`/chat-page/${sessionId}`)
+																		}
 																		className="p-2 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
 																	>
-																		<span className="text-sm text-gray-800 dark:text-white/90">{sessionId}</span>
-																		<Button 
-																			size="sm" 
-																			variant="ghost" 
-																			onClick={(e) => {
-																				e.stopPropagation();
-																				router.push(`/chat-page/${sessionId}`);
+																		<span className="text-sm text-gray-800 dark:text-white/90">
+																			{sessionId}
+																		</span>
+																		<Button
+																			size="sm"
+																			variant="ghost"
+																			onClick={e => {
+																				e.stopPropagation()
+																				router.push(`/chat-page/${sessionId}`)
 																			}}
 																			className="h-7 w-7 p-0"
 																		>

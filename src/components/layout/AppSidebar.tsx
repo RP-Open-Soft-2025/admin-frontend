@@ -59,36 +59,44 @@ const AppSidebar: React.FC = () => {
 	const pathname = usePathname()
 	const [isMobileSize, setIsMobileSize] = useState(false)
 	const [navItems, setNavItems] = useState<NavItem[]>(baseNavItems)
-	
+
 	// Set up navigation items based on user role - client-side only to avoid hydration errors
 	useEffect(() => {
 		const { auth } = store.getState()
 		const userRole = auth.user?.userRole || 'employee'
 		const isAdmin = userRole === 'admin'
 		const isHR = userRole === 'hr'
-		
+
 		// Create the full navigation set based on user role
 		const fullNavItems = [
 			...baseNavItems.slice(0, 2), // Dashboard and Calendar
-			
+
 			// Only add Add Employee for admin
-			...(isAdmin ? [{
-				name: 'Add Employee',
-				icon: <PlusCircle />,
-				path: '/form-layout',
-			}] : []),
-			
+			...(isAdmin
+				? [
+						{
+							name: 'Add Employee',
+							icon: <PlusCircle />,
+							path: '/form-layout',
+						},
+					]
+				: []),
+
 			// Add Users for both admin and HR
-			...(isAdmin || isHR ? [{
-				name: 'Users',
-				icon: <Users />,
-				path: '/users',
-			}] : []),
-			
+			...(isAdmin || isHR
+				? [
+						{
+							name: 'Users',
+							icon: <Users />,
+							path: '/users',
+						},
+					]
+				: []),
+
 			// Add the remaining base items
-			...baseNavItems.slice(2)
+			...baseNavItems.slice(2),
 		]
-		
+
 		setNavItems(fullNavItems)
 	}, [])
 

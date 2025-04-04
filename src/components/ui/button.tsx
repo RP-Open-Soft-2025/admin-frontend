@@ -45,7 +45,7 @@ function Button({
 		asChild?: boolean
 	}) {
 	// Simpler approach - restore original implementation
-	const Comp = asChild ? Slot : 'button';
+	const Comp = asChild ? Slot : 'button'
 
 	// Using forwardRef pattern that's compatible with React 19
 	return (

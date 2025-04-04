@@ -22,12 +22,15 @@ export default function ResetPasswordPage() {
 		// Verify token before allowing password reset
 		async function verifyToken() {
 			try {
-				const response = await fetch(`${API_URL}/auth/validate-reset-token/${token}`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				})
+				const response = await fetch(
+					`${API_URL}/auth/validate-reset-token/${token}`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+					}
+				)
 
 				if (!response.ok) {
 					setTimeout(() => {

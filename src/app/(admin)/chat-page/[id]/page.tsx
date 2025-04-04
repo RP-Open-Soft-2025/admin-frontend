@@ -21,11 +21,11 @@ type SessionHist = {
 
 // Define a Session interface to properly type the session data
 interface Session {
-	session_id: string;
-	employee_id: string;
-	chat_id: string;
-	status: string;
-	scheduled_at: string;
+	session_id: string
+	employee_id: string
+	chat_id: string
+	status: string
+	scheduled_at: string
 }
 
 const MessageComp = ({ message }: { message: MessageResp }) => {
@@ -192,162 +192,185 @@ const ChatPage = () => {
 			if (!auth.user?.accessToken) {
 				toast({
 					type: 'error',
-					description: 'Authentication token is missing. Please log in again.'
-				});
-				setHistoryLoading(false);
-				setIsLoading(false);
-				return;
+					description: 'Authentication token is missing. Please log in again.',
+				})
+				setHistoryLoading(false)
+				setIsLoading(false)
+				return
 			}
 
 			// Step 1: Check if ID is already a chat ID first
 			if (id.startsWith('CHAT')) {
-				console.log('ID appears to be a chat ID, using it directly:', id);
+				console.log('ID appears to be a chat ID, using it directly:', id)
 				// Skip to fetching chat history using the ID directly
-				await fetchChatHistory(id);
-				return;
+				await fetchChatHistory(id)
+				return
 			}
 
 			// Step 2: If not a chat ID, try to find it in the sessions
-			const endpoint = auth.user.userRole === 'admin' ? 'admin' : auth.user.userRole;
-			console.log(`Using endpoint: ${endpoint}/sessions for user role: ${auth.user.userRole}`);
+			const endpoint =
+				auth.user.userRole === 'admin' ? 'admin' : auth.user.userRole
+			console.log(
+				`Using endpoint: ${endpoint}/sessions for user role: ${auth.user.userRole}`
+			)
 
 			try {
 				// Try with the regular sessions endpoint first
-				let matchingSession = null;
-				let sessionsData = [];
-				
+				let matchingSession = null
+				let sessionsData = []
+
 				// Try regular sessions first
-				console.log(`Fetching from ${API_URL}/${endpoint}/sessions`);
-				const sessionsResponse = await fetch(`${API_URL}/${endpoint}/sessions`, {
-					method: 'GET',
-					headers: {
-						'Authorization': `Bearer ${auth.user.accessToken}`,
-						'Content-Type': 'application/json'
-					}
-				});
-				
-				if (sessionsResponse.ok) {
-					sessionsData = await sessionsResponse.json();
-					console.log(`Received ${sessionsData.length} active/pending sessions`);
-					
-					// Try to find the session
-					matchingSession = sessionsData.find((session: Session) => session.session_id === id);
-				} else {
-					console.error(`Failed to fetch regular sessions: ${sessionsResponse.status}`);
-				}
-				
-				// If not found, try the completed sessions endpoint
-				if (!matchingSession) {
-					console.log(`Session not found in active sessions, trying completed sessions endpoint`);
-					console.log(`Fetching from ${API_URL}/${endpoint}/sessions/completed`);
-					
-					const completedSessionsResponse = await fetch(`${API_URL}/${endpoint}/sessions/completed`, {
+				console.log(`Fetching from ${API_URL}/${endpoint}/sessions`)
+				const sessionsResponse = await fetch(
+					`${API_URL}/${endpoint}/sessions`,
+					{
 						method: 'GET',
 						headers: {
-							'Authorization': `Bearer ${auth.user.accessToken}`,
-							'Content-Type': 'application/json'
+							Authorization: `Bearer ${auth.user.accessToken}`,
+							'Content-Type': 'application/json',
+						},
+					}
+				)
+
+				if (sessionsResponse.ok) {
+					sessionsData = await sessionsResponse.json()
+					console.log(`Received ${sessionsData.length} active/pending sessions`)
+
+					// Try to find the session
+					matchingSession = sessionsData.find(
+						(session: Session) => session.session_id === id
+					)
+				} else {
+					console.error(
+						`Failed to fetch regular sessions: ${sessionsResponse.status}`
+					)
+				}
+
+				// If not found, try the completed sessions endpoint
+				if (!matchingSession) {
+					console.log(
+						`Session not found in active sessions, trying completed sessions endpoint`
+					)
+					console.log(`Fetching from ${API_URL}/${endpoint}/sessions/completed`)
+
+					const completedSessionsResponse = await fetch(
+						`${API_URL}/${endpoint}/sessions/completed`,
+						{
+							method: 'GET',
+							headers: {
+								Authorization: `Bearer ${auth.user.accessToken}`,
+								'Content-Type': 'application/json',
+							},
 						}
-					});
-					
+					)
+
 					if (completedSessionsResponse.ok) {
-						const completedSessionsData = await completedSessionsResponse.json();
-						console.log(`Received ${completedSessionsData.length} completed sessions`);
-						
+						const completedSessionsData = await completedSessionsResponse.json()
+						console.log(
+							`Received ${completedSessionsData.length} completed sessions`
+						)
+
 						// Try to find the session in completed sessions
-						matchingSession = completedSessionsData.find((session: Session) => session.session_id === id);
-						
+						matchingSession = completedSessionsData.find(
+							(session: Session) => session.session_id === id
+						)
+
 						if (matchingSession) {
-							console.log(`Found session ${id} in completed sessions`);
+							console.log(`Found session ${id} in completed sessions`)
 						}
 					} else {
-						console.error(`Failed to fetch completed sessions: ${completedSessionsResponse.status}`);
+						console.error(
+							`Failed to fetch completed sessions: ${completedSessionsResponse.status}`
+						)
 					}
 				}
-				
+
 				// If we still don't have a matching session after checking both endpoints
 				if (!matchingSession) {
-					console.error(`Session ID "${id}" not found in any sessions list`);
+					console.error(`Session ID "${id}" not found in any sessions list`)
 					toast({
 						type: 'error',
-						description: `Session ${id} not found in active or completed sessions. Please check the session ID.`
-					});
-					setHistoryLoading(false);
-					setIsLoading(false);
-					return;
+						description: `Session ${id} not found in active or completed sessions. Please check the session ID.`,
+					})
+					setHistoryLoading(false)
+					setIsLoading(false)
+					return
 				}
-				
+
 				// Step 3: Extract the chat ID
-				const chatId = matchingSession.chat_id;
-				console.log('Found chat ID:', chatId, 'for session ID:', id);
-				
+				const chatId = matchingSession.chat_id
+				console.log('Found chat ID:', chatId, 'for session ID:', id)
+
 				// Step 4: Fetch chat history
-				await fetchChatHistory(chatId);
+				await fetchChatHistory(chatId)
 			} catch (error) {
-				console.error('Error fetching sessions:', error);
+				console.error('Error fetching sessions:', error)
 				toast({
 					type: 'error',
-					description: 'Failed to load sessions. Please try again.'
-				});
-				setHistoryLoading(false);
-				setIsLoading(false);
+					description: 'Failed to load sessions. Please try again.',
+				})
+				setHistoryLoading(false)
+				setIsLoading(false)
 			}
 
 			// Function to fetch chat history once we have the chat ID
 			async function fetchChatHistory(chatId: string) {
 				try {
-					console.log('Fetching chat history for chat ID:', chatId);
-					
+					console.log('Fetching chat history for chat ID:', chatId)
+
 					const response = await fetch(`${API_URL}/chat/history/${chatId}`, {
 						method: 'GET',
 						headers: {
-							'Authorization': `Bearer ${auth.user?.accessToken}`,
-							'Content-Type': 'application/json'
-						}
-					});
-					
+							Authorization: `Bearer ${auth.user?.accessToken}`,
+							'Content-Type': 'application/json',
+						},
+					})
+
 					if (!response.ok) {
-						throw new Error(`HTTP error! status: ${response.status}`);
+						throw new Error(`HTTP error! status: ${response.status}`)
 					}
-					
-					const data = await response.json();
-					console.log('Chat history data received for chat ID:', chatId);
-					
+
+					const data = await response.json()
+					console.log('Chat history data received for chat ID:', chatId)
+
 					// Handle the data as before
 					if (data && data.chatId && Array.isArray(data.messages)) {
 						const session: SessionHist = {
 							chat_id: data.chatId,
 							last_message: data.messages[data.messages.length - 1]?.text || '',
-							last_message_time: data.messages[data.messages.length - 1]?.timestamp || null,
+							last_message_time:
+								data.messages[data.messages.length - 1]?.timestamp || null,
 							unread_count: 0,
 							total_messages: data.messages.length,
 							chat_mode: 'BOT',
 							is_escalated: false,
-							created_at: data.messages[0]?.timestamp || new Date().toISOString()
-						};
-						
-						setSessions([session]);
-						setMessages(data.messages);
+							created_at:
+								data.messages[0]?.timestamp || new Date().toISOString(),
+						}
+
+						setSessions([session])
+						setMessages(data.messages)
 					} else {
-						console.error('Invalid data format received:', data);
+						console.error('Invalid data format received:', data)
 						toast({
 							type: 'error',
-							description: 'Invalid data format received from server'
-						});
+							description: 'Invalid data format received from server',
+						})
 					}
 				} catch (error) {
-					console.error('Error fetching chat history:', error);
+					console.error('Error fetching chat history:', error)
 					toast({
 						type: 'error',
-						description: 'Failed to load chat history. Please try again.'
-					});
+						description: 'Failed to load chat history. Please try again.',
+					})
 				} finally {
-					setHistoryLoading(false);
-					setIsLoading(false);
+					setHistoryLoading(false)
+					setIsLoading(false)
 				}
 			}
-		};
+		}
 
-		fetchSessionHistory();
+		fetchSessionHistory()
 	}, [auth.user, id])
 
 	useEffect(() => {

@@ -1,5 +1,6 @@
 import store from '@/redux/store'
 import { API_URL } from '@/constants'
+import { Role } from '@/types/employee'
 
 // Types for API responses
 export interface User {
@@ -72,37 +73,42 @@ export async function getAuthToken() {
 }
 
 export async function fetchUsers(): Promise<User[]> {
-	const controller = new AbortController();
-	const timeoutId = setTimeout(() => controller.abort(), 10000);
+	const controller = new AbortController()
+	const timeoutId = setTimeout(() => controller.abort(), 10000)
 
 	try {
-		const { auth } = store.getState();
+		const { auth } = store.getState()
 		if (!auth.isAuthenticated) {
-			throw new Error('User is not authenticated');
+			throw new Error('User is not authenticated')
 		}
-
-		const response = await fetch(`${API_URL}/${auth.user?.userRole}/list-users`, {
+		const endpoint =
+			auth.user?.userRole == Role.HR
+				? 'hr/list-assigned-users'
+				: Role.ADMIN
+					? 'admin/list-users'
+					: ''
+		const response = await fetch(`${API_URL}/${endpoint}`, {
 			headers: {
 				Authorization: `Bearer ${auth.user?.accessToken}`,
 			},
-			signal: controller.signal
-		});
+			signal: controller.signal,
+		})
 
 		if (!response.ok) {
-			throw new Error(`Error fetching users: ${response.status}`);
+			throw new Error(`Error fetching users: ${response.status}`)
 		}
 
-		const data = await response.json();
-		return data.users || [];
+		const data = await response.json()
+		return data.users || []
 	} catch (fetchError) {
 		if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-			console.error('Request timeout fetching users');
-			return []; // Return empty array on timeout
+			console.error('Request timeout fetching users')
+			return [] // Return empty array on timeout
 		}
-		console.error('Error fetching users:', fetchError);
-		throw fetchError;
+		console.error('Error fetching users:', fetchError)
+		throw fetchError
 	} finally {
-		clearTimeout(timeoutId);
+		clearTimeout(timeoutId)
 	}
 }
 
@@ -264,7 +270,9 @@ export async function fetchCompletedSessions(): Promise<Session[]> {
 		})
 
 		if (!response.ok) {
-			throw new Error(`Error fetching completed sessions: ${response.statusText}`)
+			throw new Error(
+				`Error fetching completed sessions: ${response.statusText}`
+			)
 		}
 
 		const sessions: Session[] = await response.json()

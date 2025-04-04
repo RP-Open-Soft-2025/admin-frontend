@@ -40,54 +40,54 @@ function Page() {
 				: '/hr/list-assigned-users'
 		const getUpdate = () => {
 			setHistoryLoading(true)
-			
+
 			// Add timeout to prevent indefinite loading
 			const controller = new AbortController()
 			const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
-			
+
 			fetch(API_URL + route, {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${auth.user?.accessToken}`,
 					'Content-type': 'application/json',
 				},
-				signal: controller.signal
+				signal: controller.signal,
 			})
-			.then(resp => {
-				clearTimeout(timeoutId)
-				
-				if (resp.ok) {
-					return resp.json()
-				} else {
-					// Set error state without throwing or rejecting promises
+				.then(resp => {
+					clearTimeout(timeoutId)
+
+					if (resp.ok) {
+						return resp.json()
+					} else {
+						// Set error state without throwing or rejecting promises
+						setHistoryLoading(false)
+						setHasError(true)
+						setAllData([])
+						setAvailableRoles([])
+						// Just return null instead of rejecting promise
+						return null
+					}
+				})
+				.then((res: Response | null) => {
+					if (res === null) return // Skip processing if there was an error
+
+					setAllData(res.users || [])
+					// Extract unique roles from the data
+					const roles = [
+						...new Set((res.users || []).map(user => user.role)),
+					].filter(Boolean)
+					setAvailableRoles(roles)
+					setHistoryLoading(false)
+					setHasError(false)
+				})
+				.catch(error => {
+					// This will only catch network errors and AbortController errors now
+					if (error.name === 'AbortError') {
+						console.log('Request timed out')
+					}
 					setHistoryLoading(false)
 					setHasError(true)
-					setAllData([])
-					setAvailableRoles([])
-					// Just return null instead of rejecting promise
-					return null
-				}
-			})
-			.then((res: Response | null) => {
-				if (res === null) return; // Skip processing if there was an error
-				
-				setAllData(res.users || [])
-				// Extract unique roles from the data
-				const roles = [...new Set((res.users || []).map(user => user.role))].filter(
-					Boolean
-				)
-				setAvailableRoles(roles)
-				setHistoryLoading(false)
-				setHasError(false)
-			})
-			.catch(error => {
-				// This will only catch network errors and AbortController errors now
-				if (error.name === 'AbortError') {
-					console.log('Request timed out');
-				}
-				setHistoryLoading(false)
-				setHasError(true)
-			})
+				})
 		}
 
 		getUpdate()
@@ -145,23 +145,17 @@ function Page() {
 		setPaginatedData(sortedData.slice(start, end))
 	}, [currPage, allData, searchTerm, selectedRole, sortConfig])
 
-	if (historyLoading) {
-		return (
-			<div className="flex justify-center items-center h-24">
-				<div className="animate-spin rounded-full h-6 w-6 border-t-2 border-indigo-500"></div>
-			</div>
-		)
-	}
-
 	if (hasError) {
 		return (
 			<div className="flex flex-col justify-center items-center h-64 p-4">
-				<div className="text-red-500 text-xl mb-2">Unable to load user data</div>
+				<div className="text-red-500 text-xl mb-2">
+					Unable to load user data
+				</div>
 				<p className="text-gray-500 mb-4 text-center">
-					There was a problem connecting to the server. 
-					The HR list-assigned-users endpoint may be unavailable.
+					There was a problem connecting to the server. The HR
+					list-assigned-users endpoint may be unavailable.
 				</p>
-				<button 
+				<button
 					onClick={() => window.location.reload()}
 					className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
 				>

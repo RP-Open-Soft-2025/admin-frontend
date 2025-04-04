@@ -10,15 +10,21 @@ import { cn } from '@/lib/utils'
 const Dialog = DialogPrimitive.Root
 
 // Avoid ref forwarding for DialogTrigger to prevent React 19 warnings
-const DialogTrigger = ({ 
-	asChild = false, 
-	...props 
-}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger> & { 
-	asChild?: boolean 
+const DialogTrigger = ({
+	asChild = false,
+	...props
+}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger> & {
+	asChild?: boolean
 }) => {
 	// Return to a more standard implementation that lets Radix UI handle the asChild logic
 	// This preserves the Dialog state management while still avoiding nested buttons
-	return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} asChild={asChild} />
+	return (
+		<DialogPrimitive.Trigger
+			data-slot="dialog-trigger"
+			{...props}
+			asChild={asChild}
+		/>
+	)
 }
 DialogTrigger.displayName = 'DialogTrigger'
 
@@ -135,5 +141,5 @@ export {
 	DialogHeader,
 	DialogFooter,
 	DialogTitle,
-	DialogDescription
+	DialogDescription,
 }
