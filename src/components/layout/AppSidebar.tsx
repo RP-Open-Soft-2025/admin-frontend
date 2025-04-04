@@ -86,7 +86,7 @@ const AppSidebar: React.FC = () => {
 			...(isAdmin || isHR
 				? [
 						{
-							name: 'Users',
+							name: 'Employees',
 							icon: <Users />,
 							path: '/users',
 						},

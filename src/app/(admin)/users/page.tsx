@@ -175,7 +175,7 @@ function Page() {
 
 	return (
 		<div>
-			<h2 className="text-lg font-semibold mb-4 dark:text-white">ALL USERS</h2>
+			<h2 className="text-lg font-semibold mb-4 dark:text-white">ALL EMPLOYEES</h2>
 
 			<div className="flex flex-col mb-4 gap-4 md:flex-row md:items-center">
 				<div className="relative max-w-sm md:w-64">
@@ -198,7 +198,7 @@ function Page() {
 					<input
 						type="search"
 						className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-						placeholder="Search users..."
+						placeholder="Search employee..."
 						value={searchTerm}
 						onChange={e => setSearchTerm(e.target.value)}
 					/>

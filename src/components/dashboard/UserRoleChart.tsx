@@ -62,7 +62,7 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 						total: {
 							show: true,
 							showAlways: true,
-							label: 'Total Users',
+							label: 'Total Employees',
 							// eslint-disable-next-line @typescript-eslint/no-explicit-any
 							formatter: (w: any) => {
 								return w.globals.seriesTotals.reduce(
@@ -117,7 +117,7 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 			<div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
 				<div className="mb-4 flex items-center justify-between">
 					<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-						User Distribution by Role
+						Employees Distribution by Role
 					</h3>
 				</div>
 				<div className="flex h-80 items-center justify-center">
@@ -131,7 +131,7 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 		<div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
 			<div className="mb-4 flex items-center justify-between">
 				<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-					User Distribution by Role
+					Employees Distribution by Role
 				</h3>
 			</div>
 			<div className="h-80">

@@ -26,7 +26,7 @@ const StatsOverview = ({
 
 	const cards = [
 		{
-			title: 'Total Users',
+			title: 'Total Employees',
 			value: formatStat(totalUsers),
 			bgClass: 'bg-blue-500/10',
 			textClass: 'text-blue-500',
@@ -49,7 +49,7 @@ const StatsOverview = ({
 			),
 		},
 		{
-			title: 'Active Users',
+			title: 'Active Employees',
 			value: formatStat(activeUsers),
 			bgClass: 'bg-green-500/10',
 			textClass: 'text-green-500',
@@ -119,7 +119,7 @@ const StatsOverview = ({
 			),
 		},
 		{
-			title: 'Pending Sessions',
+			title: 'Scheuled Sessions',
 			value: formatStat(pendingSessions),
 			bgClass: 'bg-amber-500/10',
 			textClass: 'text-amber-500',

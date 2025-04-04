@@ -271,11 +271,11 @@ function AdminDashboard() {
 			const hrData = await fetchHRList()
 			setHRUsers(hrData)
 		} catch (error) {
-			console.error('Failed to fetch HR users:', error)
+			console.error('Failed to fetch HR Employee:', error)
 			setHRUsers('UNAVAILABLE')
 			toast({
 				type: 'error',
-				description: 'Failed to load HR users. Please try again later.',
+				description: 'Failed to load HR Employee. Please try again later.',
 			})
 		} finally {
 			setLoading(prev => ({ ...prev, hr: false }))

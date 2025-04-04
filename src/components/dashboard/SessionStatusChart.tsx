@@ -60,7 +60,7 @@ const SessionStatusChart = ({
 					data: [active, pending, completed],
 				},
 			],
-			categories: ['Active', 'Pending', 'Completed'],
+			categories: ['Active', 'Scheduled', 'Completed'],
 		}
 	}
 
