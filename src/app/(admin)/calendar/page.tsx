@@ -849,12 +849,12 @@ const Calendar: React.FC = () => {
 											>
 												<div className="flex justify-between items-center">
 													<span className="text-sm font-medium text-gray-900 dark:text-white">
-														{event.title}
+														{event.title.replace(` at ${event.time}`, '')}
 													</span>
 													<span className={`text-xs px-2 py-1 rounded-full ${
 														event.type === 'meeting'
-															? 'bg-primary/20 text-primary'
-															: `bg-${event.status}/20 text-${event.status}`
+															? 'bg-primary/20 text-primary dark:text-white'
+															: `bg-${event.status}/20 text-${event.status} dark:text-white`
 													}`}>
 														{event.time}
 													</span>
@@ -909,12 +909,12 @@ const Calendar: React.FC = () => {
 											>
 												<div className="flex justify-between items-center">
 													<span className="text-sm font-medium text-gray-900 dark:text-white">
-														{event.title}
+														{event.title.replace(` at ${event.time}`, '')}
 													</span>
 													<span className={`text-xs px-2 py-1 rounded-full ${
 														event.type === 'meeting'
-															? 'bg-primary/20 text-primary'
-															: `bg-${event.status}/20 text-${event.status}`
+															? 'bg-primary/20 text-primary dark:text-white'
+															: `bg-${event.status}/20 text-${event.status} dark:text-white`
 													}`}>
 														{event.time}
 													</span>
