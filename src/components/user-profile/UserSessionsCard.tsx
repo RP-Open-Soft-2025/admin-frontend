@@ -3,8 +3,29 @@ import React, { useEffect, useState } from 'react'
 import { ChainType, ChainStatus } from '@/types/chains'
 import { getEmployeeChains } from '@/services/profileService'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, ChevronDown } from 'lucide-react'
+import { ChevronRight, ChevronDown, Plus, Clock } from 'lucide-react'
+import { Calendar as CalendarIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from '@/components/ui/sonner'
+import { API_URL } from '@/constants'
+import store from '@/redux/store'
+import { format } from 'date-fns'
+import { cn } from '@/lib/utils'
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover'
+import Calendar from '@/components/ui/calendar'
 
 // Props interface
 interface UserSessionsCardProps {
@@ -51,7 +72,15 @@ export default function UserSessionsCard({
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [hoveredRow, setHoveredRow] = useState<string | null>(null)
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [formData, setFormData] = useState({
+		employee_id: employeeId,
+		notes: '',
+		scheduled_time: new Date().toISOString().slice(0, 16),
+	})
 	const router = useRouter()
+	const { auth } = store.getState()
 
 	// Actually use role in a comment to avoid the unused variable warning
 	// Role: ${role} is used for authorization checks
@@ -83,6 +112,93 @@ export default function UserSessionsCard({
 					)
 				: null
 		)
+	}
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+		const { name, value } = e.target
+		setFormData(prev => ({
+			...prev,
+			[name]: value
+		}))
+	}
+
+	const onAddSession = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setIsSubmitting(true)
+		
+		// Basic validation
+		if (!formData.notes.trim() || !formData.scheduled_time) {
+			toast({
+				description: 'Please fill in all fields',
+				type: 'error',
+			})
+			setIsSubmitting(false)
+			return
+		}
+		
+		try {
+			// Make sure scheduled_time is in the future
+			const scheduledDate = new Date(formData.scheduled_time);
+			const now = new Date();
+			
+			if (scheduledDate < now) {
+				toast({
+					description: 'Scheduled time must be in the future',
+					type: 'error',
+				});
+				setIsSubmitting(false);
+				return;
+			}
+			
+			// Format the data properly
+			const formattedData = {
+				...formData,
+				scheduled_time: scheduledDate.toISOString(),
+			}
+
+			const response = await fetch(`${API_URL}/admin/chains/create`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+				},
+				body: JSON.stringify(formattedData),
+			})
+
+			if (!response.ok) {
+				throw new Error(`Error: ${response.status}`)
+			}
+
+			const result = await response.json()
+			
+			// Show success message
+			toast({
+				description: 'Session scheduled successfully',
+				type: 'success',
+			})
+			
+			// Refresh the chains data
+			const updatedChains = await getEmployeeChains(employeeId)
+			setChainsData(updatedChains)
+			
+			// Close the modal
+			setIsModalOpen(false)
+			setFormData({
+				employee_id: employeeId,
+				notes: '',
+				scheduled_time: new Date().toISOString().slice(0, 16),
+			})
+			
+			console.log('Chain created:', result)
+		} catch (error) {
+			console.error('Error creating chain:', error)
+			toast({
+				description: 'Failed to schedule session',
+				type: 'error',
+			})
+		} finally {
+			setIsSubmitting(false)
+		}
 	}
 
 	if (loading) {
@@ -141,7 +257,181 @@ export default function UserSessionsCard({
 						<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
 							Sessions History
 						</h4>
+						{role === 'admin' || role === 'hr' ? (
+							<Button 
+								onClick={() => setIsModalOpen(true)}
+								className="flex items-center gap-1 dark:text-white bg-blue-500"
+								size="sm"
+							>
+								<Plus className="w-4 h-4" />
+								Add Session
+							</Button>
+						) : null}
 					</div>
+					
+					{/* Add Session Modal */}
+					<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+						<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700">
+							<DialogHeader>
+								<DialogTitle className="dark:text-white">Schedule New Session</DialogTitle>
+							</DialogHeader>
+							<form onSubmit={onAddSession} className="space-y-4">
+								<div className="grid w-full items-center gap-2">
+									<label htmlFor="employee_id" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+										Employee ID 
+										<span className="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 text-xs px-2 py-0.5 rounded-md font-medium">Autofilled</span>
+									</label>
+									<Input 
+										id="employee_id"
+										name="employee_id"
+										value={formData.employee_id}
+										onChange={handleInputChange}
+										disabled 
+										className="bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700" 
+									/>
+									<p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+										Session will be scheduled for this employee profile
+									</p>
+								</div>
+								
+								<div className="grid w-full items-center gap-2">
+									<label htmlFor="scheduled_time" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+										Scheduled Time
+									</label>
+									<div className="space-y-2">
+										<Popover>
+											<PopoverTrigger asChild>
+												<Button
+													variant={"outline"}
+													className={cn(
+														"w-full justify-start text-left font-normal dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700",
+														!formData.scheduled_time && "text-muted-foreground"
+													)}
+												>
+													<CalendarIcon className="mr-2 h-4 w-4" />
+													{formData.scheduled_time ? (
+														<span>{format(new Date(formData.scheduled_time), 'PPP')}</span>
+													) : (
+														<span>Pick a date</span>
+													)}
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700">
+												<Calendar
+													mode="single"
+													selected={formData.scheduled_time ? new Date(formData.scheduled_time) : undefined}
+													onSelect={(date) => {
+														if (date) {
+															// Preserve the time part from the existing date if there is one
+															const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
+															const newDate = new Date(date);
+															newDate.setHours(currentDate.getHours());
+															newDate.setMinutes(currentDate.getMinutes());
+															
+															setFormData(prev => ({
+																...prev,
+																scheduled_time: newDate.toISOString()
+															}));
+														}
+													}}
+													className="dark:bg-gray-800 dark:text-gray-300"
+													initialFocus
+												/>
+											</PopoverContent>
+										</Popover>
+										
+										<div className="flex gap-2 items-center">
+											<div className="relative flex-1">
+												<Input 
+													id="time"
+													name="time"
+													type="time" 
+													value={formData.scheduled_time ? format(new Date(formData.scheduled_time), 'HH:mm') : ''}
+													onChange={(e) => {
+														if (e.target.value && formData.scheduled_time) {
+															const [hours, minutes] = e.target.value.split(':');
+															const date = new Date(formData.scheduled_time);
+															date.setHours(parseInt(hours, 10));
+															date.setMinutes(parseInt(minutes, 10));
+															
+															setFormData(prev => ({
+																...prev,
+																scheduled_time: date.toISOString()
+															}));
+														}
+													}}
+													className="pr-10 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700" 
+												/>
+												<Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+											</div>
+											
+											<Button 
+												type="button"
+												variant="outline"
+												size="sm"
+												className="dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+												onClick={() => {
+													const now = new Date();
+													if (formData.scheduled_time) {
+														const date = new Date(formData.scheduled_time);
+														date.setHours(now.getHours());
+														date.setMinutes(now.getMinutes());
+														
+														setFormData(prev => ({
+															...prev,
+															scheduled_time: date.toISOString()
+														}));
+													}
+												}}
+											>
+												Now
+											</Button>
+										</div>
+									</div>
+								</div>
+								
+								<div className="grid w-full items-center gap-2">
+									<label htmlFor="notes" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+										Notes
+									</label>
+									<Textarea 
+										id="notes"
+										name="notes"
+										value={formData.notes}
+										onChange={handleInputChange}
+										placeholder="Enter session notes here..." 
+										className="resize-none min-h-[100px] dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:placeholder-gray-500" 
+									/>
+								</div>
+								
+								<DialogFooter className="gap-2 sm:gap-0">
+									<Button 
+										type="button" 
+										variant="outline"
+										onClick={() => setIsModalOpen(false)}
+										className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+									>
+										Cancel
+									</Button>
+									<Button 
+										type="submit" 
+										disabled={isSubmitting}
+										className="relative dark:bg-blue-600 dark:hover:bg-blue-700"
+									>
+										{isSubmitting && (
+											<div className="absolute inset-0 flex items-center justify-center">
+												<div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white dark:border-gray-300"></div>
+											</div>
+										)}
+										<span className={isSubmitting ? 'opacity-0' : ''}>
+											Schedule Session
+										</span>
+									</Button>
+								</DialogFooter>
+							</form>
+						</DialogContent>
+					</Dialog>
+					
 					{activeChains.length > 0 && (
 						<div className="mt-2 mb-4 p-3 bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all duration-200 flex items-center">
 							<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
