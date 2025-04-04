@@ -324,7 +324,7 @@ const ChatPage = () => {
 			{/* Left Sidebar - Always present but may be collapsed */}
 			<div
 				className={`transition-all duration-300 ease-in-out border-r dark:border-gray-700 border-gray-300 
-				${sidebarOpen ? 'w-[80%] md:w-64' : 'w-0 overflow-hidden'} md:relative
+				${sidebarOpen ? 'w-[60%] md:w-64' : 'w-0 overflow-hidden'} md:relative
 				fixed top-0 left-0 h-full bg-white dark:bg-[#0f172a] z-[100] md:z-0`}
 			>
 				{/* Sidebar Content */}
