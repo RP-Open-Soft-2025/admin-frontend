@@ -8,7 +8,6 @@ import { useModal } from '@/hooks/useModal'
 import store from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 import {
-	EventApi,
 	EventInput,
 	DateSelectArg,
 	EventClickArg,
@@ -30,11 +29,11 @@ interface CalendarEvent extends EventInput {
 
 // Add this interface after the CalendarEvent interface
 interface TodayEvent {
-    title: string
-    time: string
-    type: 'meeting' | 'session'
-    status: string
-    redirectUrl: string
+	title: string
+	time: string
+	type: 'meeting' | 'session'
+	status: string
+	redirectUrl: string
 }
 
 // Add CSS for event styling
@@ -404,7 +403,7 @@ const formatTimeInIST = (dateString: string) => {
 		hour: '2-digit',
 		minute: '2-digit',
 		hour12: true,
-		timeZone: 'Asia/Kolkata'
+		timeZone: 'Asia/Kolkata',
 	})
 }
 
@@ -601,12 +600,12 @@ const Calendar: React.FC = () => {
 		}
 	}
 
-	const resetModalFields = () => {
-		setEventTitle('')
-		setEventStartDate('')
-		setEventLevel('')
-		setSelectedEvent(null)
-	}
+	// const resetModalFields = () => {
+	// 	setEventTitle('')
+	// 	setEventStartDate('')
+	// 	setEventLevel('')
+	// 	setSelectedEvent(null)
+	// }
 
 	useEffect(() => {
 		// Skip if calendarRef isn't available
@@ -714,42 +713,47 @@ const Calendar: React.FC = () => {
 	}, [])
 
 	// Function to get events for a specific date
-	const getEventsForDate = useCallback((date: Date) => {
-		const startOfDay = new Date(date)
-		startOfDay.setHours(0, 0, 0, 0)
-		
-		const endOfDay = new Date(date)
-		endOfDay.setHours(23, 59, 59, 999)
+	const getEventsForDate = useCallback(
+		(date: Date) => {
+			const startOfDay = new Date(date)
+			startOfDay.setHours(0, 0, 0, 0)
 
-		const dateEvents = events.filter(event => {
-			const eventDate = new Date(event.start as string)
-			return eventDate >= startOfDay && eventDate <= endOfDay
-		}).map(event => ({
-			title: event.title || 'Untitled Event',
-			time: formatTimeInIST(event.start as string),
-			type: event.extendedProps.eventType,
-			status: event.extendedProps.calendar,
-			redirectUrl: event.extendedProps.redirectUrl
-		}))
+			const endOfDay = new Date(date)
+			endOfDay.setHours(23, 59, 59, 999)
 
-		// Sort by time
-		dateEvents.sort((a, b) => {
-			const timeA = new Date(`1970/01/01 ${a.time}`).getTime()
-			const timeB = new Date(`1970/01/01 ${b.time}`).getTime()
-			return timeA - timeB
-		})
+			const dateEvents = events
+				.filter(event => {
+					const eventDate = new Date(event.start as string)
+					return eventDate >= startOfDay && eventDate <= endOfDay
+				})
+				.map(event => ({
+					title: event.title || 'Untitled Event',
+					time: formatTimeInIST(event.start as string),
+					type: event.extendedProps.eventType,
+					status: event.extendedProps.calendar,
+					redirectUrl: event.extendedProps.redirectUrl,
+				}))
 
-		return dateEvents
-	}, [events])
+			// Sort by time
+			dateEvents.sort((a, b) => {
+				const timeA = new Date(`1970/01/01 ${a.time}`).getTime()
+				const timeB = new Date(`1970/01/01 ${b.time}`).getTime()
+				return timeA - timeB
+			})
+
+			return dateEvents
+		},
+		[events]
+	)
 
 	// Function to format date for display
 	const formatDate = (dateStr: string) => {
 		const date = new Date(dateStr)
-		return date.toLocaleDateString('en-US', { 
-			weekday: 'long', 
-			year: 'numeric', 
-			month: 'long', 
-			day: 'numeric' 
+		return date.toLocaleDateString('en-US', {
+			weekday: 'long',
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
 		})
 	}
 
@@ -757,20 +761,22 @@ const Calendar: React.FC = () => {
 	const getTodayEvents = useCallback(() => {
 		const today = new Date()
 		today.setHours(0, 0, 0, 0)
-		
+
 		const tomorrow = new Date(today)
 		tomorrow.setDate(tomorrow.getDate() + 1)
 
-		const todaysEvents = events.filter(event => {
-			const eventDate = new Date(event.start as string)
-			return eventDate >= today && eventDate < tomorrow
-		}).map(event => ({
-			title: event.title || 'Untitled Event',
-			time: formatTimeInIST(event.start as string),
-			type: event.extendedProps.eventType,
-			status: event.extendedProps.calendar,
-			redirectUrl: event.extendedProps.redirectUrl
-		}))
+		const todaysEvents = events
+			.filter(event => {
+				const eventDate = new Date(event.start as string)
+				return eventDate >= today && eventDate < tomorrow
+			})
+			.map(event => ({
+				title: event.title || 'Untitled Event',
+				time: formatTimeInIST(event.start as string),
+				type: event.extendedProps.eventType,
+				status: event.extendedProps.calendar,
+				redirectUrl: event.extendedProps.redirectUrl,
+			}))
 
 		// Sort by time
 		todaysEvents.sort((a, b) => {
@@ -807,7 +813,9 @@ const Calendar: React.FC = () => {
 				<div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
 					<div className="flex flex-col items-center gap-3">
 						<div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-						<p className="text-sm text-gray-600 dark:text-gray-300">Loading calendar events...</p>
+						<p className="text-sm text-gray-600 dark:text-gray-300">
+							Loading calendar events...
+						</p>
 					</div>
 				</div>
 			)}
@@ -815,12 +823,16 @@ const Calendar: React.FC = () => {
 			{/* Add new modal for selected date events */}
 			{showDateModal && (
 				<>
-					<div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-md" 
-						onClick={() => setShowDateModal(false)} 
+					<div
+						className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-md"
+						onClick={() => setShowDateModal(false)}
 						style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
 					/>
 					<div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
-						<div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg mx-4" style={{ height: '500px' }}>
+						<div
+							className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg mx-4"
+							style={{ height: '500px' }}
+						>
 							<div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
 								<h2 className="text-lg font-semibold text-gray-900 dark:text-white">
 									Events for {formatDate(selectedDate)}
@@ -829,8 +841,18 @@ const Calendar: React.FC = () => {
 									onClick={() => setShowDateModal(false)}
 									className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
 								>
-									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+									<svg
+										className="w-5 h-5"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="2"
+											d="M6 18L18 6M6 6l12 12"
+										/>
 									</svg>
 								</button>
 							</div>
@@ -851,11 +873,13 @@ const Calendar: React.FC = () => {
 													<span className="text-sm font-medium text-gray-900 dark:text-white">
 														{event.title.replace(` at ${event.time}`, '')}
 													</span>
-													<span className={`text-xs px-2 py-1 rounded-full ${
-														event.type === 'meeting'
-															? 'bg-primary/20 text-primary dark:text-white'
-															: `bg-${event.status}/20 text-${event.status} dark:text-white`
-													}`}>
+													<span
+														className={`text-xs px-2 py-1 rounded-full ${
+															event.type === 'meeting'
+																? 'bg-primary/20 text-primary dark:text-white'
+																: `bg-${event.status}/20 text-${event.status} dark:text-white`
+														}`}
+													>
 														{event.time}
 													</span>
 												</div>
@@ -875,22 +899,33 @@ const Calendar: React.FC = () => {
 
 			{showTodayModal && (
 				<>
-					<div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-md" 
-						onClick={() => setShowTodayModal(false)} 
+					<div
+						className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-md"
+						onClick={() => setShowTodayModal(false)}
 						style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
 					/>
 					<div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
 						<div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden">
 							<div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
 								<h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-									Today's Events
+									Today{'&apos'}s Events
 								</h2>
 								<button
 									onClick={() => setShowTodayModal(false)}
 									className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
 								>
-									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+									<svg
+										className="w-5 h-5"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="2"
+											d="M6 18L18 6M6 6l12 12"
+										/>
 									</svg>
 								</button>
 							</div>
@@ -911,11 +946,13 @@ const Calendar: React.FC = () => {
 													<span className="text-sm font-medium text-gray-900 dark:text-white">
 														{event.title.replace(` at ${event.time}`, '')}
 													</span>
-													<span className={`text-xs px-2 py-1 rounded-full ${
-														event.type === 'meeting'
-															? 'bg-primary/20 text-primary dark:text-white'
-															: `bg-${event.status}/20 text-${event.status} dark:text-white`
-													}`}>
+													<span
+														className={`text-xs px-2 py-1 rounded-full ${
+															event.type === 'meeting'
+																? 'bg-primary/20 text-primary dark:text-white'
+																: `bg-${event.status}/20 text-${event.status} dark:text-white`
+														}`}
+													>
 														{event.time}
 													</span>
 												</div>
@@ -941,13 +978,13 @@ const Calendar: React.FC = () => {
 					headerToolbar={{
 						left: 'prev,next',
 						center: 'title',
-						right: 'todayCustom'
+						right: 'todayCustom',
 					}}
 					customButtons={{
 						todayCustom: {
 							text: 'Today',
-							click: handleTodayClick
-						}
+							click: handleTodayClick,
+						},
 					}}
 					events={events}
 					selectable={true}
@@ -970,7 +1007,7 @@ const Calendar: React.FC = () => {
 					selectLongPressDelay={0}
 					eventLongPressDelay={0}
 					selectMinDistance={0}
-					dateClick={(info) => handleDateClick(info.date)}
+					dateClick={info => handleDateClick(info.date)}
 				/>
 			</div>
 		</div>

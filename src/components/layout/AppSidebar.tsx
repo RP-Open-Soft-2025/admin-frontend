@@ -73,7 +73,13 @@ const othersItems: NavItem[] = []
 const AppSidebar: React.FC = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
-	const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar()
+	const {
+		isExpanded,
+		isMobileOpen,
+		isHovered,
+		setIsHovered,
+		toggleMobileSidebar,
+	} = useSidebar()
 	const pathname = usePathname()
 	const [isMobileSize, setIsMobileSize] = useState(false)
 
@@ -314,7 +320,7 @@ const AppSidebar: React.FC = () => {
 					!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
 				}`}
 			>
-				<Link 
+				<Link
 					href="/"
 					onClick={() => {
 						if (isMobileOpen) {

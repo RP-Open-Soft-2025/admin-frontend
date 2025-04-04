@@ -47,7 +47,8 @@ export default function FormLayout() {
 	const [missingHRIds, setMissingHRIds] = useState<string[]>([])
 	const [suggestedIds, setSuggestedIds] = useState<string[]>([])
 	const [showIdSuggestions, setShowIdSuggestions] = useState(false)
-	const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState<number>(-1)
+	const [currentSuggestionIndex, setCurrentSuggestionIndex] =
+		useState<number>(-1)
 
 	// Add ref to first input
 	const employeeIdRef = useRef<HTMLInputElement>(null)
@@ -62,17 +63,22 @@ export default function FormLayout() {
 			try {
 				const { auth } = store.getState()
 				// Fetch missing employee IDs
-				const employeeResponse = await fetch(`${API_URL}/admin/missing/employee`, {
-					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-					},
-				})
+				const employeeResponse = await fetch(
+					`${API_URL}/admin/missing/employee`,
+					{
+						method: 'GET',
+						headers: {
+							Authorization: `Bearer ${auth.user?.accessToken}`,
+						},
+					}
+				)
 
 				if (employeeResponse.ok) {
 					const employeeData: MissingIDsResponse = await employeeResponse.json()
 					// Sort the employee IDs in increasing order
-					setMissingEmployeeIds(employeeData.missing_employee_ids.sort((a, b) => a.localeCompare(b)))
+					setMissingEmployeeIds(
+						employeeData.missing_employee_ids.sort((a, b) => a.localeCompare(b))
+					)
 				}
 
 				// Fetch missing HR IDs
@@ -86,7 +92,9 @@ export default function FormLayout() {
 				if (hrResponse.ok) {
 					const hrData: MissingIDsResponse = await hrResponse.json()
 					// Sort the HR IDs in increasing order
-					setMissingHRIds(hrData.missing_employee_ids.sort((a, b) => a.localeCompare(b)))
+					setMissingHRIds(
+						hrData.missing_employee_ids.sort((a, b) => a.localeCompare(b))
+					)
 				}
 			} catch (error) {
 				console.error('Error fetching missing IDs:', error)
@@ -113,11 +121,12 @@ export default function FormLayout() {
 	const handleEmployeeIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value
 		setFormData({ ...formData, employee_id: value })
-		
+
 		// Show suggestions if there's user input
 		if (value.length > 0) {
 			// Filter based on the role and current input
-			const idsToFilter = formData.role === Role.HR ? missingHRIds : missingEmployeeIds
+			const idsToFilter =
+				formData.role === Role.HR ? missingHRIds : missingEmployeeIds
 			const filtered = idsToFilter
 				.filter(id => id.includes(value.toUpperCase()))
 				.slice(0, 5)
@@ -130,27 +139,28 @@ export default function FormLayout() {
 
 	// Get the next suggestion based on selected role
 	const getRandomSuggestion = () => {
-		const idsToChooseFrom = formData.role === Role.HR ? missingHRIds : missingEmployeeIds
-		
+		const idsToChooseFrom =
+			formData.role === Role.HR ? missingHRIds : missingEmployeeIds
+
 		if (idsToChooseFrom.length > 0) {
 			// Move to the next suggestion in the list
-			let nextIndex = currentSuggestionIndex + 1;
-			
+			let nextIndex = currentSuggestionIndex + 1
+
 			// Wrap around to the beginning if we reach the end
 			if (nextIndex >= idsToChooseFrom.length) {
-				nextIndex = 0;
+				nextIndex = 0
 			}
-			
-			setCurrentSuggestionIndex(nextIndex);
-			setFormData({ ...formData, employee_id: idsToChooseFrom[nextIndex] });
-			setShowIdSuggestions(false);
+
+			setCurrentSuggestionIndex(nextIndex)
+			setFormData({ ...formData, employee_id: idsToChooseFrom[nextIndex] })
+			setShowIdSuggestions(false)
 		}
 	}
 
 	// Reset suggestion index when role changes
 	useEffect(() => {
-		setCurrentSuggestionIndex(-1);
-	}, [formData.role]);
+		setCurrentSuggestionIndex(-1)
+	}, [formData.role])
 
 	// Select a suggested ID
 	const selectSuggestedId = (id: string) => {
@@ -365,8 +375,13 @@ export default function FormLayout() {
 										placeholder="Enter employee ID (e.g., EMP0001)"
 										value={formData.employee_id}
 										onChange={handleEmployeeIdChange}
-										onFocus={() => formData.role && setShowIdSuggestions(suggestedIds.length > 0)}
-										onBlur={() => setTimeout(() => setShowIdSuggestions(false), 200)}
+										onFocus={() =>
+											formData.role &&
+											setShowIdSuggestions(suggestedIds.length > 0)
+										}
+										onBlur={() =>
+											setTimeout(() => setShowIdSuggestions(false), 200)
+										}
 										className={`w-full p-3 bg-white dark:bg-gray-900 border ${
 											errors.employee_id
 												? 'border-error-500'

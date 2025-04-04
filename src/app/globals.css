@@ -193,9 +193,11 @@ layer(base);
 	body {
 		@apply relative font-normal font-outfit z-1 bg-gray-50;
 	}
-	
+
 	/* Make dark mode transitions instant */
-	*, *::before, *::after {
+	*,
+	*::before,
+	*::after {
 		transition: none !important;
 	}
 }
@@ -683,16 +685,16 @@ layer(base);
 }
 
 /* Day styling */
-.rdp-day_selected, 
-.rdp-day_selected:focus, 
+.rdp-day_selected,
+.rdp-day_selected:focus,
 .rdp-day_selected:hover {
 	background-color: var(--rdp-accent-color);
 	color: white;
 	font-weight: 500;
 }
 
-.dark .rdp-day_selected, 
-.dark .rdp-day_selected:focus, 
+.dark .rdp-day_selected,
+.dark .rdp-day_selected:focus,
 .dark .rdp-day_selected:hover {
 	background-color: var(--rdp-accent-color-dark);
 	color: white;
