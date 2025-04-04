@@ -56,9 +56,13 @@ export default function EmployeeTable({
 		}
 	}
 
-	const isOnline = (lastPing: string) => {
-		const lastPingTime = new Date(lastPing).getTime()
-		return Date.now() - lastPingTime <= DEL_TIME
+	const isOnline = (dateCurr: string) => {
+		const curr = new Date()
+		curr.setHours(curr.getHours() - 5)
+		curr.setMinutes(curr.getMinutes() - 30)
+		const lastTime = new Date(dateCurr)
+		const delTime = curr.getTime() - lastTime.getTime()
+		return delTime <= DEL_TIME && delTime >= 0
 	}
 
 	return (
