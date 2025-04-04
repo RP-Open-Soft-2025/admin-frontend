@@ -264,7 +264,7 @@ export default function UserSessionsCard({
 								size="sm"
 							>
 								<Plus className="w-4 h-4" />
-								Add Session
+								Add Chain
 							</Button>
 						) : null}
 					</div>
