@@ -186,7 +186,9 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 									<p className="text-sm text-gray-500 dark:text-gray-400 2xl:text-sm xl:text-xs lg:text-xs md:text-xs whitespace-nowrap">
 										Last Active:{' '}
 										<span className="font-medium">
-											{formatDate(userData.last_ping)}
+											{getOnline(userData.last_ping)
+												? 'Online now'
+												: formatDate(userData.last_ping)}
 										</span>
 									</p>
 								</div>
