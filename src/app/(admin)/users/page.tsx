@@ -25,6 +25,7 @@ function Page() {
 	const [searchTerm, setSearchTerm] = useState<string>('')
 	const [selectedRole, setSelectedRole] = useState<string>('')
 	const [availableRoles, setAvailableRoles] = useState<string[]>([])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [historyLoading, setHistoryLoading] = useState<boolean>(true)
 	const [hasError, setHasError] = useState<boolean>(false)
 	const [sortConfig, setSortConfig] = useState<SortConfig>({
