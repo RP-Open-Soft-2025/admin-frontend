@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { ShieldAlert, ShieldCheck } from 'lucide-react'
+import { DEL_TIME } from '@/constants'
 
 // Props interface
 interface UserMetaCardProps {
@@ -26,6 +27,15 @@ interface UserMetaCardProps {
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString)
 	return date.toLocaleDateString('en-GB') // Use consistent locale (DD/MM/YYYY)
+}
+
+const getOnline = (dateCurr: string) => {
+	const curr = new Date()
+	curr.setHours(curr.getHours() - 5)
+	curr.setMinutes(curr.getMinutes() - 30)
+	const lastTime = new Date(dateCurr)
+	const delTime = curr.getTime() - lastTime.getTime()
+	return delTime <= DEL_TIME && delTime >= 0
 }
 
 export default function UserMetaCard({ userData }: UserMetaCardProps) {
@@ -152,6 +162,15 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 											: userData.account_activated
 												? 'Active'
 												: 'Pending'}
+									</span>
+									<span
+										className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap 2xl:text-xs xl:text-[10px] lg:text-[10px] md:text-[10px] ${
+											getOnline(userData.last_ping)
+												? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+												: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+										}`}
+									>
+										{getOnline(userData.last_ping) ? 'Online' : 'Offline'}
 									</span>
 								</div>
 								<div className="mt-2 flex flex-col items-center gap-1 md:flex-row md:gap-3 md:flex-wrap">

@@ -175,7 +175,9 @@ function Page() {
 
 	return (
 		<div>
-			<h2 className="text-lg font-semibold mb-4 dark:text-white">ALL EMPLOYEES</h2>
+			<h2 className="text-lg font-semibold mb-4 dark:text-white">
+				ALL EMPLOYEES
+			</h2>
 
 			<div className="flex flex-col mb-4 gap-4 md:flex-row md:items-center">
 				<div className="relative max-w-sm md:w-64">
