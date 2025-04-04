@@ -25,7 +25,6 @@ function Page() {
 	const [searchTerm, setSearchTerm] = useState<string>('')
 	const [selectedRole, setSelectedRole] = useState<string>('')
 	const [availableRoles, setAvailableRoles] = useState<string[]>([])
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [historyLoading, setHistoryLoading] = useState<boolean>(true)
 	const [hasError, setHasError] = useState<boolean>(false)
 	const [sortConfig, setSortConfig] = useState<SortConfig>({
@@ -145,6 +144,14 @@ function Page() {
 		const end = start + MAX_PER_PAGE_USER
 		setPaginatedData(sortedData.slice(start, end))
 	}, [currPage, allData, searchTerm, selectedRole, sortConfig])
+
+	if (historyLoading && allData.length == 0) {
+		return (
+			<div className="flex justify-center items-center h-24">
+				<div className="animate-spin rounded-full h-6 w-6 border-t-2 border-indigo-500"></div>
+			</div>
+		)
+	}
 
 	if (hasError) {
 		return (
