@@ -406,8 +406,8 @@ function AdminDashboard() {
 		<div className="space-y-6">
 			{/* Stats Overview */}
 			<StatsOverview
-				totalUsers={isHR ? 'UNAVAILABLE' : totalUsers}
-				activeUsers={isHR ? 'UNAVAILABLE' : activeUsers}
+				totalUsers={totalUsers}
+				activeUsers={activeUsers}
 				totalSessions={totalSessions}
 				activeSessions={activeSessionsCount}
 				pendingSessions={pendingSessionsCount}
