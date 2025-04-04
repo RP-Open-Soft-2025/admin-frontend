@@ -26,6 +26,10 @@ interface HRResponse {
 	hrs: LocalHR[]
 }
 
+interface MissingIDsResponse {
+	missing_employee_ids: string[]
+}
+
 export default function FormLayout() {
 	const [hrsGot, setHrs] = useState<LocalHR[]>([])
 	const [filterHR, setFilterHR] = useState<LocalHR[]>([])
@@ -39,6 +43,11 @@ export default function FormLayout() {
 	})
 	const [errors, setErrors] = useState<FormErrors>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [missingEmployeeIds, setMissingEmployeeIds] = useState<string[]>([])
+	const [missingHRIds, setMissingHRIds] = useState<string[]>([])
+	const [suggestedIds, setSuggestedIds] = useState<string[]>([])
+	const [showIdSuggestions, setShowIdSuggestions] = useState(false)
+	const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState<number>(-1)
 
 	// Add ref to first input
 	const employeeIdRef = useRef<HTMLInputElement>(null)
@@ -46,6 +55,108 @@ export default function FormLayout() {
 	useEffect(() => {
 		employeeIdRef.current?.focus()
 	}, [])
+
+	// Fetch missing employee IDs when component mounts
+	useEffect(() => {
+		const fetchMissingIds = async () => {
+			try {
+				const { auth } = store.getState()
+				// Fetch missing employee IDs
+				const employeeResponse = await fetch(`${API_URL}/admin/missing/employee`, {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+					},
+				})
+
+				if (employeeResponse.ok) {
+					const employeeData: MissingIDsResponse = await employeeResponse.json()
+					// Sort the employee IDs in increasing order
+					setMissingEmployeeIds(employeeData.missing_employee_ids.sort((a, b) => a.localeCompare(b)))
+				}
+
+				// Fetch missing HR IDs
+				const hrResponse = await fetch(`${API_URL}/admin/missing/hr`, {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+					},
+				})
+
+				if (hrResponse.ok) {
+					const hrData: MissingIDsResponse = await hrResponse.json()
+					// Sort the HR IDs in increasing order
+					setMissingHRIds(hrData.missing_employee_ids.sort((a, b) => a.localeCompare(b)))
+				}
+			} catch (error) {
+				console.error('Error fetching missing IDs:', error)
+			}
+		}
+
+		fetchMissingIds()
+	}, [])
+
+	// Update suggested IDs based on role selection
+	useEffect(() => {
+		if (formData.role === Role.EMPLOYEE) {
+			// Show the first 5 employee IDs in sorted order (already sorted during fetch)
+			setSuggestedIds(missingEmployeeIds.slice(0, 5))
+		} else if (formData.role === Role.HR) {
+			// Show the first 5 HR IDs in sorted order (already sorted during fetch)
+			setSuggestedIds(missingHRIds.slice(0, 5))
+		} else {
+			setSuggestedIds([])
+		}
+	}, [formData.role, missingEmployeeIds, missingHRIds])
+
+	// Filter suggestions based on user input
+	const handleEmployeeIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value
+		setFormData({ ...formData, employee_id: value })
+		
+		// Show suggestions if there's user input
+		if (value.length > 0) {
+			// Filter based on the role and current input
+			const idsToFilter = formData.role === Role.HR ? missingHRIds : missingEmployeeIds
+			const filtered = idsToFilter
+				.filter(id => id.includes(value.toUpperCase()))
+				.slice(0, 5)
+			setSuggestedIds(filtered)
+			setShowIdSuggestions(filtered.length > 0)
+		} else {
+			setShowIdSuggestions(false)
+		}
+	}
+
+	// Get the next suggestion based on selected role
+	const getRandomSuggestion = () => {
+		const idsToChooseFrom = formData.role === Role.HR ? missingHRIds : missingEmployeeIds
+		
+		if (idsToChooseFrom.length > 0) {
+			// Move to the next suggestion in the list
+			let nextIndex = currentSuggestionIndex + 1;
+			
+			// Wrap around to the beginning if we reach the end
+			if (nextIndex >= idsToChooseFrom.length) {
+				nextIndex = 0;
+			}
+			
+			setCurrentSuggestionIndex(nextIndex);
+			setFormData({ ...formData, employee_id: idsToChooseFrom[nextIndex] });
+			setShowIdSuggestions(false);
+		}
+	}
+
+	// Reset suggestion index when role changes
+	useEffect(() => {
+		setCurrentSuggestionIndex(-1);
+	}, [formData.role]);
+
+	// Select a suggested ID
+	const selectSuggestedId = (id: string) => {
+		setFormData({ ...formData, employee_id: id })
+		setShowIdSuggestions(false)
+	}
 
 	const validateForm = (): boolean => {
 		const newErrors: FormErrors = {}
@@ -216,30 +327,83 @@ export default function FormLayout() {
 					</h2>
 					<form onSubmit={handleSubmit} className="space-y-6">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-							{/* Employee ID Field */}
+							{/* Role Field - Moved up so ID suggestions can be role-specific */}
 							<div>
+								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+									Role*
+								</label>
+								<select
+									value={formData.role}
+									onChange={e =>
+										setFormData({ ...formData, role: e.target.value })
+									}
+									className={`w-full p-3 bg-white dark:bg-gray-900 border ${
+										errors.role
+											? 'border-error-500'
+											: 'border-gray-200 dark:border-gray-700'
+									} rounded-lg text-gray-900 dark:text-white/90
+									focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:focus:border-brand-500 transition`}
+								>
+									<option value="">Select Role</option>
+									<option value={Role.HR}>HR Manager</option>
+									<option value={Role.EMPLOYEE}>Employee</option>
+								</select>
+								{errors.role && (
+									<p className="mt-1 text-sm text-error-500">{errors.role}</p>
+								)}
+							</div>
+
+							{/* Employee ID Field with suggestions */}
+							<div className="relative">
 								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 									Employee ID*
 								</label>
-								<input
-									ref={employeeIdRef}
-									type="text"
-									placeholder="Enter employee ID (e.g., EMP0001)"
-									value={formData.employee_id}
-									onChange={e =>
-										setFormData({ ...formData, employee_id: e.target.value })
-									}
-									className={`w-full p-3 bg-white dark:bg-gray-900 border ${
-										errors.employee_id
-											? 'border-error-500'
-											: 'border-gray-200 dark:border-gray-700'
-									} rounded-lg text-gray-900 dark:text-white/90 placeholder-gray-500 dark:placeholder-gray-400
-                  focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:focus:border-brand-500 transition`}
-								/>
+								<div className="flex">
+									<input
+										ref={employeeIdRef}
+										type="text"
+										placeholder="Enter employee ID (e.g., EMP0001)"
+										value={formData.employee_id}
+										onChange={handleEmployeeIdChange}
+										onFocus={() => formData.role && setShowIdSuggestions(suggestedIds.length > 0)}
+										onBlur={() => setTimeout(() => setShowIdSuggestions(false), 200)}
+										className={`w-full p-3 bg-white dark:bg-gray-900 border ${
+											errors.employee_id
+												? 'border-error-500'
+												: 'border-gray-200 dark:border-gray-700'
+										} rounded-lg text-gray-900 dark:text-white/90 placeholder-gray-500 dark:placeholder-gray-400
+										focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:focus:border-brand-500 transition`}
+									/>
+									{formData.role && (
+										<button
+											type="button"
+											onClick={getRandomSuggestion}
+											className="ml-2 px-3 py-2 rounded-lg bg-brand-500/20 text-brand-600 dark:text-brand-400 hover:bg-brand-500/30 transition-colors"
+											title="Suggest next available ID"
+										>
+											Suggest
+										</button>
+									)}
+								</div>
 								{errors.employee_id && (
 									<p className="mt-1 text-sm text-error-500">
 										{errors.employee_id}
 									</p>
+								)}
+								{showIdSuggestions && suggestedIds.length > 0 && (
+									<div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto">
+										<ul className="py-1">
+											{suggestedIds.map(id => (
+												<li
+													key={id}
+													className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-gray-900 dark:text-white/90"
+													onClick={() => selectSuggestedId(id)}
+												>
+													{id}
+												</li>
+											))}
+										</ul>
+									</div>
 								)}
 							</div>
 
@@ -288,32 +452,6 @@ export default function FormLayout() {
 								/>
 								{errors.email && (
 									<p className="mt-1 text-sm text-error-500">{errors.email}</p>
-								)}
-							</div>
-
-							{/* Role Field */}
-							<div>
-								<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-									Role*
-								</label>
-								<select
-									value={formData.role}
-									onChange={e =>
-										setFormData({ ...formData, role: e.target.value })
-									}
-									className={`w-full p-3 bg-white dark:bg-gray-900 border ${
-										errors.role
-											? 'border-error-500'
-											: 'border-gray-200 dark:border-gray-700'
-									} rounded-lg text-gray-900 dark:text-white/90
-									focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:focus:border-brand-500 transition`}
-								>
-									<option value="">Select Role</option>
-									<option value={Role.HR}>HR Manager</option>
-									<option value={Role.EMPLOYEE}>Employee</option>
-								</select>
-								{errors.role && (
-									<p className="mt-1 text-sm text-error-500">{errors.role}</p>
 								)}
 							</div>
 
