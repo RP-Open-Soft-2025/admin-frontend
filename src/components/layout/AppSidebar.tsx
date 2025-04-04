@@ -73,7 +73,7 @@ const othersItems: NavItem[] = []
 const AppSidebar: React.FC = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
-	const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
+	const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar()
 	const pathname = usePathname()
 	const [isMobileSize, setIsMobileSize] = useState(false)
 
@@ -124,6 +124,11 @@ const AppSidebar: React.FC = () => {
 						nav.path && (
 							<Link
 								href={nav.path}
+								onClick={() => {
+									if (isMobileOpen) {
+										toggleMobileSidebar()
+									}
+								}}
 								className={`menu-item group ${
 									isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
 								}`}
@@ -161,6 +166,11 @@ const AppSidebar: React.FC = () => {
 									<li key={subItem.name}>
 										<Link
 											href={subItem.path}
+											onClick={() => {
+												if (isMobileOpen) {
+													toggleMobileSidebar()
+												}
+											}}
 											className={`menu-dropdown-item ${
 												isActive(subItem.path)
 													? 'menu-dropdown-item-active'
@@ -304,7 +314,14 @@ const AppSidebar: React.FC = () => {
 					!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
 				}`}
 			>
-				<Link href="/">
+				<Link 
+					href="/"
+					onClick={() => {
+						if (isMobileOpen) {
+							toggleMobileSidebar()
+						}
+					}}
+				>
 					{isExpanded || isHovered || isMobileOpen ? (
 						<>
 							<Image
