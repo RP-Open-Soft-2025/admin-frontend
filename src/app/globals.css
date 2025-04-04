@@ -193,6 +193,11 @@ layer(base);
 	body {
 		@apply relative font-normal font-outfit z-1 bg-gray-50;
 	}
+	
+	/* Make dark mode transitions instant */
+	*, *::before, *::after {
+		transition: none !important;
+	}
 }
 
 @utility menu-item {
