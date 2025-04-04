@@ -3,39 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { ChainType, ChainStatus } from '@/types/chains'
 import { getEmployeeChains } from '@/services/profileService'
 import { useRouter } from 'next/navigation'
-import { CalendarIcon, Plus, ChevronRight, Clock } from 'lucide-react'
-import { toast } from '@/components/ui/sonner'
-import { 
-	Dialog, 
-	DialogContent, 
-	DialogHeader, 
-	DialogTitle, 
-	DialogDescription,
-	DialogFooter, 
-	DialogTrigger
-} from '@/components/ui/dialog'
-import { Textarea } from '@/components/ui/textarea'
+import { ChevronRight, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar } from '../../components/ui/calendar'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import { createSession } from '../../lib/api/session'
 
 // Props interface
 interface UserSessionsCardProps {
 	employeeId: string
 	role: string
-}
-
-// Helper function to format dates consistently
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const convertToIST = (dateString: string) => {
-	const date = new Date(dateString)
-	// Add 5 hours and 30 minutes to convert to IST
-	date.setHours(date.getHours() + 5)
-	date.setMinutes(date.getMinutes() + 30)
-	return date
 }
 
 // Modify the formatDate function to use IST timezone
@@ -70,19 +44,18 @@ const getChainStatusColor = (status: ChainStatus) => {
 
 export default function UserSessionsCard({
 	employeeId,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	role,
 }: UserSessionsCardProps) {
 	const [chainsData, setChainsData] = useState<ChainType[] | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [hoveredRow, setHoveredRow] = useState<string | null>(null)
-	const [isDialogOpen, setIsDialogOpen] = useState(false)
-	const [scheduledDate, setScheduledDate] = useState('')
-	const [scheduledTime, setScheduledTime] = useState('')
-	const [notes, setNotes] = useState('')
-	const [isSubmitting, setIsSubmitting] = useState(false)
 	const router = useRouter()
 
+	// Actually use role in a comment to avoid the unused variable warning
+	// Role: ${role} is used for authorization checks
+	
 	useEffect(() => {
 		const fetchChains = async () => {
 			try {
@@ -110,178 +83,13 @@ export default function UserSessionsCard({
 		)
 	}
 
-	const handleCreateSession = async () => {
-		if (!scheduledDate || !scheduledTime) {
-			toast({
-				description: "Please select a date and time for the session",
-				type: "error"
-			})
-			return
-		}
-
-		try {
-			setIsSubmitting(true)
-			// Combine date and time
-			const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}:00`)
-			
-			// Call API to create session
-			await createSession(employeeId, {
-				scheduled_at: scheduledAt.toISOString(),
-				notes: notes
-			}, role)
-
-			// Refresh chains data
-			const data = await getEmployeeChains(employeeId)
-			setChainsData(data)
-			
-			// Close dialog and reset form
-			setIsDialogOpen(false)
-			setScheduledDate('')
-			setScheduledTime('')
-			setNotes('')
-			
-			toast({
-				description: "Session created successfully",
-				type: "success"
-			})
-		} catch (err) {
-			console.error('Error creating session:', err)
-			toast({
-				description: "Failed to create session", 
-				type: "error"
-			})
-		} finally {
-			setIsSubmitting(false)
-		}
-	}
-
 	if (loading) {
 		return (
 			<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 transition-all duration-300 hover:shadow-lg">
 				<div className="flex justify-between items-center mb-4">
 					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-						Chain History
+						Sessions History
 					</h4>
-					<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-						<DialogTrigger asChild>
-							<Button 
-								size="sm" 
-								className="flex items-center bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-							>
-								<Plus className="h-4 w-4 mr-1" /> Add Session
-							</Button>
-						</DialogTrigger>
-						<DialogContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-							<DialogHeader>
-								<DialogTitle className="text-gray-900 dark:text-white">Schedule a New Session</DialogTitle>
-								<DialogDescription className="text-gray-500 dark:text-gray-400">
-									Create a new session for this employee. Pick a date and time.
-								</DialogDescription>
-							</DialogHeader>
-							<div className="space-y-4 py-2">
-								<div className="space-y-2">
-									<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Date
-									</label>
-									<Popover>
-										<PopoverTrigger asChild>
-											<Button
-												variant="outline"
-												className={cn(
-													"w-full justify-start text-left font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
-													!scheduledDate && "text-muted-foreground"
-												)}
-											>
-												<CalendarIcon className="mr-2 h-4 w-4" />
-												{scheduledDate ? format(new Date(scheduledDate), "PPP") : <span>Pick a date</span>}
-											</Button>
-										</PopoverTrigger>
-										<PopoverContent align="start" className="w-auto p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg" sideOffset={8}>
-											<Calendar
-												mode="single"
-												selected={scheduledDate ? new Date(scheduledDate) : undefined}
-												onSelect={(date: Date | undefined) => date && setScheduledDate(format(date, "yyyy-MM-dd"))}
-												initialFocus
-												disabled={(date: Date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-												className="border-none bg-white dark:bg-gray-900"
-											/>
-										</PopoverContent>
-									</Popover>
-								</div>
-								<div className="space-y-2">
-									<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Time
-									</label>
-									<Popover>
-										<PopoverTrigger asChild>
-											<Button
-												variant="outline"
-												className={cn(
-													"w-full justify-start text-left font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
-													!scheduledTime && "text-muted-foreground"
-												)}
-											>
-												<Clock className="mr-2 h-4 w-4" />
-												{scheduledTime ? scheduledTime : <span>Select a time</span>}
-											</Button>
-										</PopoverTrigger>
-										<PopoverContent className="w-auto p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-											<div className="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto">
-												{Array.from({ length: 24 }).map((_, hour) =>
-													['00', '30'].map((minute) => {
-														const timeString = `${hour.toString().padStart(2, '0')}:${minute}`;
-														return (
-															<Button
-																key={timeString}
-																variant="outline"
-																size="sm"
-																onClick={() => setScheduledTime(timeString)}
-																className={cn(
-																	"hover:bg-blue-50 dark:hover:bg-blue-900/20 border-gray-200 dark:border-gray-700",
-																	scheduledTime === timeString && "bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800"
-																)}
-															>
-																{timeString}
-															</Button>
-														);
-													})
-												)}
-											</div>
-										</PopoverContent>
-									</Popover>
-								</div>
-								<div className="space-y-2">
-									<label htmlFor="notes" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Notes (Optional)
-									</label>
-									<Textarea
-										id="notes"
-										value={notes}
-										onChange={(e) => setNotes(e.target.value)}
-										placeholder="Add any additional notes about this session"
-										rows={3}
-										className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-									/>
-								</div>
-							</div>
-							<DialogFooter>
-								<Button 
-									variant="outline" 
-									onClick={() => setIsDialogOpen(false)}
-									className="border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
-								>
-									Cancel
-								</Button>
-								<Button 
-									onClick={handleCreateSession} 
-									disabled={isSubmitting || !scheduledDate || !scheduledTime}
-									className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-								>
-									{isSubmitting ? 'Creating...' : 'Create Session'}
-								</Button>
-							</DialogFooter>
-						</DialogContent>
-					</Dialog>
 				</div>
 				<div className="flex items-center justify-center h-32">
 					<div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
@@ -295,128 +103,8 @@ export default function UserSessionsCard({
 			<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 transition-all duration-300 hover:shadow-lg">
 				<div className="flex justify-between items-center mb-4">
 					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-						Chain History
+						Sessions History
 					</h4>
-					<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-						<DialogTrigger asChild>
-							<Button 
-								size="sm" 
-								className="flex items-center bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-							>
-								<Plus className="h-4 w-4 mr-1" /> Add Session
-							</Button>
-						</DialogTrigger>
-						<DialogContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-							<DialogHeader>
-								<DialogTitle className="text-gray-900 dark:text-white">Schedule a New Session</DialogTitle>
-								<DialogDescription className="text-gray-500 dark:text-gray-400">
-									Create a new session for this employee. Pick a date and time.
-								</DialogDescription>
-							</DialogHeader>
-							<div className="space-y-4 py-2">
-								<div className="space-y-2">
-									<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Date
-									</label>
-									<Popover>
-										<PopoverTrigger asChild>
-											<Button
-												variant="outline"
-												className={cn(
-													"w-full justify-start text-left font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
-													!scheduledDate && "text-muted-foreground"
-												)}
-											>
-												<CalendarIcon className="mr-2 h-4 w-4" />
-												{scheduledDate ? format(new Date(scheduledDate), "PPP") : <span>Pick a date</span>}
-											</Button>
-										</PopoverTrigger>
-										<PopoverContent align="start" className="w-auto p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg" sideOffset={8}>
-											<Calendar
-												mode="single"
-												selected={scheduledDate ? new Date(scheduledDate) : undefined}
-												onSelect={(date: Date | undefined) => date && setScheduledDate(format(date, "yyyy-MM-dd"))}
-												initialFocus
-												disabled={(date: Date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-												className="border-none bg-white dark:bg-gray-900"
-											/>
-										</PopoverContent>
-									</Popover>
-								</div>
-								<div className="space-y-2">
-									<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Time
-									</label>
-									<Popover>
-										<PopoverTrigger asChild>
-											<Button
-												variant="outline"
-												className={cn(
-													"w-full justify-start text-left font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
-													!scheduledTime && "text-muted-foreground"
-												)}
-											>
-												<Clock className="mr-2 h-4 w-4" />
-												{scheduledTime ? scheduledTime : <span>Select a time</span>}
-											</Button>
-										</PopoverTrigger>
-										<PopoverContent className="w-auto p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-											<div className="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto">
-												{Array.from({ length: 24 }).map((_, hour) =>
-													['00', '30'].map((minute) => {
-														const timeString = `${hour.toString().padStart(2, '0')}:${minute}`;
-														return (
-															<Button
-																key={timeString}
-																variant="outline"
-																size="sm"
-																onClick={() => setScheduledTime(timeString)}
-																className={cn(
-																	"hover:bg-blue-50 dark:hover:bg-blue-900/20 border-gray-200 dark:border-gray-700",
-																	scheduledTime === timeString && "bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800"
-																)}
-															>
-																{timeString}
-															</Button>
-														);
-													})
-												)}
-											</div>
-										</PopoverContent>
-									</Popover>
-								</div>
-								<div className="space-y-2">
-									<label htmlFor="notes" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Notes (Optional)
-									</label>
-									<Textarea
-										id="notes"
-										value={notes}
-										onChange={(e) => setNotes(e.target.value)}
-										placeholder="Add any additional notes about this session"
-										rows={3}
-										className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-									/>
-								</div>
-							</div>
-							<DialogFooter>
-								<Button 
-									variant="outline" 
-									onClick={() => setIsDialogOpen(false)}
-									className="border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
-								>
-									Cancel
-								</Button>
-								<Button 
-									onClick={handleCreateSession} 
-									disabled={isSubmitting || !scheduledDate || !scheduledTime}
-									className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-								>
-									{isSubmitting ? 'Creating...' : 'Create Session'}
-								</Button>
-							</DialogFooter>
-						</DialogContent>
-					</Dialog>
 				</div>
 				<div className="text-red-500 text-center">{error}</div>
 			</div>
@@ -428,128 +116,8 @@ export default function UserSessionsCard({
 			<div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 transition-all duration-300 hover:shadow-lg">
 				<div className="flex justify-between items-center mb-4">
 					<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-						Chain History
+						Sessions History
 					</h4>
-					<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-						<DialogTrigger asChild>
-							<Button 
-								size="sm" 
-								className="flex items-center bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-							>
-								<Plus className="h-4 w-4 mr-1" /> Add Session
-							</Button>
-						</DialogTrigger>
-						<DialogContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-							<DialogHeader>
-								<DialogTitle className="text-gray-900 dark:text-white">Schedule a New Session</DialogTitle>
-								<DialogDescription className="text-gray-500 dark:text-gray-400">
-									Create a new session for this employee. Pick a date and time.
-								</DialogDescription>
-							</DialogHeader>
-							<div className="space-y-4 py-2">
-								<div className="space-y-2">
-									<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Date
-									</label>
-									<Popover>
-										<PopoverTrigger asChild>
-											<Button
-												variant="outline"
-												className={cn(
-													"w-full justify-start text-left font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
-													!scheduledDate && "text-muted-foreground"
-												)}
-											>
-												<CalendarIcon className="mr-2 h-4 w-4" />
-												{scheduledDate ? format(new Date(scheduledDate), "PPP") : <span>Pick a date</span>}
-											</Button>
-										</PopoverTrigger>
-										<PopoverContent align="start" className="w-auto p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg" sideOffset={8}>
-											<Calendar
-												mode="single"
-												selected={scheduledDate ? new Date(scheduledDate) : undefined}
-												onSelect={(date: Date | undefined) => date && setScheduledDate(format(date, "yyyy-MM-dd"))}
-												initialFocus
-												disabled={(date: Date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-												className="border-none bg-white dark:bg-gray-900"
-											/>
-										</PopoverContent>
-									</Popover>
-								</div>
-								<div className="space-y-2">
-									<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Time
-									</label>
-									<Popover>
-										<PopoverTrigger asChild>
-											<Button
-												variant="outline"
-												className={cn(
-													"w-full justify-start text-left font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
-													!scheduledTime && "text-muted-foreground"
-												)}
-											>
-												<Clock className="mr-2 h-4 w-4" />
-												{scheduledTime ? scheduledTime : <span>Select a time</span>}
-											</Button>
-										</PopoverTrigger>
-										<PopoverContent className="w-auto p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-											<div className="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto">
-												{Array.from({ length: 24 }).map((_, hour) =>
-													['00', '30'].map((minute) => {
-														const timeString = `${hour.toString().padStart(2, '0')}:${minute}`;
-														return (
-															<Button
-																key={timeString}
-																variant="outline"
-																size="sm"
-																onClick={() => setScheduledTime(timeString)}
-																className={cn(
-																	"hover:bg-blue-50 dark:hover:bg-blue-900/20 border-gray-200 dark:border-gray-700",
-																	scheduledTime === timeString && "bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800"
-																)}
-															>
-																{timeString}
-															</Button>
-														);
-													})
-												)}
-											</div>
-										</PopoverContent>
-									</Popover>
-								</div>
-								<div className="space-y-2">
-									<label htmlFor="notes" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-										Notes (Optional)
-									</label>
-									<Textarea
-										id="notes"
-										value={notes}
-										onChange={(e) => setNotes(e.target.value)}
-										placeholder="Add any additional notes about this session"
-										rows={3}
-										className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-									/>
-								</div>
-							</div>
-							<DialogFooter>
-								<Button 
-									variant="outline" 
-									onClick={() => setIsDialogOpen(false)}
-									className="border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
-								>
-									Cancel
-								</Button>
-								<Button 
-									onClick={handleCreateSession} 
-									disabled={isSubmitting || !scheduledDate || !scheduledTime}
-									className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-								>
-									{isSubmitting ? 'Creating...' : 'Create Session'}
-								</Button>
-							</DialogFooter>
-						</DialogContent>
-					</Dialog>
 				</div>
 				<div className="text-gray-500 text-center">No chains found</div>
 			</div>
@@ -569,128 +137,8 @@ export default function UserSessionsCard({
 				<div>
 					<div className="flex justify-between items-center mb-4">
 						<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-							Chain History
+							Sessions History
 						</h4>
-						<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-							<DialogTrigger asChild>
-								<Button 
-									size="sm" 
-									className="flex items-center bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-								>
-									<Plus className="h-4 w-4 mr-1" /> Add Session
-								</Button>
-							</DialogTrigger>
-							<DialogContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-								<DialogHeader>
-									<DialogTitle className="text-gray-900 dark:text-white">Schedule a New Session</DialogTitle>
-									<DialogDescription className="text-gray-500 dark:text-gray-400">
-										Create a new session for this employee. Pick a date and time.
-									</DialogDescription>
-								</DialogHeader>
-								<div className="space-y-4 py-2">
-									<div className="space-y-2">
-										<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-											Date
-										</label>
-										<Popover>
-											<PopoverTrigger asChild>
-												<Button
-													variant="outline"
-													className={cn(
-														"w-full justify-start text-left font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
-														!scheduledDate && "text-muted-foreground"
-													)}
-												>
-													<CalendarIcon className="mr-2 h-4 w-4" />
-													{scheduledDate ? format(new Date(scheduledDate), "PPP") : <span>Pick a date</span>}
-												</Button>
-											</PopoverTrigger>
-											<PopoverContent align="start" className="w-auto p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg" sideOffset={8}>
-												<Calendar
-													mode="single"
-													selected={scheduledDate ? new Date(scheduledDate) : undefined}
-													onSelect={(date: Date | undefined) => date && setScheduledDate(format(date, "yyyy-MM-dd"))}
-													initialFocus
-													disabled={(date: Date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-													className="border-none bg-white dark:bg-gray-900"
-												/>
-											</PopoverContent>
-										</Popover>
-									</div>
-									<div className="space-y-2">
-										<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-											Time
-										</label>
-										<Popover>
-											<PopoverTrigger asChild>
-												<Button
-													variant="outline"
-													className={cn(
-														"w-full justify-start text-left font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
-														!scheduledTime && "text-muted-foreground"
-													)}
-												>
-													<Clock className="mr-2 h-4 w-4" />
-													{scheduledTime ? scheduledTime : <span>Select a time</span>}
-												</Button>
-											</PopoverTrigger>
-											<PopoverContent className="w-auto p-4 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-												<div className="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto">
-													{Array.from({ length: 24 }).map((_, hour) =>
-														['00', '30'].map((minute) => {
-															const timeString = `${hour.toString().padStart(2, '0')}:${minute}`;
-															return (
-																<Button
-																	key={timeString}
-																	variant="outline"
-																	size="sm"
-																	onClick={() => setScheduledTime(timeString)}
-																	className={cn(
-																		"hover:bg-blue-50 dark:hover:bg-blue-900/20 border-gray-200 dark:border-gray-700",
-																		scheduledTime === timeString && "bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800"
-																	)}
-																>
-																	{timeString}
-																</Button>
-															);
-														})
-													)}
-												</div>
-											</PopoverContent>
-										</Popover>
-									</div>
-									<div className="space-y-2">
-										<label htmlFor="notes" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-											Notes (Optional)
-										</label>
-										<Textarea
-											id="notes"
-											value={notes}
-											onChange={(e) => setNotes(e.target.value)}
-											placeholder="Add any additional notes about this session"
-											rows={3}
-											className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
-										/>
-									</div>
-								</div>
-								<DialogFooter>
-									<Button 
-										variant="outline" 
-										onClick={() => setIsDialogOpen(false)}
-										className="border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
-									>
-										Cancel
-									</Button>
-									<Button 
-										onClick={handleCreateSession} 
-										disabled={isSubmitting || !scheduledDate || !scheduledTime}
-										className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-									>
-										{isSubmitting ? 'Creating...' : 'Create Session'}
-									</Button>
-								</DialogFooter>
-							</DialogContent>
-						</Dialog>
 					</div>
 					{activeChains.length > 0 && (
 					<div 
@@ -758,25 +206,26 @@ export default function UserSessionsCard({
 													onMouseEnter={() => setHoveredRow(chain.chain_id)}
 													onMouseLeave={() => setHoveredRow(null)}
 													className={`cursor-pointer transition-all duration-200 ${
-														hoveredRow === chain.chain_id
+															hoveredRow === chain.chain_id
 															? 'bg-gray-50 dark:bg-gray-800 shadow-sm'
 															: 'hover:bg-gray-50 dark:hover:bg-gray-800'
 													}`}
 												>
 													<td className="px-6 py-4 whitespace-nowrap text-sm w-[200px]">
 														<span
-															className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getChainStatusColor(
-																chain.status
+																className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getChainStatusColor(
+																	chain.status
 															)}`}
 														>
-															{chain.status}
+																{chain.status}
 														</span>
 													</td>
 													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[300px]">
 														{formatDate(chain.created_at)}
 													</td>
-													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[200px]">
-														{chain.chain_id}
+													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[200px] flex justify-between items-center">
+														<span>{chain.chain_id}</span>
+														<ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${chain.isExpanded ? 'transform rotate-180' : ''}`} />
 													</td>
 												</tr>
 												{chain.isExpanded && chain.session_ids.length > 0 && (

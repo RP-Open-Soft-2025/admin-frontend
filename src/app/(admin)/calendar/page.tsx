@@ -655,7 +655,7 @@ const Calendar: React.FC = () => {
 					headerToolbar={{
 						left: 'prev,next',
 						center: 'title',
-						right: 'dayGridMonth,timeGridWeek,timeGridDay',
+						right: 'today',
 					}}
 					events={events}
 					selectable={true}

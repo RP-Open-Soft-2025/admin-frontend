@@ -326,8 +326,7 @@ const AppSidebar: React.FC = () => {
 		return () => {
 			window.removeEventListener('resize', updateSubMenuHeights)
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [subMenuHeight])
+	}, [subMenuHeight, navItems, othersItems])
 
 	return (
 		<aside
