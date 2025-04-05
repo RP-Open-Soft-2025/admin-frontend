@@ -986,7 +986,7 @@ const Calendar: React.FC = () => {
 						<div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden">
 							<div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
 								<h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-									Today{'&apos'}s Events
+									Today&apos;s Events
 								</h2>
 								<button
 									onClick={() => setShowTodayModal(false)}
