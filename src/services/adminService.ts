@@ -1,6 +1,5 @@
 import store from '@/redux/store'
 import { API_URL } from '@/constants'
-import { Role } from '@/types/employee'
 
 // Types for API responses
 export interface User {
@@ -162,7 +161,6 @@ export async function fetchSessions(): Promise<{
 }> {
 	try {
 		const token = await getAuthToken()
-		const { auth } = store.getState()
 		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/sessions`, {
@@ -201,7 +199,6 @@ export async function fetchSessions(): Promise<{
 export async function fetchActiveSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
-		const { auth } = store.getState()
 		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/sessions/active`, {
@@ -227,7 +224,6 @@ export async function fetchActiveSessions(): Promise<Session[]> {
 export async function fetchPendingSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
-		const { auth } = store.getState()
 		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/sessions/pending`, {
@@ -253,7 +249,6 @@ export async function fetchPendingSessions(): Promise<Session[]> {
 export async function fetchCompletedSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
-		const { auth } = store.getState()
 		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/sessions/completed`, {
@@ -281,7 +276,6 @@ export async function fetchCompletedSessions(): Promise<Session[]> {
 export async function fetchMeets(): Promise<Meet[]> {
 	try {
 		const token = await getAuthToken()
-		const { auth } = store.getState()
 		const userRole =  'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/meets`, {
@@ -364,7 +358,6 @@ export async function deleteUser(
 export async function createSession(userId: string): Promise<Session> {
 	try {
 		const token = await getAuthToken()
-		const { auth } = store.getState()
 		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/session/${userId}`, {
