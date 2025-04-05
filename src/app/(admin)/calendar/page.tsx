@@ -419,7 +419,7 @@ const Calendar: React.FC = () => {
 	const [eventLevel, setEventLevel] = useState('')
 	const [events, setEvents] = useState<CalendarEvent[]>([])
 	const [allEvents, setAllEvents] = useState<CalendarEvent[]>([])
-	const [activeFilter, setActiveFilter] = useState<FilterType>('meetings');
+	const [activeFilter, setActiveFilter] = useState<FilterType>('meetings')
 	const [isLoading, setIsLoading] = useState(true)
 	const calendarRef = useRef<FullCalendar>(null)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -448,29 +448,27 @@ const Calendar: React.FC = () => {
 			}
 			try {
 				// Fetch meetings
-				const meetingsResponse = await fetch(
-					`${API_URL}/admin/meets`,
-					{
-						headers: {
-							Authorization: `Bearer ${auth.user.accessToken}`,
-						},
-					}
-				)
+				const meetingsResponse = await fetch(`${API_URL}/admin/meets`, {
+					headers: {
+						Authorization: `Bearer ${auth.user.accessToken}`,
+					},
+				})
 
 				// Fetch sessions using the admin endpoints
-				const [activeAndPendingResponse, completedResponse] =
-					await Promise.all([
+				const [activeAndPendingResponse, completedResponse] = await Promise.all(
+					[
 						fetch(`${API_URL}/admin/sessions`, {
-						headers: {
-							Authorization: `Bearer ${auth.user.accessToken}`,
-						},
-					}),
+							headers: {
+								Authorization: `Bearer ${auth.user.accessToken}`,
+							},
+						}),
 						fetch(`${API_URL}/admin/sessions/completed`, {
-						headers: {
-							Authorization: `Bearer ${auth.user.accessToken}`,
-						},
-					}),
-				])
+							headers: {
+								Authorization: `Bearer ${auth.user.accessToken}`,
+							},
+						}),
+					]
+				)
 
 				if (
 					!meetingsResponse.ok ||
@@ -489,11 +487,9 @@ const Calendar: React.FC = () => {
 				}
 
 				const meetingsData = await meetingsResponse.json()
-				const [activeAndPendingSessions, completedSessions] =
-					await Promise.all([
-						activeAndPendingResponse.json(),
-					completedResponse.json(),
-				])
+				const [activeAndPendingSessions, completedSessions] = await Promise.all(
+					[activeAndPendingResponse.json(), completedResponse.json()]
+				)
 
 				// Format meetings
 				const formattedMeetings = meetingsData.map((meet: Meeting) => {
@@ -537,7 +533,7 @@ const Calendar: React.FC = () => {
 				const activeSessions = activeAndPendingSessions.filter(
 					(session: SessionType) => session.status === SessionStatus.ACTIVE
 				)
-				
+
 				const pendingSessions = activeAndPendingSessions.filter(
 					(session: SessionType) => session.status === SessionStatus.PENDING
 				)

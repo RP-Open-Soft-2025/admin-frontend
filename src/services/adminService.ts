@@ -276,7 +276,7 @@ export async function fetchCompletedSessions(): Promise<Session[]> {
 export async function fetchMeets(): Promise<Meet[]> {
 	try {
 		const token = await getAuthToken()
-		const userRole =  'admin'
+		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/meets`, {
 			method: 'GET',

@@ -115,16 +115,13 @@ export async function getUserProfileData(userId: string): Promise<EmployeeAPI> {
 
 		console.log('Making API request to /admin/user-det') // Debug log
 
-		const response = await fetch(
-			`${API_URL}/admin/user-det/${userId}`,
-			{
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-			}
-		)
+		const response = await fetch(`${API_URL}/admin/user-det/${userId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+		})
 
 		console.log('API Response status:', response.status) // Debug log
 
@@ -243,23 +240,22 @@ export const getSessionsData = async (
 
 	try {
 		// Fetch from consistent admin endpoints
-		const [activeAndPendingResponse, completedResponse] =
-			await Promise.all([
-				fetch(`${API_URL}/admin/sessions`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-					},
-				}),
-				fetch(`${API_URL}/admin/sessions/completed`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-					},
-				}),
-			])
+		const [activeAndPendingResponse, completedResponse] = await Promise.all([
+			fetch(`${API_URL}/admin/sessions`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+				},
+			}),
+			fetch(`${API_URL}/admin/sessions/completed`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+				},
+			}),
+		])
 
 		// Check if any of the responses failed
 		if (!activeAndPendingResponse.ok || !completedResponse.ok) {

@@ -22,9 +22,10 @@ const TableSession = ({ state }: { state: State }) => {
 				// Use consistent admin endpoints for both HR and admin users
 				// For completed sessions, use /admin/sessions/completed
 				// For active and pending sessions, use /admin/sessions and filter by status
-				const endpoint = state === 'completed' 
-					? `${API_URL}/admin/sessions/completed` 
-					: `${API_URL}/admin/sessions`;
+				const endpoint =
+					state === 'completed'
+						? `${API_URL}/admin/sessions/completed`
+						: `${API_URL}/admin/sessions`
 
 				fetch(endpoint, {
 					method: 'GET',
@@ -37,9 +38,11 @@ const TableSession = ({ state }: { state: State }) => {
 							// If using the /admin/sessions endpoint for active or pending,
 							// filter the results by status
 							if (state !== 'completed') {
-								result = result.filter(session => session.status.toLowerCase() === state);
+								result = result.filter(
+									session => session.status.toLowerCase() === state
+								)
 							}
-							
+
 							setCurrData(result)
 							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE_SESSION))
 							setHistoryLoading(false)

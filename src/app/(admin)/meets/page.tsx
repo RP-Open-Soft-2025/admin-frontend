@@ -30,16 +30,13 @@ export default function MeetsPage() {
 				if (!auth.isAuthenticated)
 					throw new Error('No token found in Redux store')
 
-				const response = await fetch(
-					`${API_URL}/admin/meets`,
-					{
-						method: 'GET',
-						headers: {
-							Authorization: `Bearer ${auth.user?.accessToken}`, // ✅ Fixed string interpolation
-							'Content-Type': 'application/json',
-						},
-					}
-				)
+				const response = await fetch(`${API_URL}/admin/meets`, {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${auth.user?.accessToken}`, // ✅ Fixed string interpolation
+						'Content-Type': 'application/json',
+					},
+				})
 
 				if (!response.ok)
 					throw new Error(`HTTP error! Status: ${response.status}`)

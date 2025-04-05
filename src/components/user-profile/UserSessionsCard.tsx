@@ -3,7 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { ChainType, ChainStatus } from '@/types/chains'
 import { getEmployeeChains } from '@/services/profileService'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, ChevronDown, Plus, Clock } from 'lucide-react'
+import {
+	ChevronRight,
+	ChevronDown,
+	Plus,
+	Clock,
+	CheckCircle,
+} from 'lucide-react'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -79,6 +85,14 @@ export default function UserSessionsCard({
 		notes: '',
 		scheduled_time: new Date().toISOString().slice(0, 16),
 	})
+	const [completeSessionId, setCompleteSessionId] = useState<string | null>(
+		null
+	)
+	const [completeSessionNotes, setCompleteSessionNotes] = useState('')
+	const [isCompletingSession, setIsCompletingSession] = useState(false)
+	const [completeChainId, setCompleteChainId] = useState<string | null>(null)
+	const [completeChainNotes, setCompleteChainNotes] = useState('')
+	const [isCompletingChain, setIsCompletingChain] = useState(false)
 	const router = useRouter()
 	const { auth } = store.getState()
 
@@ -200,6 +214,96 @@ export default function UserSessionsCard({
 			})
 		} finally {
 			setIsSubmitting(false)
+		}
+	}
+
+	const completeSession = async (sessionId: string) => {
+		if (!sessionId) return
+
+		setIsCompletingSession(true)
+		try {
+			const response = await fetch(`${API_URL}/admin/session/complete`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+				},
+				body: JSON.stringify({
+					session_id: sessionId,
+					notes: completeSessionNotes,
+				}),
+			})
+
+			if (!response.ok) {
+				throw new Error(`Error: ${response.status}`)
+			}
+
+			// Show success message
+			toast({
+				description: 'Session completed successfully',
+				type: 'success',
+			})
+
+			// Refresh the chains data
+			const updatedChains = await getEmployeeChains(employeeId)
+			setChainsData(updatedChains)
+
+			// Reset state
+			setCompleteSessionId(null)
+			setCompleteSessionNotes('')
+		} catch (error) {
+			console.error('Error completing session:', error)
+			toast({
+				description: 'Failed to complete session',
+				type: 'error',
+			})
+		} finally {
+			setIsCompletingSession(false)
+		}
+	}
+
+	const completeChain = async (chainId: string) => {
+		if (!chainId) return
+
+		setIsCompletingChain(true)
+		try {
+			const response = await fetch(
+				`${API_URL}/admin/chains/${chainId}/complete`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+					},
+					// No request body needed for this endpoint
+				}
+			)
+
+			if (!response.ok) {
+				throw new Error(`Error: ${response.status}`)
+			}
+
+			// Show success message
+			toast({
+				description: 'Chain completed successfully',
+				type: 'success',
+			})
+
+			// Refresh the chains data
+			const updatedChains = await getEmployeeChains(employeeId)
+			setChainsData(updatedChains)
+
+			// Reset state
+			setCompleteChainId(null)
+			setCompleteChainNotes('')
+		} catch (error) {
+			console.error('Error completing chain:', error)
+			toast({
+				description: 'Failed to complete chain',
+				type: 'error',
+			})
+		} finally {
+			setIsCompletingChain(false)
 		}
 	}
 
@@ -456,7 +560,7 @@ export default function UserSessionsCard({
 					<div className="flex justify-between items-center mb-4">
 						<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
 							Sessions History
-					</h4>
+						</h4>
 						{role === 'admin' || role === 'hr' ? (
 							<Button
 								onClick={() => setIsModalOpen(true)}
@@ -498,8 +602,8 @@ export default function UserSessionsCard({
 									/>
 									<p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
 										Session will be scheduled for this employee profile
-							</p>
-						</div>
+									</p>
+								</div>
 
 								<div className="grid w-full items-center gap-2">
 									<label
@@ -566,10 +670,7 @@ export default function UserSessionsCard({
 													type="time"
 													value={
 														formData.scheduled_time
-															? format(
-																	new Date(formData.scheduled_time),
-																	'HH:mm'
-																)
+															? format(new Date(formData.scheduled_time), 'HH:mm')
 															: ''
 													}
 													onChange={e => {
@@ -684,27 +785,33 @@ export default function UserSessionsCard({
 						<h5 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
 							Chain Records
 						</h5>
-						<div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+						<div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
 							<table className="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 								<thead className="bg-gray-50 dark:bg-gray-800">
 									<tr>
 										<th
 											scope="col"
-											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[200px]"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[150px]"
 										>
 											Status
 										</th>
 										<th
 											scope="col"
-											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[300px]"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[250px]"
 										>
 											Scheduled At
 										</th>
 										<th
 											scope="col"
-											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[200px]"
+											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
 										>
-											Chat ID
+											Chain ID
+										</th>
+										<th
+											scope="col"
+											className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400 w-[120px]"
+										>
+											Actions
 										</th>
 									</tr>
 								</thead>
@@ -720,36 +827,62 @@ export default function UserSessionsCard({
 												<tr
 													onClick={() => toggleChainExpand(chain.chain_id)}
 													onMouseEnter={() => setHoveredRow(chain.chain_id)}
-												onMouseLeave={() => setHoveredRow(null)}
-												className={`cursor-pointer transition-all duration-200 ${
+													onMouseLeave={() => setHoveredRow(null)}
+													className={`cursor-pointer transition-all duration-200 ${
 														hoveredRow === chain.chain_id
-														? 'bg-gray-50 dark:bg-gray-800 shadow-sm'
-														: 'hover:bg-gray-50 dark:hover:bg-gray-800'
-												}`}
-											>
-													<td className="px-6 py-4 whitespace-nowrap text-sm w-[200px]">
-													<span
-															className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getChainStatusColor(
+															? 'bg-gray-50 dark:bg-gray-800'
+															: 'hover:bg-gray-50 dark:hover:bg-gray-800'
+													} ${chain.isExpanded ? 'bg-gray-50 dark:bg-gray-800 border-l-4 border-l-blue-500 dark:border-l-blue-600' : ''}`}
+												>
+													<td className="px-6 py-4 whitespace-nowrap text-sm">
+														<span
+															className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getChainStatusColor(
 																chain.status
-														)}`}
-													>
+															)}`}
+														>
+															{chain.status === ChainStatus.ACTIVE && 
+																<span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
+															}
 															{chain.status}
-													</span>
-												</td>
-													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[300px]">
-														{formatDate(chain.created_at)}
+														</span>
 													</td>
-													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[200px] flex justify-between items-center">
-														<span>{chain.chain_id}</span>
+													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
+														<div className="flex items-center">
+															<CalendarIcon className="h-3.5 w-3.5 mr-2 text-gray-400" />
+															{formatDate(chain.created_at)}
+														</div>
+													</td>
+													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 flex justify-between items-center">
+														<div className="font-mono text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+															{chain.chain_id}
+														</div>
 														<ChevronDown
-															className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${chain.isExpanded ? 'transform rotate-180' : ''}`}
+															className={`h-5 w-5 text-gray-500 transition-transform duration-300 ${chain.isExpanded ? 'transform rotate-180 text-blue-500' : ''}`}
+															onClick={() => toggleChainExpand(chain.chain_id)}
 														/>
-												</td>
+													</td>
+													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 text-right">
+													{chain.status === ChainStatus.ACTIVE && (role === 'admin' || role === 'hr') && (
+															<Button
+																size="sm"
+																variant="outline"
+																className="h-8 px-3 text-xs bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800 shadow-sm hover:shadow transition-all"
+																onClick={e => {
+																	e.stopPropagation()
+																	setCompleteChainId(chain.chain_id)
+																}}
+															>
+																<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+																Complete
+															</Button>
+														)}
+													</td>
 												</tr>
 												{chain.isExpanded && chain.session_ids.length > 0 && (
-													<tr className="bg-gray-50 dark:bg-gray-800">
-														<td colSpan={3} className="px-6 py-2">
-															<div className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">
+													<tr className="bg-gray-50 dark:bg-gray-800/80">
+														<td colSpan={4} className="px-6 py-3">
+															<div className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300 flex items-center">
+																<div className="h-1 w-1 bg-blue-500 rounded-full mr-2"></div>
 																Sessions:
 															</div>
 															<div className="grid gap-2">
@@ -759,27 +892,43 @@ export default function UserSessionsCard({
 																		onClick={() =>
 																			router.push(`/chat-page/${sessionId}`)
 																		}
-																		className="p-2 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+																		className="p-2.5 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow"
 																	>
-																		<span className="text-sm text-gray-800 dark:text-white/90">
+																		<span className="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-gray-800 dark:text-white/90">
 																			{sessionId}
 																		</span>
-																		<Button
-																			size="sm"
-																			variant="ghost"
-																			onClick={e => {
-																				e.stopPropagation()
-																				router.push(`/chat-page/${sessionId}`)
-																			}}
-																			className="h-7 w-7 p-0"
-																		>
-																			<ChevronRight className="h-4 w-4" />
-																		</Button>
+																		<div className="flex items-center gap-2">
+																			{role === 'admin' || role === 'hr' ? (
+																				<Button
+																					size="sm"
+																					variant="outline"
+																					className="h-8 px-3 text-xs bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800 shadow-sm hover:shadow transition-all"
+																					onClick={e => {
+																						e.stopPropagation()
+																						setCompleteSessionId(sessionId)
+																					}}
+																				>
+																					<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+																					Complete
+																				</Button>
+																			) : null}
+																			<Button
+																				size="sm"
+																				variant="ghost"
+																				onClick={e => {
+																					e.stopPropagation()
+																					router.push(`/chat-page/${sessionId}`)
+																				}}
+																				className="h-8 w-8 p-0 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
+																			>
+																				<ChevronRight className="h-5 w-5" />
+																			</Button>
+																		</div>
 																	</div>
 																))}
 															</div>
-												</td>
-											</tr>
+														</td>
+													</tr>
 												)}
 											</React.Fragment>
 										))}
@@ -789,6 +938,139 @@ export default function UserSessionsCard({
 					</div>
 				</div>
 			</div>
+
+			{/* Complete Chain Modal */}
+			<Dialog
+				open={!!completeChainId}
+				onOpenChange={open => !open && setCompleteChainId(null)}
+			>
+				<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700">
+					<DialogHeader>
+						<DialogTitle className="dark:text-white">
+							Complete Chain
+						</DialogTitle>
+					</DialogHeader>
+					<div className="py-3">
+						<div className="mb-4">
+							<label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+								Chain ID
+							</label>
+							<div className="mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200">
+								{completeChainId}
+							</div>
+						</div>
+
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							Are you sure you want to complete this chain? This action cannot
+							be undone.
+						</p>
+					</div>
+
+					<DialogFooter className="gap-2 sm:gap-0">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setCompleteChainId(null)}
+							className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+						>
+							Cancel
+						</Button>
+						<Button
+							onClick={() => completeChainId && completeChain(completeChainId)}
+							disabled={isCompletingChain}
+							className="relative bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+						>
+							{isCompletingChain && (
+								<div className="absolute inset-0 flex items-center justify-center">
+									<div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white dark:border-gray-300"></div>
+								</div>
+							)}
+							<span className={isCompletingChain ? 'opacity-0' : ''}>
+								Complete Chain
+							</span>
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* Complete Session Modal */}
+			<Dialog
+				open={!!completeSessionId}
+				onOpenChange={open => !open && setCompleteSessionId(null)}
+			>
+				<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700">
+					<DialogHeader>
+						<DialogTitle className="dark:text-white">
+							Complete Session
+						</DialogTitle>
+					</DialogHeader>
+					<form
+						onSubmit={e => {
+							e.preventDefault()
+							if (completeSessionId) {
+								completeSession(completeSessionId)
+							}
+						}}
+						className="space-y-4"
+					>
+						<div className="grid w-full items-center gap-2">
+							<label
+								htmlFor="session_id"
+								className="text-sm font-medium text-gray-700 dark:text-gray-300"
+							>
+								Session ID
+							</label>
+							<Input
+								id="session_id"
+								value={completeSessionId || ''}
+								disabled
+								className="bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+							/>
+						</div>
+
+						<div className="grid w-full items-center gap-2">
+							<label
+								htmlFor="completion_notes"
+								className="text-sm font-medium text-gray-700 dark:text-gray-300"
+							>
+								Completion Notes
+							</label>
+							<Textarea
+								id="completion_notes"
+								value={completeSessionNotes}
+								onChange={e => setCompleteSessionNotes(e.target.value)}
+								placeholder="Enter completion notes here..."
+								className="resize-none min-h-[100px] dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:placeholder-gray-500"
+							/>
+						</div>
+
+						<DialogFooter className="gap-2 sm:gap-0">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setCompleteSessionId(null)}
+								className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+							>
+								Cancel
+							</Button>
+							<Button
+								type="submit"
+								disabled={isCompletingSession}
+								className="relative bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+							>
+								{isCompletingSession && (
+									<div className="absolute inset-0 flex items-center justify-center">
+										<div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white dark:border-gray-300"></div>
+									</div>
+								)}
+								<span className={isCompletingSession ? 'opacity-0' : ''}>
+									Complete Session
+								</span>
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
 		</div>
 	)
 }
