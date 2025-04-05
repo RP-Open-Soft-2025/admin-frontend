@@ -81,12 +81,7 @@ export async function fetchUsers(): Promise<User[]> {
 		if (!auth.isAuthenticated) {
 			throw new Error('User is not authenticated')
 		}
-		const endpoint =
-			auth.user?.userRole == Role.HR
-				? 'hr/list-assigned-users'
-				: Role.ADMIN
-					? 'admin/list-users'
-					: ''
+		const endpoint = 'admin/list-users'
 		const response = await fetch(`${API_URL}/${endpoint}`, {
 			headers: {
 				Authorization: `Bearer ${auth.user?.accessToken}`,
@@ -168,7 +163,7 @@ export async function fetchSessions(): Promise<{
 	try {
 		const token = await getAuthToken()
 		const { auth } = store.getState()
-		const userRole = auth.user?.userRole || 'admin'
+		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/sessions`, {
 			method: 'GET',
@@ -207,7 +202,7 @@ export async function fetchActiveSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
 		const { auth } = store.getState()
-		const userRole = auth.user?.userRole || 'admin'
+		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/sessions/active`, {
 			method: 'GET',
@@ -233,7 +228,7 @@ export async function fetchPendingSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
 		const { auth } = store.getState()
-		const userRole = auth.user?.userRole || 'admin'
+		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/sessions/pending`, {
 			method: 'GET',
@@ -259,7 +254,7 @@ export async function fetchCompletedSessions(): Promise<Session[]> {
 	try {
 		const token = await getAuthToken()
 		const { auth } = store.getState()
-		const userRole = auth.user?.userRole || 'admin'
+		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/sessions/completed`, {
 			method: 'GET',
@@ -287,7 +282,7 @@ export async function fetchMeets(): Promise<Meet[]> {
 	try {
 		const token = await getAuthToken()
 		const { auth } = store.getState()
-		const userRole = auth.user?.userRole || 'admin'
+		const userRole =  'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/meets`, {
 			method: 'GET',
@@ -370,7 +365,7 @@ export async function createSession(userId: string): Promise<Session> {
 	try {
 		const token = await getAuthToken()
 		const { auth } = store.getState()
-		const userRole = auth.user?.userRole || 'admin'
+		const userRole = 'admin'
 
 		const response = await fetch(`${API_URL}/${userRole}/session/${userId}`, {
 			method: 'POST',

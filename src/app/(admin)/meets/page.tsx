@@ -31,7 +31,7 @@ export default function MeetsPage() {
 					throw new Error('No token found in Redux store')
 
 				const response = await fetch(
-					`${API_URL}/${auth.user?.userRole}/meets`,
+					`${API_URL}/admin/meets`,
 					{
 						method: 'GET',
 						headers: {
@@ -56,7 +56,7 @@ export default function MeetsPage() {
 		}
 
 		fetchMeets()
-	}, [auth.isAuthenticated, auth.user?.accessToken, auth.user?.userRole])
+	}, [auth.isAuthenticated, auth.user?.accessToken])
 
 	if (isLoading) {
 		return (
