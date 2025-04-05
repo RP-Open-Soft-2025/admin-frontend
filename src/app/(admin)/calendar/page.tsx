@@ -36,6 +36,7 @@ interface TodayEvent {
 	redirectUrl: string
 }
 
+
 // Add CSS for event styling
 const calendarStyles = `
 .fc-bg-primary {
@@ -358,6 +359,38 @@ body.fc-popover-open {
 .dark .fc-daygrid-day:hover {
 	background-color: rgba(255,255,255,0.02) !important;
 }
+
+/* The scrollbar styles have been moved to globals.css */
+
+.fc-popover {
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+}
+
+body.fc-popover-open {
+    overflow: hidden !important;
+}
+
+/* Prevent calendar from becoming too narrow */
+.fc-view-harness {
+  min-width: 800px !important; /* Minimum viable width */
+}
+
+.fc-daygrid-day-frame {
+  min-width: 120px !important; /* Prevent column collapse */
+}
+
+/* Responsive toolbar for mobile */
+@media (max-width: 768px) {
+  .fc-toolbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .fc-header-toolbar {
+    flex-wrap: wrap;
+  }
+}
 `
 
 const RenderEventContent = (eventInfo: EventContentArg) => {
@@ -384,6 +417,7 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 	}
 
 	return (
+		<>
 		<a
 			className={`event-fc-color fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full flex items-center`}
 			href={eventInfo.event.extendedProps.redirectUrl}
@@ -392,6 +426,7 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 				{title}
 			</div>
 		</a>
+		</>
 	)
 }
 
@@ -430,6 +465,7 @@ const Calendar: React.FC = () => {
 	const [selectedDate, setSelectedDate] = useState<string>('')
 	const [showTodayModal, setShowTodayModal] = useState(false)
 	const [todayEvents, setTodayEvents] = useState<TodayEvent[]>([])
+	const [isDashboardExpanded, setIsDashboardExpanded] = useState(true)
 
 	const handleAuthError = useCallback(() => {
 		toast({
@@ -743,6 +779,70 @@ const Calendar: React.FC = () => {
 		[events]
 	)
 
+	// Add this function to handle the "more" links click
+	const handleMoreEventsClick = (date: string) => {
+		// Convert the date cell to a Date object
+		const cellDate = new Date(date);
+		// Get all events for this date
+		const events = getEventsForDate(cellDate);
+		// Set the selected date and events
+		setSelectedDateEvents(events);
+		setSelectedDate(cellDate.toISOString());
+		// Show the modal
+		setShowDateModal(true);
+	};
+
+	// Add event listener after the calendar is rendered
+	useEffect(() => {
+		if (!calendarRef.current) return;
+		
+		const addEventListenersToMoreLinks = () => {
+			// Find all "more" links in the calendar
+			const moreLinks = document.querySelectorAll('.fc-daygrid-more-link');
+			
+			moreLinks.forEach(link => {
+				// Remove any existing listeners to prevent duplicates
+				link.removeEventListener('click', moreClickHandler);
+				
+				// Add click event listener
+				link.addEventListener('click', moreClickHandler);
+			});
+		};
+		
+		// Handler for the more link clicks
+		const moreClickHandler = (e: Event) => {
+			e.preventDefault();
+			e.stopPropagation();
+			
+			// Get the date from the parent cell
+			const dayEl = (e.target as Element).closest('.fc-daygrid-day');
+			if (dayEl) {
+				const dateAttr = dayEl.getAttribute('data-date');
+				if (dateAttr) {
+					handleMoreEventsClick(dateAttr);
+				}
+			}
+		};
+		
+		// Initial setup
+		addEventListenersToMoreLinks();
+		
+		// Add listeners when view changes
+		const api = calendarRef.current.getApi();
+		(api as any).on('viewDidMount', addEventListenersToMoreLinks);
+		
+		// Also handle when events are rerendered
+		(api as any).on('eventDidMount', addEventListenersToMoreLinks);
+		
+		return () => {
+			if (calendarRef.current) {
+				const api = calendarRef.current.getApi();
+				(api as any).off('viewDidMount', addEventListenersToMoreLinks);
+				(api as any).off('eventDidMount', addEventListenersToMoreLinks);
+			}
+		};
+	}, [calendarRef, getEventsForDate]);
+
 	// Function to format date for display
 	const formatDate = (dateStr: string) => {
 		const date = new Date(dateStr)
@@ -802,6 +902,36 @@ const Calendar: React.FC = () => {
 		setShowDateModal(true)
 	}
 
+	// Add ResizeObserver to handle calendar size changes
+	useEffect(() => {
+		const handleResize = () => {
+			if (calendarRef.current) {
+				calendarRef.current.getApi().updateSize()
+			}
+		}
+
+		const resizeObserver = new ResizeObserver(handleResize)
+		const calendarEl = document.querySelector('.fc')
+		
+		if (calendarEl) {
+			resizeObserver.observe(calendarEl)
+		}
+
+		return () => resizeObserver.disconnect()
+	}, [])
+	
+	// Update calendar size when dashboard state changes
+	useEffect(() => {
+		if (calendarRef.current) {
+			// Debounce to handle rapid resizing
+			const timeoutId = setTimeout(() => {
+				calendarRef.current?.getApi().updateSize()
+			}, 300)
+			
+			return () => clearTimeout(timeoutId)
+		}
+	}, [isDashboardExpanded]) // Trigger when dashboard state changes
+
 	return (
 		<div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] relative min-h-[400px] md:min-h-[600px]">
 			<style>{calendarStyles}</style>
@@ -853,7 +983,7 @@ const Calendar: React.FC = () => {
 									</svg>
 								</button>
 							</div>
-							<div className="h-[calc(500px-80px)] overflow-y-auto p-4">
+							<div className="h-[calc(500px-80px)] overflow-y-auto p-4 custom-scrollbar">
 								{selectedDateEvents.length > 0 ? (
 									<div className="space-y-3">
 										{selectedDateEvents.map((event, index) => (
@@ -905,7 +1035,7 @@ const Calendar: React.FC = () => {
 						<div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden">
 							<div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
 								<h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-									Today{'&apos'}s Events
+									Today&apos;s Events
 								</h2>
 								<button
 									onClick={() => setShowTodayModal(false)}
@@ -926,7 +1056,7 @@ const Calendar: React.FC = () => {
 									</svg>
 								</button>
 							</div>
-							<div className="p-4 overflow-y-auto max-h-[60vh]">
+							<div className="p-4 overflow-y-auto max-h-[60vh] custom-scrollbar">
 								{todayEvents.length > 0 ? (
 									<div className="space-y-3">
 										{todayEvents.map((event, index) => (
@@ -941,7 +1071,7 @@ const Calendar: React.FC = () => {
 											>
 												<div className="flex justify-between items-center">
 													<span className="text-sm font-medium text-gray-900 dark:text-white">
-														{event.title.replace(` at ${event.time}`, '')}
+														{/* {event.title.replace(` at ${event.time}`, '')} */}
 													</span>
 													<span
 														className={`text-xs px-2 py-1 rounded-full ${
@@ -967,7 +1097,7 @@ const Calendar: React.FC = () => {
 				</>
 			)}
 
-			<div className="custom-calendar">
+			<div className="custom-calendar custom-scrollbar w-full overflow-x-auto">
 				<FullCalendar
 					ref={calendarRef}
 					plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -989,8 +1119,10 @@ const Calendar: React.FC = () => {
 					eventClick={handleEventClick}
 					eventContent={RenderEventContent}
 					dayMaxEvents={3}
-					moreLinkClick="popover"
+					moreLinkClick="function"
+					moreLinkContent={(arg) => `+${arg.num} more`}
 					height="auto"
+					aspectRatio={1.5}
 					displayEventEnd={false}
 					eventDisplay="block"
 					slotDuration="00:30:00"
