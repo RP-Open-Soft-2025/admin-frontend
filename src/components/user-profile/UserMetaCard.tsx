@@ -232,7 +232,7 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 
 			{/* Block User Modal */}
 			<Dialog open={showBlockModal} onOpenChange={setShowBlockModal}>
-				<DialogContent>
+				<DialogContent className="text-white bg-gray-900">
 					<DialogHeader>
 						<DialogTitle>Block User</DialogTitle>
 						<DialogDescription>
@@ -283,7 +283,7 @@ export default function UserMetaCard({ userData }: UserMetaCardProps) {
 
 			{/* Unblock User Modal */}
 			<Dialog open={showUnblockModal} onOpenChange={setShowUnblockModal}>
-				<DialogContent>
+				<DialogContent className="text-white bg-gray-900">
 					<DialogHeader>
 						<DialogTitle>Unblock User</DialogTitle>
 						<DialogDescription>
