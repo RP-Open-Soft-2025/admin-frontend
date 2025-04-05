@@ -949,7 +949,7 @@ export default function UserSessionsCard({
 				open={!!completeChainId}
 				onOpenChange={open => !open && setCompleteChainId(null)}
 			>
-				<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700">
+				<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700 bg-white">
 					<DialogHeader>
 						<DialogTitle className="dark:text-white">
 							Complete Chain

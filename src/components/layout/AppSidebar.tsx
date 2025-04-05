@@ -44,9 +44,9 @@ const navItems: NavItem[] = [
 		path: '/form-layout',
 	},
 	{
-		name: 'Users',
+		name: 'Employees',
 		icon: <Users />,
-		path: '/users',
+		path: '/employees',
 	},
 	{
 		name: 'Sessions',

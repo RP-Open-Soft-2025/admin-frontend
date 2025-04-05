@@ -828,7 +828,6 @@ const Calendar: React.FC = () => {
 		addEventListenersToMoreLinks()
 
 		// Add listeners when view changes
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const api = calendarRef.current.getApi()
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		;(api as any).on('viewDidMount', addEventListenersToMoreLinks)
@@ -917,14 +916,12 @@ const Calendar: React.FC = () => {
 
 		const resizeObserver = new ResizeObserver(handleResize)
 		const calendarEl = document.querySelector('.fc')
-
 		if (calendarEl) {
 			resizeObserver.observe(calendarEl)
 		}
 
 		return () => resizeObserver.disconnect()
 	}, [])
-
 	// Update calendar size when dashboard state changes
 	useEffect(() => {
 		if (calendarRef.current) {
@@ -932,7 +929,6 @@ const Calendar: React.FC = () => {
 			const timeoutId = setTimeout(() => {
 				calendarRef.current?.getApi().updateSize()
 			}, 300)
-
 			return () => clearTimeout(timeoutId)
 		}
 	}, [isDashboardExpanded]) // Trigger when dashboard state changes

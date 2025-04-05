@@ -50,7 +50,6 @@ const UserDropdown = () => {
 
 		// Add event listener for wheel (scroll) event
 		window.addEventListener('wheel', handleWheel, { passive: true })
-
 		// Add event listener for touch moves (for mobile)
 		window.addEventListener('touchmove', handleWheel, { passive: true })
 
