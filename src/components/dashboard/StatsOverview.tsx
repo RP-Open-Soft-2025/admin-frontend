@@ -39,7 +39,7 @@ const StatsOverview = ({
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
-					className="size-5"
+					className="size-4"
 				>
 					<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
 					<circle cx="9" cy="7" r="4" />
@@ -62,7 +62,7 @@ const StatsOverview = ({
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
-					className="size-5"
+					className="size-4"
 				>
 					<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
 					<circle cx="9" cy="7" r="4" />
@@ -85,7 +85,7 @@ const StatsOverview = ({
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
-					className="size-5"
+					className="size-4"
 				>
 					<rect width="18" height="18" x="3" y="3" rx="2" />
 					<path d="M7 7h10" />
@@ -108,7 +108,7 @@ const StatsOverview = ({
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
-					className="size-5"
+					className="size-4"
 				>
 					<path d="M21 15V6" />
 					<path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
@@ -119,7 +119,7 @@ const StatsOverview = ({
 			),
 		},
 		{
-			title: 'Scheuled Sessions',
+			title: 'Scheduled Sessions',
 			value: formatStat(pendingSessions),
 			bgClass: 'bg-amber-500/10',
 			textClass: 'text-amber-500',
@@ -132,7 +132,7 @@ const StatsOverview = ({
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
-					className="size-5"
+					className="size-4"
 				>
 					<circle cx="12" cy="12" r="10" />
 					<line x1="12" x2="12" y1="8" y2="12" />
@@ -154,7 +154,7 @@ const StatsOverview = ({
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
-					className="size-5"
+					className="size-4"
 				>
 					<rect width="18" height="18" x="3" y="3" rx="2" />
 					<path d="M8 12h8" />

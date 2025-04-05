@@ -461,16 +461,16 @@ const Calendar: React.FC = () => {
 				const [activeAndPendingResponse, completedResponse] =
 					await Promise.all([
 						fetch(`${API_URL}/admin/sessions`, {
-							headers: {
-								Authorization: `Bearer ${auth.user.accessToken}`,
-							},
-						}),
+						headers: {
+							Authorization: `Bearer ${auth.user.accessToken}`,
+						},
+					}),
 						fetch(`${API_URL}/admin/sessions/completed`, {
-							headers: {
-								Authorization: `Bearer ${auth.user.accessToken}`,
-							},
-						}),
-					])
+						headers: {
+							Authorization: `Bearer ${auth.user.accessToken}`,
+						},
+					}),
+				])
 
 				if (
 					!meetingsResponse.ok ||
@@ -492,8 +492,8 @@ const Calendar: React.FC = () => {
 				const [activeAndPendingSessions, completedSessions] =
 					await Promise.all([
 						activeAndPendingResponse.json(),
-						completedResponse.json(),
-					])
+					completedResponse.json(),
+				])
 
 				// Format meetings
 				const formattedMeetings = meetingsData.map((meet: Meeting) => {

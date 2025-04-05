@@ -456,7 +456,7 @@ export default function UserSessionsCard({
 					<div className="flex justify-between items-center mb-4">
 						<h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
 							Sessions History
-						</h4>
+					</h4>
 						{role === 'admin' || role === 'hr' ? (
 							<Button
 								onClick={() => setIsModalOpen(true)}
@@ -498,8 +498,8 @@ export default function UserSessionsCard({
 									/>
 									<p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
 										Session will be scheduled for this employee profile
-									</p>
-								</div>
+							</p>
+						</div>
 
 								<div className="grid w-full items-center gap-2">
 									<label
@@ -720,22 +720,22 @@ export default function UserSessionsCard({
 												<tr
 													onClick={() => toggleChainExpand(chain.chain_id)}
 													onMouseEnter={() => setHoveredRow(chain.chain_id)}
-													onMouseLeave={() => setHoveredRow(null)}
-													className={`cursor-pointer transition-all duration-200 ${
+												onMouseLeave={() => setHoveredRow(null)}
+												className={`cursor-pointer transition-all duration-200 ${
 														hoveredRow === chain.chain_id
-															? 'bg-gray-50 dark:bg-gray-800 shadow-sm'
-															: 'hover:bg-gray-50 dark:hover:bg-gray-800'
-													}`}
-												>
+														? 'bg-gray-50 dark:bg-gray-800 shadow-sm'
+														: 'hover:bg-gray-50 dark:hover:bg-gray-800'
+												}`}
+											>
 													<td className="px-6 py-4 whitespace-nowrap text-sm w-[200px]">
-														<span
+													<span
 															className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-200 ${getChainStatusColor(
 																chain.status
-															)}`}
-														>
+														)}`}
+													>
 															{chain.status}
-														</span>
-													</td>
+													</span>
+												</td>
 													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 w-[300px]">
 														{formatDate(chain.created_at)}
 													</td>
@@ -744,7 +744,7 @@ export default function UserSessionsCard({
 														<ChevronDown
 															className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${chain.isExpanded ? 'transform rotate-180' : ''}`}
 														/>
-													</td>
+												</td>
 												</tr>
 												{chain.isExpanded && chain.session_ids.length > 0 && (
 													<tr className="bg-gray-50 dark:bg-gray-800">
@@ -778,8 +778,8 @@ export default function UserSessionsCard({
 																	</div>
 																))}
 															</div>
-														</td>
-													</tr>
+												</td>
+											</tr>
 												)}
 											</React.Fragment>
 										))}
