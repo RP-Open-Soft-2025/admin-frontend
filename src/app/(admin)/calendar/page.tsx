@@ -36,7 +36,6 @@ interface TodayEvent {
 	redirectUrl: string
 }
 
-
 // Add CSS for event styling
 const calendarStyles = `
 .fc-bg-primary {
@@ -418,14 +417,14 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 
 	return (
 		<>
-		<a
-			className={`event-fc-color fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full flex items-center`}
-			href={eventInfo.event.extendedProps.redirectUrl}
-		>
-			<div className="text-white text-xs overflow-hidden text-ellipsis whitespace-nowrap">
-				{title}
-			</div>
-		</a>
+			<a
+				className={`event-fc-color fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full flex items-center`}
+				href={eventInfo.event.extendedProps.redirectUrl}
+			>
+				<div className="text-white text-xs overflow-hidden text-ellipsis whitespace-nowrap">
+					{title}
+				</div>
+			</a>
 		</>
 	)
 }
@@ -465,6 +464,7 @@ const Calendar: React.FC = () => {
 	const [selectedDate, setSelectedDate] = useState<string>('')
 	const [showTodayModal, setShowTodayModal] = useState(false)
 	const [todayEvents, setTodayEvents] = useState<TodayEvent[]>([])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [isDashboardExpanded, setIsDashboardExpanded] = useState(true)
 
 	const handleAuthError = useCallback(() => {
@@ -782,66 +782,71 @@ const Calendar: React.FC = () => {
 	// Add this function to handle the "more" links click
 	const handleMoreEventsClick = (date: string) => {
 		// Convert the date cell to a Date object
-		const cellDate = new Date(date);
+		const cellDate = new Date(date)
 		// Get all events for this date
-		const events = getEventsForDate(cellDate);
+		const events = getEventsForDate(cellDate)
 		// Set the selected date and events
-		setSelectedDateEvents(events);
-		setSelectedDate(cellDate.toISOString());
+		setSelectedDateEvents(events)
+		setSelectedDate(cellDate.toISOString())
 		// Show the modal
-		setShowDateModal(true);
-	};
+		setShowDateModal(true)
+	}
 
 	// Add event listener after the calendar is rendered
 	useEffect(() => {
-		if (!calendarRef.current) return;
-		
+		if (!calendarRef.current) return
+
 		const addEventListenersToMoreLinks = () => {
 			// Find all "more" links in the calendar
-			const moreLinks = document.querySelectorAll('.fc-daygrid-more-link');
-			
+			const moreLinks = document.querySelectorAll('.fc-daygrid-more-link')
+
 			moreLinks.forEach(link => {
 				// Remove any existing listeners to prevent duplicates
-				link.removeEventListener('click', moreClickHandler);
-				
+				link.removeEventListener('click', moreClickHandler)
+
 				// Add click event listener
-				link.addEventListener('click', moreClickHandler);
-			});
-		};
-		
+				link.addEventListener('click', moreClickHandler)
+			})
+		}
+
 		// Handler for the more link clicks
 		const moreClickHandler = (e: Event) => {
-			e.preventDefault();
-			e.stopPropagation();
-			
+			e.preventDefault()
+			e.stopPropagation()
+
 			// Get the date from the parent cell
-			const dayEl = (e.target as Element).closest('.fc-daygrid-day');
+			const dayEl = (e.target as Element).closest('.fc-daygrid-day')
 			if (dayEl) {
-				const dateAttr = dayEl.getAttribute('data-date');
+				const dateAttr = dayEl.getAttribute('data-date')
 				if (dateAttr) {
-					handleMoreEventsClick(dateAttr);
+					handleMoreEventsClick(dateAttr)
 				}
 			}
-		};
-		
+		}
+
 		// Initial setup
-		addEventListenersToMoreLinks();
-		
+		addEventListenersToMoreLinks()
+
 		// Add listeners when view changes
-		const api = calendarRef.current.getApi();
-		(api as any).on('viewDidMount', addEventListenersToMoreLinks);
-		
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const api = calendarRef.current.getApi()
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		;(api as any).on('viewDidMount', addEventListenersToMoreLinks)
+
 		// Also handle when events are rerendered
-		(api as any).on('eventDidMount', addEventListenersToMoreLinks);
-		
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		;(api as any).on('eventDidMount', addEventListenersToMoreLinks)
+
 		return () => {
 			if (calendarRef.current) {
-				const api = calendarRef.current.getApi();
-				(api as any).off('viewDidMount', addEventListenersToMoreLinks);
-				(api as any).off('eventDidMount', addEventListenersToMoreLinks);
+				const api = calendarRef.current.getApi()
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				;(api as any).off('viewDidMount', addEventListenersToMoreLinks)
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				;(api as any).off('eventDidMount', addEventListenersToMoreLinks)
 			}
-		};
-	}, [calendarRef, getEventsForDate]);
+		}
+	}, [calendarRef, getEventsForDate])
 
 	// Function to format date for display
 	const formatDate = (dateStr: string) => {
@@ -912,14 +917,14 @@ const Calendar: React.FC = () => {
 
 		const resizeObserver = new ResizeObserver(handleResize)
 		const calendarEl = document.querySelector('.fc')
-		
+
 		if (calendarEl) {
 			resizeObserver.observe(calendarEl)
 		}
 
 		return () => resizeObserver.disconnect()
 	}, [])
-	
+
 	// Update calendar size when dashboard state changes
 	useEffect(() => {
 		if (calendarRef.current) {
@@ -927,7 +932,7 @@ const Calendar: React.FC = () => {
 			const timeoutId = setTimeout(() => {
 				calendarRef.current?.getApi().updateSize()
 			}, 300)
-			
+
 			return () => clearTimeout(timeoutId)
 		}
 	}, [isDashboardExpanded]) // Trigger when dashboard state changes
@@ -1120,7 +1125,7 @@ const Calendar: React.FC = () => {
 					eventContent={RenderEventContent}
 					dayMaxEvents={3}
 					moreLinkClick="function"
-					moreLinkContent={(arg) => `+${arg.num} more`}
+					moreLinkContent={arg => `+${arg.num} more`}
 					height="auto"
 					aspectRatio={1.5}
 					displayEventEnd={false}

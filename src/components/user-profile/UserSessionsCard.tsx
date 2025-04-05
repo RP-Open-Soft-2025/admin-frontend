@@ -91,6 +91,7 @@ export default function UserSessionsCard({
 	const [completeSessionNotes, setCompleteSessionNotes] = useState('')
 	const [isCompletingSession, setIsCompletingSession] = useState(false)
 	const [completeChainId, setCompleteChainId] = useState<string | null>(null)
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [completeChainNotes, setCompleteChainNotes] = useState('')
 	const [isCompletingChain, setIsCompletingChain] = useState(false)
 	const router = useRouter()
@@ -670,7 +671,10 @@ export default function UserSessionsCard({
 													type="time"
 													value={
 														formData.scheduled_time
-															? format(new Date(formData.scheduled_time), 'HH:mm')
+															? format(
+																	new Date(formData.scheduled_time),
+																	'HH:mm'
+																)
 															: ''
 													}
 													onChange={e => {
@@ -840,9 +844,9 @@ export default function UserSessionsCard({
 																chain.status
 															)}`}
 														>
-															{chain.status === ChainStatus.ACTIVE && 
+															{chain.status === ChainStatus.ACTIVE && (
 																<span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
-															}
+															)}
 															{chain.status}
 														</span>
 													</td>
@@ -862,20 +866,21 @@ export default function UserSessionsCard({
 														/>
 													</td>
 													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90 text-right">
-													{chain.status === ChainStatus.ACTIVE && (role === 'admin' || role === 'hr') && (
-															<Button
-																size="sm"
-																variant="outline"
-																className="h-8 px-3 text-xs bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800 shadow-sm hover:shadow transition-all"
-																onClick={e => {
-																	e.stopPropagation()
-																	setCompleteChainId(chain.chain_id)
-																}}
-															>
-																<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-																Complete
-															</Button>
-														)}
+														{chain.status === ChainStatus.ACTIVE &&
+															(role === 'admin' || role === 'hr') && (
+																<Button
+																	size="sm"
+																	variant="outline"
+																	className="h-8 px-3 text-xs bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800 shadow-sm hover:shadow transition-all"
+																	onClick={e => {
+																		e.stopPropagation()
+																		setCompleteChainId(chain.chain_id)
+																	}}
+																>
+																	<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+																	Complete
+																</Button>
+															)}
 													</td>
 												</tr>
 												{chain.isExpanded && chain.session_ids.length > 0 && (
