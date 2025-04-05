@@ -36,6 +36,7 @@ interface TodayEvent {
 	redirectUrl: string
 }
 
+
 // Add CSS for event styling
 const calendarStyles = `
 .fc-bg-primary {
@@ -369,6 +370,27 @@ body.fc-popover-open {
 body.fc-popover-open {
     overflow: hidden !important;
 }
+
+/* Prevent calendar from becoming too narrow */
+.fc-view-harness {
+  min-width: 800px !important; /* Minimum viable width */
+}
+
+.fc-daygrid-day-frame {
+  min-width: 120px !important; /* Prevent column collapse */
+}
+
+/* Responsive toolbar for mobile */
+@media (max-width: 768px) {
+  .fc-toolbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .fc-header-toolbar {
+    flex-wrap: wrap;
+  }
+}
 `
 
 const RenderEventContent = (eventInfo: EventContentArg) => {
@@ -443,6 +465,7 @@ const Calendar: React.FC = () => {
 	const [selectedDate, setSelectedDate] = useState<string>('')
 	const [showTodayModal, setShowTodayModal] = useState(false)
 	const [todayEvents, setTodayEvents] = useState<TodayEvent[]>([])
+	const [isDashboardExpanded, setIsDashboardExpanded] = useState(true)
 
 	const handleAuthError = useCallback(() => {
 		toast({
@@ -883,6 +906,36 @@ const Calendar: React.FC = () => {
 		setShowDateModal(true)
 	}
 
+	// Add ResizeObserver to handle calendar size changes
+	useEffect(() => {
+		const handleResize = () => {
+			if (calendarRef.current) {
+				calendarRef.current.getApi().updateSize()
+			}
+		}
+
+		const resizeObserver = new ResizeObserver(handleResize)
+		const calendarEl = document.querySelector('.fc')
+		
+		if (calendarEl) {
+			resizeObserver.observe(calendarEl)
+		}
+
+		return () => resizeObserver.disconnect()
+	}, [])
+	
+	// Update calendar size when dashboard state changes
+	useEffect(() => {
+		if (calendarRef.current) {
+			// Debounce to handle rapid resizing
+			const timeoutId = setTimeout(() => {
+				calendarRef.current?.getApi().updateSize()
+			}, 300)
+			
+			return () => clearTimeout(timeoutId)
+		}
+	}, [isDashboardExpanded]) // Trigger when dashboard state changes
+
 	return (
 		<div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] relative min-h-[400px] md:min-h-[600px]">
 			<style>{calendarStyles}</style>
@@ -1048,7 +1101,7 @@ const Calendar: React.FC = () => {
 				</>
 			)}
 
-			<div className="custom-calendar custom-scrollbar">
+			<div className="custom-calendar custom-scrollbar w-full overflow-x-auto">
 				<FullCalendar
 					ref={calendarRef}
 					plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -1073,6 +1126,7 @@ const Calendar: React.FC = () => {
 					moreLinkClick="function"
 					moreLinkContent={(arg) => `+${arg.num} more`}
 					height="auto"
+					aspectRatio={1.5}
 					displayEventEnd={false}
 					eventDisplay="block"
 					slotDuration="00:30:00"
