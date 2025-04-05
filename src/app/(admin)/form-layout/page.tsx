@@ -6,6 +6,7 @@ import { Role } from '@/types/employee'
 import store from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 import Select from 'react-select'
+import { useRouter } from 'next/navigation'
 
 interface FormErrors {
 	employee_id?: string
@@ -31,6 +32,7 @@ interface MissingIDsResponse {
 }
 
 export default function FormLayout() {
+	const router = useRouter()
 	const [hrsGot, setHrs] = useState<LocalHR[]>([])
 	const [filterHR, setFilterHR] = useState<LocalHR[]>([])
 	const [currSel, SetCurrSel] = useState<string>('')
@@ -49,16 +51,38 @@ export default function FormLayout() {
 	const [showIdSuggestions, setShowIdSuggestions] = useState(false)
 	const [currentSuggestionIndex, setCurrentSuggestionIndex] =
 		useState<number>(-1)
+	const [isAuthorized, setIsAuthorized] = useState(false)
+	const [isLoading, setIsLoading] = useState(true)
 
 	// Add ref to first input
 	const employeeIdRef = useRef<HTMLInputElement>(null)
 
+	// Check user authorization
 	useEffect(() => {
-		employeeIdRef.current?.focus()
-	}, [])
+		const { auth } = store.getState()
+		if (!auth.user || auth.user.userRole !== 'admin') {
+			// HR users don't have access - redirect to dashboard
+			toast({
+				type: 'error',
+				description: 'You do not have permission to access this page',
+			})
+			router.push('/dashboard')
+		} else {
+			setIsAuthorized(true)
+			setIsLoading(false)
+		}
+	}, [router])
+
+	useEffect(() => {
+		if (isAuthorized && !isLoading) {
+			employeeIdRef.current?.focus()
+		}
+	}, [isAuthorized, isLoading])
 
 	// Fetch missing employee IDs when component mounts
 	useEffect(() => {
+		if (!isAuthorized) return
+
 		const fetchMissingIds = async () => {
 			try {
 				const { auth } = store.getState()
@@ -102,7 +126,7 @@ export default function FormLayout() {
 		}
 
 		fetchMissingIds()
-	}, [])
+	}, [isAuthorized])
 
 	// Update suggested IDs based on role selection
 	useEffect(() => {
@@ -298,6 +322,8 @@ export default function FormLayout() {
 	}
 
 	useEffect(() => {
+		if (!isAuthorized) return
+
 		const { auth } = store.getState()
 		fetch(`${API_URL}/admin/list-hr`, {
 			method: 'GET',
@@ -312,7 +338,7 @@ export default function FormLayout() {
 				})
 			}
 		})
-	}, [])
+	}, [isAuthorized])
 
 	useEffect(() => {
 		if (currSel) {
@@ -326,6 +352,21 @@ export default function FormLayout() {
 			setFilterHR(hrsGot) // Optional: You can clear the filter when currSel is empty.
 		}
 	}, [currSel, hrsGot])
+
+	if (isLoading) {
+		return (
+			<div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+				<div className="flex flex-col items-center gap-4">
+					<div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+					<p className="text-gray-600 dark:text-gray-300">Loading...</p>
+				</div>
+			</div>
+		)
+	}
+
+	if (!isAuthorized) {
+		return null // This shouldn't render as we redirect unauthorized users
+	}
 
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-900">

@@ -449,7 +449,7 @@ const Calendar: React.FC = () => {
 			try {
 				// Fetch meetings
 				const meetingsResponse = await fetch(
-					`${API_URL}/${auth.user.userRole}/meets`,
+					`${API_URL}/admin/meets`,
 					{
 						headers: {
 							Authorization: `Bearer ${auth.user.accessToken}`,
@@ -457,20 +457,15 @@ const Calendar: React.FC = () => {
 					}
 				)
 
-				// Fetch all session types
-				const [activeResponse, completedResponse, pendingResponse] =
+				// Fetch sessions using the admin endpoints
+				const [activeAndPendingResponse, completedResponse] =
 					await Promise.all([
-						fetch(`${API_URL}/${auth.user.userRole}/sessions/active`, {
+						fetch(`${API_URL}/admin/sessions`, {
 							headers: {
 								Authorization: `Bearer ${auth.user.accessToken}`,
 							},
 						}),
-						fetch(`${API_URL}/${auth.user.userRole}/sessions/completed`, {
-							headers: {
-								Authorization: `Bearer ${auth.user.accessToken}`,
-							},
-						}),
-						fetch(`${API_URL}/${auth.user.userRole}/sessions/pending`, {
+						fetch(`${API_URL}/admin/sessions/completed`, {
 							headers: {
 								Authorization: `Bearer ${auth.user.accessToken}`,
 							},
@@ -479,15 +474,13 @@ const Calendar: React.FC = () => {
 
 				if (
 					!meetingsResponse.ok ||
-					!activeResponse.ok ||
-					!completedResponse.ok ||
-					!pendingResponse.ok
+					!activeAndPendingResponse.ok ||
+					!completedResponse.ok
 				) {
 					if (
 						meetingsResponse.status === 401 ||
-						activeResponse.status === 401 ||
-						completedResponse.status === 401 ||
-						pendingResponse.status === 401
+						activeAndPendingResponse.status === 401 ||
+						completedResponse.status === 401
 					) {
 						handleAuthError()
 						return
@@ -496,11 +489,10 @@ const Calendar: React.FC = () => {
 				}
 
 				const meetingsData = await meetingsResponse.json()
-				const [activeSessions, completedSessions, pendingSessions] =
+				const [activeAndPendingSessions, completedSessions] =
 					await Promise.all([
-						activeResponse.json(),
+						activeAndPendingResponse.json(),
 						completedResponse.json(),
-						pendingResponse.json(),
 					])
 
 				// Format meetings
@@ -540,6 +532,15 @@ const Calendar: React.FC = () => {
 						},
 					}
 				}
+
+				// Separate active and pending sessions based on their status field
+				const activeSessions = activeAndPendingSessions.filter(
+					(session: SessionType) => session.status === SessionStatus.ACTIVE
+				)
+				
+				const pendingSessions = activeAndPendingSessions.filter(
+					(session: SessionType) => session.status === SessionStatus.PENDING
+				)
 
 				const formattedSessions = [
 					...activeSessions.map((session: SessionType) =>

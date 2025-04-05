@@ -113,10 +113,10 @@ export async function getUserProfileData(userId: string): Promise<EmployeeAPI> {
 			throw new Error('Authentication token not found. Please log in.')
 		}
 
-		console.log('Making API request to /employee/profile') // Debug log
+		console.log('Making API request to /admin/user-det') // Debug log
 
 		const response = await fetch(
-			`${API_URL}/${authState.user?.userRole}/user-det/${userId}`,
+			`${API_URL}/admin/user-det/${userId}`,
 			{
 				method: 'GET',
 				headers: {
@@ -240,27 +240,19 @@ export const getSessionsData = async (
 	employeeId: string
 ): Promise<SessionType[]> => {
 	const { auth } = store.getState()
-	const userRole = auth.user?.userRole || 'admin'
 
 	try {
-		// Fetch from all three endpoints using the correct role-based path
-		const [activeResponse, completedResponse, pendingResponse] =
+		// Fetch from consistent admin endpoints
+		const [activeAndPendingResponse, completedResponse] =
 			await Promise.all([
-				fetch(`${API_URL}/${userRole}/sessions/active`, {
+				fetch(`${API_URL}/admin/sessions`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${auth.user?.accessToken}`,
 					},
 				}),
-				fetch(`${API_URL}/${userRole}/sessions/completed`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-					},
-				}),
-				fetch(`${API_URL}/${userRole}/sessions/pending`, {
+				fetch(`${API_URL}/admin/sessions/completed`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
@@ -270,19 +262,18 @@ export const getSessionsData = async (
 			])
 
 		// Check if any of the responses failed
-		if (!activeResponse.ok || !completedResponse.ok || !pendingResponse.ok) {
+		if (!activeAndPendingResponse.ok || !completedResponse.ok) {
 			throw new Error('Failed to fetch sessions data')
 		}
 
 		// Parse all responses
-		const [activeData, completedData, pendingData] = await Promise.all([
-			activeResponse.json(),
+		const [activeAndPendingData, completedData] = await Promise.all([
+			activeAndPendingResponse.json(),
 			completedResponse.json(),
-			pendingResponse.json(),
 		])
 
 		// Combine all sessions and filter by employee_id
-		const allSessions = [...activeData, ...completedData, ...pendingData]
+		const allSessions = [...activeAndPendingData, ...completedData]
 		return allSessions.filter(
 			(session: SessionType) => session.employee_id === employeeId
 		)

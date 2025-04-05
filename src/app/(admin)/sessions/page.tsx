@@ -19,7 +19,14 @@ const TableSession = ({ state }: { state: State }) => {
 	useEffect(() => {
 		const fetchSessions = async () => {
 			try {
-				fetch(`${API_URL}/${auth.user!.userRole}/sessions/${state}`, {
+				// Use consistent admin endpoints for both HR and admin users
+				// For completed sessions, use /admin/sessions/completed
+				// For active and pending sessions, use /admin/sessions and filter by status
+				const endpoint = state === 'completed' 
+					? `${API_URL}/admin/sessions/completed` 
+					: `${API_URL}/admin/sessions`;
+
+				fetch(endpoint, {
 					method: 'GET',
 					headers: {
 						Authorization: `Bearer ${auth.user?.accessToken}`,
@@ -27,6 +34,12 @@ const TableSession = ({ state }: { state: State }) => {
 				}).then(resp => {
 					if (resp.ok) {
 						resp.json().then((result: SessionType[]) => {
+							// If using the /admin/sessions endpoint for active or pending,
+							// filter the results by status
+							if (state !== 'completed') {
+								result = result.filter(session => session.status.toLowerCase() === state);
+							}
+							
 							setCurrData(result)
 							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE_SESSION))
 							setHistoryLoading(false)
