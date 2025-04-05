@@ -146,6 +146,7 @@ const ChatPage = () => {
 	const [sessions, setSessions] = useState<SessionHist[]>([])
 	const [historyLoading, setHistoryLoading] = useState(false)
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
+	const [chatid, setChatId] = useState<string>('')
 
 	// Scroll to latest message
 	useEffect(() => {
@@ -349,6 +350,7 @@ const ChatPage = () => {
 						}
 
 						setSessions([session])
+						if (chatid == '') setChatId(session.chat_id)
 						setMessages(data.messages)
 					} else {
 						console.error('Invalid data format received:', data)
@@ -374,7 +376,7 @@ const ChatPage = () => {
 	}, [auth.user, id])
 
 	useEffect(() => {
-		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + id)
+		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + chatid)
 
 		ws.onmessage = event => {
 			const data = JSON.parse(event.data)
@@ -395,7 +397,7 @@ const ChatPage = () => {
 		return () => {
 			ws.close()
 		}
-	}, [id])
+	}, [chatid])
 
 	// Handle message sending
 	const sendMessage = () => {

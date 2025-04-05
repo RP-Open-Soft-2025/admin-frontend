@@ -350,7 +350,7 @@ export default function UserSessionsCard({
 							size="sm"
 						>
 							<Plus className="w-4 h-4" />
-							Add Chain
+							Session
 						</Button>
 					) : null}
 				</div>
@@ -903,20 +903,6 @@ export default function UserSessionsCard({
 																			{sessionId}
 																		</span>
 																		<div className="flex items-center gap-2">
-																			{role === 'admin' || role === 'hr' ? (
-																				<Button
-																					size="sm"
-																					variant="outline"
-																					className="h-8 px-3 text-xs bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800 shadow-sm hover:shadow transition-all"
-																					onClick={e => {
-																						e.stopPropagation()
-																						setCompleteSessionId(sessionId)
-																					}}
-																				>
-																					<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-																					Complete
-																				</Button>
-																			) : null}
 																			<Button
 																				size="sm"
 																				variant="ghost"
