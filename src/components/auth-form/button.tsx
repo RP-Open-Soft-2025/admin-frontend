@@ -32,7 +32,7 @@ export function SubmitButton({
 						? 'bg-gray-400 cursor-not-allowed'
 						: isSuccessful
 							? 'bg-green-500 cursor-not-allowed'
-							: 'bg-[#66872B] hover:bg-[#7FA034] dark:bg-[#3B4F17] dark:hover:bg-[#4A6420]'
+							: 'bg-[#2d6bbd] hover:bg-[#2265b3] dark:bg-[#2d6bbd] dark:hover:bg-[#2265b3]'
 				}
         text-white transition-colors
         ${className}
