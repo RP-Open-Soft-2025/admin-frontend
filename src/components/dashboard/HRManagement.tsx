@@ -53,24 +53,24 @@ const HRManagement = ({
 
 			<div className="h-[400px] overflow-auto">
 				<div className="overflow-x-auto">
-					<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+					<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
 						<thead className="sticky top-0 bg-gray-50 dark:bg-gray-800">
 							<tr>
 								<th
 									scope="col"
-									className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+									className="w-1/3 px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
 								>
 									ID
 								</th>
 								<th
 									scope="col"
-									className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+									className="w-1/3 px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
 								>
 									Name
 								</th>
 								<th
 									scope="col"
-									className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+									className="w-1/3 px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
 								>
 									Assigned Users
 								</th>
@@ -100,14 +100,14 @@ const HRManagement = ({
 											key={hr.hrId}
 											className="hover:bg-gray-50 dark:hover:bg-gray-800"
 										>
-											<td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+											<td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-center text-gray-900 dark:text-white">
 												{hr.hrId}
 											</td>
-											<td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+											<td className="whitespace-nowrap px-6 py-4 text-sm text-center text-gray-500 dark:text-gray-400">
 												{hr.name}
 											</td>
-											<td className="whitespace-nowrap px-6 py-4  text-sm text-gray-500 dark:text-gray-400">
-												{hr.currentAssignedUsers}
+											<td className="whitespace-nowrap px-6 py-4 text-sm text-center text-gray-500 dark:text-gray-400">
+												{hr.currentAssignedUsersCount}
 											</td>
 											{/* <td className="whitespace-nowrap px-6 py-4 text-sm">
 											<div className="flex items-center">

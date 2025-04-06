@@ -17,7 +17,8 @@ export interface User {
 export interface HRUser {
 	hrId: string
 	name: string
-	currentAssignedUsers: number
+	currentAssignedUsersCount: number
+	avgVibeScore: number
 }
 
 export interface Session {
@@ -112,6 +113,7 @@ export async function fetchHRList(): Promise<HRUser[]> {
 		}
 
 		const data = await response.json()
+		console.log('HR List API Response:', data)
 		return data.hrs || []
 	} catch (error) {
 		console.error('Failed to fetch HR list:', error)
