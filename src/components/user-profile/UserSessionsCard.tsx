@@ -9,6 +9,7 @@ import {
 	Plus,
 	Clock,
 	CheckCircle,
+	FileText,
 } from 'lucide-react'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -67,6 +68,17 @@ const getChainStatusColor = (status: ChainStatus) => {
 		default:
 			return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
 	}
+}
+
+// Add a helper function to get session data
+const getSessionStatusFromChain = (chain: ChainType) => {
+	// If chain is completed, we assume all sessions in it are completed
+	if (chain.status === ChainStatus.COMPLETED) {
+		return 'COMPLETED'
+	}
+	// For active chains, we need to check the session status
+	// This is a simplified implementation - you might need to adjust based on your data structure
+	return 'ACTIVE'
 }
 
 export default function UserSessionsCard({
@@ -893,32 +905,54 @@ export default function UserSessionsCard({
 																Sessions:
 															</div>
 															<div className="grid gap-2">
-																{chain.session_ids.map(sessionId => (
-																	<div
-																		key={sessionId}
-																		onClick={() =>
-																			router.push(`/chat-page/${sessionId}`)
-																		}
-																		className="p-2.5 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow"
-																	>
-																		<span className="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-gray-800 dark:text-white/90">
-																			{sessionId}
-																		</span>
-																		<div className="flex items-center gap-2">
-																			<Button
-																				size="sm"
-																				variant="ghost"
-																				onClick={e => {
-																					e.stopPropagation()
-																					router.push(`/chat-page/${sessionId}`)
-																				}}
-																				className="h-8 w-8 p-0 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
-																			>
-																				<ChevronRight className="h-5 w-5" />
-																			</Button>
+																{chain.session_ids.map(sessionId => {
+																	const sessionStatus =
+																		getSessionStatusFromChain(chain)
+																	return (
+																		<div
+																			key={sessionId}
+																			onClick={() =>
+																				router.push(`/chat-page/${sessionId}`)
+																			}
+																			className="p-2.5 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow"
+																		>
+																			<span className="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-gray-800 dark:text-white/90">
+																				{sessionId}
+																			</span>
+																			<div className="flex items-center gap-2">
+																				{sessionStatus === 'COMPLETED' && (
+																					<Button
+																						size="sm"
+																						variant="outline"
+																						className="h-8 px-3 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 border-blue-200 dark:border-blue-800 shadow-sm hover:shadow transition-all"
+																						onClick={e => {
+																							e.stopPropagation()
+																							router.push(
+																								`/report/${employeeId}${sessionId}${sessionStatus.toLowerCase()}`
+																							)
+																						}}
+																					>
+																						<FileText className="h-3.5 w-3.5 mr-1.5" />
+																						Report
+																					</Button>
+																				)}
+																				<Button
+																					size="sm"
+																					variant="ghost"
+																					onClick={e => {
+																						e.stopPropagation()
+																						router.push(
+																							`/chat-page/${sessionId}`
+																						)
+																					}}
+																					className="h-8 w-8 p-0 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
+																				>
+																					<ChevronRight className="h-5 w-5" />
+																				</Button>
+																			</div>
 																		</div>
-																	</div>
-																))}
+																	)
+																})}
 															</div>
 														</td>
 													</tr>
