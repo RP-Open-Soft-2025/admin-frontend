@@ -358,7 +358,7 @@ export default function UserSessionsCard({
 
 				{/* Add Session Modal */}
 				<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-					<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700">
+					<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
 						<DialogHeader>
 							<DialogTitle className="dark:text-white">
 								Schedule New Session
@@ -576,7 +576,7 @@ export default function UserSessionsCard({
 
 					{/* Add Session Modal */}
 					<Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-						<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700">
+						<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
 							<DialogHeader>
 								<DialogTitle className="dark:text-white">
 									Schedule New Session
@@ -935,7 +935,7 @@ export default function UserSessionsCard({
 				open={!!completeChainId}
 				onOpenChange={open => !open && setCompleteChainId(null)}
 			>
-				<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700 bg-white">
+				<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
 					<DialogHeader>
 						<DialogTitle className="dark:text-white">
 							Complete Chain
@@ -989,7 +989,7 @@ export default function UserSessionsCard({
 				open={!!completeSessionId}
 				onOpenChange={open => !open && setCompleteSessionId(null)}
 			>
-				<DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-700">
+				<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
 					<DialogHeader>
 						<DialogTitle className="dark:text-white">
 							Complete Session
