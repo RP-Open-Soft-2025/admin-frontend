@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import store from '@/redux/store'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -162,6 +162,7 @@ const ReportPage = () => {
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const { auth } = store.getState()
+	const router = useRouter()
 
 	useEffect(() => {
 		const fetchReport = async () => {
@@ -200,13 +201,13 @@ const ReportPage = () => {
 		return (
 			<div className="container mx-auto py-8 px-4">
 				<div className="mb-6">
-					<Link
-						href="/dashboard"
-						className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4"
+					<div
+						onClick={() => router.back()}
+						className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4 cursor-pointer"
 					>
 						<ChevronLeft className="h-4 w-4 mr-1" />
-						Back to Dashboard
-					</Link>
+						Go Back
+					</div>
 					<Skeleton className="h-10 w-3/4 mb-4" />
 					<div className="flex flex-wrap gap-4 mb-6">
 						<Skeleton className="h-6 w-40" />
@@ -214,7 +215,7 @@ const ReportPage = () => {
 					</div>
 				</div>
 				<Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-					<CardHeader className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+					<CardHeader className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 ">
 						<Skeleton className="h-8 w-60" />
 					</CardHeader>
 					<CardContent className="p-6">
@@ -235,13 +236,13 @@ const ReportPage = () => {
 		return (
 			<div className="container mx-auto py-8 px-4">
 				<div className="mb-6">
-					<Link
-						href="/"
-						className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4"
+					<div
+						onClick={() => router.back()}
+						className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4 cursor-pointer"
 					>
 						<ChevronLeft className="h-4 w-4 mr-1" />
-						Back to Dashboard
-					</Link>
+						Go Back
+					</div>
 				</div>
 				<Card className="border border-red-200 dark:border-red-800 shadow-sm">
 					<CardContent className="p-6">
@@ -261,13 +262,13 @@ const ReportPage = () => {
 		return (
 			<div className="container mx-auto py-8 px-4">
 				<div className="mb-6">
-					<Link
-						href="/"
-						className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4"
+					<div
+						onClick={() => router.back()}
+						className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4 cursor-pointer"
 					>
 						<ChevronLeft className="h-4 w-4 mr-1" />
-						Back to Dashboard
-					</Link>
+						Go Back
+					</div>
 				</div>
 				<Card className="border border-yellow-200 dark:border-yellow-800 shadow-sm">
 					<CardContent className="p-6">
@@ -289,13 +290,13 @@ const ReportPage = () => {
 				{markdownStyles}
 			</style>
 			<div className="mb-6">
-				<Link
-					href="/"
-					className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4"
+				<div
+					onClick={() => router.back()}
+					className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4 cursor-pointer"
 				>
 					<ChevronLeft className="h-4 w-4 mr-1" />
-					Back to Dashboard
-				</Link>
+					Go Back
+				</div>
 				<h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
 					Session Report
 				</h1>
