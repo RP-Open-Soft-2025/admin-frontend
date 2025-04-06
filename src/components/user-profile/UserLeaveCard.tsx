@@ -15,7 +15,11 @@ const formatDate = (dateString: string) => {
 
 // Helper function to calculate total leave days
 const calculateTotalLeaveDays = (leaves: Leave[]) => {
-	return leaves.reduce((total, leave) => total + leave.Leave_Days, 0)
+	// If no leaves, return 0
+	if (leaves.length === 0) return 0
+
+	// Find the maximum Leave_Days from all leaves
+	return Math.max(...leaves.map(leave => leave.Leave_Days))
 }
 
 // Helper function to get leave type color
@@ -78,12 +82,6 @@ export default function UserLeaveCard({ leaveData }: UserLeaveCardProps) {
 											scope="col"
 											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
 										>
-											Days
-										</th>
-										<th
-											scope="col"
-											className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
-										>
 											Duration
 										</th>
 									</tr>
@@ -99,9 +97,6 @@ export default function UserLeaveCard({ leaveData }: UserLeaveCardProps) {
 												>
 													{leave.Leave_Type}
 												</span>
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
-												{leave.Leave_Days} days
 											</td>
 											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
 												{formatDate(leave.Leave_Start_Date)} -{' '}
