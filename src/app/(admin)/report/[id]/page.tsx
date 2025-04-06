@@ -169,9 +169,12 @@ const ReportPage = () => {
 				setLoading(true)
 
 				// Use our API proxy to avoid CORS issues
-				const response = await fetch(`https://storage.googleapis.com/opensoft-reports/${id}.md`, {
-					method: 'GET',
-				})
+				const response = await fetch(
+					`https://storage.googleapis.com/opensoft-reports/${id}.md`,
+					{
+						method: 'GET',
+					}
+				)
 
 				if (!response.ok) {
 					throw new Error(`Error: ${response.status}`)

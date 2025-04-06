@@ -4,8 +4,17 @@ import { useParams } from 'next/navigation'
 import { MessageResp, SenderType } from '@/types/chat'
 import { API_URL, WS_URL } from '@/constants'
 import store from '@/redux/store'
-import { Role } from '@/types/employee'
 import { toast } from '@/components/ui/sonner'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import Select from '@/components/form/Select'
 
 // Define session history type
 type SessionHist = {
@@ -136,17 +145,19 @@ const ChatPage = () => {
 	const params = useParams()
 	const id = params.id as string
 	const [messages, setMessages] = useState<MessageResp[]>([])
-	const [newMessage, setNewMessage] = useState('')
 	const chatEndRef = useRef<HTMLDivElement>(null)
 	const messagesContainerRef = useRef<HTMLDivElement>(null)
 	const { auth } = store.getState()
 	const [isLoading, setIsLoading] = useState(true)
-	const [takeOver, setTakeOver] = useState<boolean>(false)
 	const [sidebarOpen, setSidebarOpen] = useState(true)
 	const [sessions, setSessions] = useState<SessionHist[]>([])
 	const [historyLoading, setHistoryLoading] = useState(false)
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
 	const [chatid, setChatId] = useState<string>('')
+	const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false)
+	const [endSessionNotes, setEndSessionNotes] = useState('')
+	const [isEndingSession, setIsEndingSession] = useState(false)
+	const [sessionAction, setSessionAction] = useState<string>('complete')
 
 	// Scroll to latest message
 	useEffect(() => {
@@ -399,45 +410,52 @@ const ChatPage = () => {
 		}
 	}, [chatid])
 
-	// Handle message sending
-	const sendMessage = () => {
-		if (newMessage.trim() !== '') {
-			console.log(API_URL)
-			fetch(`${API_URL}/chat/message-to-employee`, {
+	const endSession = async () => {
+		setIsEndingSession(true)
+		try {
+			const endpoint = `/admin/chains/${id}/${sessionAction}`
+
+			const response = await fetch(`${API_URL}${endpoint}`, {
 				method: 'POST',
 				headers: {
-					'Content-type': 'Application/json',
+					'Content-Type': 'application/json',
 					Authorization: `Bearer ${auth.user?.accessToken}`,
 				},
 				body: JSON.stringify({
-					chatId: id,
-					message: newMessage.trim(),
+					notes: endSessionNotes,
 				}),
-			}).then(resp => {
-				if (resp.ok) {
-					const message: MessageResp = {
-						sender: SenderType.HR,
-						text: newMessage.trim(),
-						timestamp: new Date().toISOString(),
-					}
-					setMessages(prevMessages => [...prevMessages, message])
-					setNewMessage('')
-				}
 			})
-		}
-	}
 
-	// Send message on Enter key press
-	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			e.preventDefault()
-			sendMessage()
-		}
-	}
+			if (!response.ok) {
+				throw new Error(`Error: ${response.status}`)
+			}
 
-	const initTakeOver = () => {
-		console.log('Chat Taken Over')
-		setTakeOver(true)
+			// Show success message with appropriate action
+			const actionText =
+				sessionAction === 'complete'
+					? 'completed'
+					: sessionAction === 'escalate'
+						? 'escalated'
+						: 'cancelled'
+
+			toast({
+				description: `Session ${actionText} successfully`,
+				type: 'success',
+			})
+
+			// Close modal and reset state
+			setIsEndSessionModalOpen(false)
+			setEndSessionNotes('')
+			setSessionAction('complete')
+		} catch (error) {
+			console.error(`Error ${sessionAction}ing session:`, error)
+			toast({
+				description: `Failed to ${sessionAction} session`,
+				type: 'error',
+			})
+		} finally {
+			setIsEndingSession(false)
+		}
 	}
 
 	const navigateToChat = (chatId: string) => {
@@ -550,38 +568,126 @@ const ChatPage = () => {
 				</div>
 
 				{/* Chat Input */}
-				{auth.user?.userRole == Role.HR && takeOver ? (
-					<div className="p-2 bg-[#162040] border-t border-gray-700">
-						<div className="flex space-x-2">
-							<input
-								type="text"
-								className="flex-grow p-2 rounded dark:bg-[#1e293b] bg-white
-                border border-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-white text-sm"
-								value={newMessage}
-								onChange={e => setNewMessage(e.target.value)}
-								onKeyDown={handleKeyDown}
-								placeholder="Type your message..."
-							/>
-							<button
-								className="px-3 py-2 bg-indigo-500 text-white rounded text-sm
-                hover:bg-indigo-600 transition-colors"
-								onClick={sendMessage}
-							>
-								Send
-							</button>
-						</div>
-					</div>
-				) : (
-					<div className="dark:bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700 bg-white">
-						<button
-							className="px-4 py-2 dark:bg-[#1e293b] dark:text-white rounded-md shadow-md text-sm bg-blue-200 text-black
+
+				<div className="dark:bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700 bg-white">
+					<button
+						className="px-4 py-2 dark:bg-[#1e293b] dark:text-white rounded-md shadow-md text-sm bg-blue-200 text-black
               dark:hover:bg-[#334155] transition-colors hover:bg-blue-light-500"
-							onClick={() => initTakeOver()}
+						onClick={() => setIsEndSessionModalOpen(true)}
+					>
+						End Session
+					</button>
+				</div>
+
+				{/* End Session Modal */}
+				<Dialog
+					open={isEndSessionModalOpen}
+					onOpenChange={setIsEndSessionModalOpen}
+				>
+					<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
+						<DialogHeader>
+							<DialogTitle className="dark:text-white">
+								Session Action
+							</DialogTitle>
+						</DialogHeader>
+						<form
+							onSubmit={e => {
+								e.preventDefault()
+								endSession()
+							}}
+							className="space-y-4"
 						>
-							TakeOver
-						</button>
-					</div>
-				)}
+							<div className="grid w-full items-center gap-2">
+								<label
+									htmlFor="session_action"
+									className="text-sm font-medium text-gray-700 dark:text-gray-300"
+								>
+									Action
+								</label>
+								<div className="relative">
+									<Select
+										options={[
+											{ value: 'complete', label: 'Complete' },
+											{ value: 'escalate', label: 'Escalate' },
+											{ value: 'cancel', label: 'Cancel' },
+										]}
+										placeholder="Select action"
+										onChange={value => setSessionAction(value)}
+										defaultValue={sessionAction}
+									/>
+									<span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+										<svg
+											className="size-5"
+											xmlns="http://www.w3.org/2000/svg"
+											width="24"
+											height="24"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
+											<path d="m6 9 6 6 6-6" />
+										</svg>
+									</span>
+								</div>
+							</div>
+
+							<div className="grid w-full items-center gap-2">
+								<label
+									htmlFor="end_session_notes"
+									className="text-sm font-medium text-gray-700 dark:text-gray-300"
+								>
+									Notes
+								</label>
+								<Textarea
+									id="end_session_notes"
+									value={endSessionNotes}
+									onChange={e => setEndSessionNotes(e.target.value)}
+									placeholder="Enter any notes about this action..."
+									className="resize-none min-h-[100px] dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:placeholder-gray-500"
+								/>
+							</div>
+
+							<DialogFooter className="gap-2 sm:gap-0">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setIsEndSessionModalOpen(false)}
+									className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+								>
+									Cancel
+								</Button>
+								<Button
+									type="submit"
+									disabled={isEndingSession}
+									className={`relative ${
+										sessionAction === 'complete'
+											? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
+											: sessionAction === 'escalate'
+												? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800'
+												: 'bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800'
+									}`}
+								>
+									{isEndingSession && (
+										<div className="absolute inset-0 flex items-center justify-center">
+											<div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white dark:border-gray-300"></div>
+										</div>
+									)}
+									<span className={isEndingSession ? 'opacity-0' : ''}>
+										{sessionAction === 'complete'
+											? 'Complete'
+											: sessionAction === 'escalate'
+												? 'Escalate'
+												: 'Cancel'}{' '}
+										Session
+									</span>
+								</Button>
+							</DialogFooter>
+						</form>
+					</DialogContent>
+				</Dialog>
 			</div>
 		</div>
 	)
