@@ -83,7 +83,9 @@ export default function UserSessionsCard({
 	const [formData, setFormData] = useState({
 		employee_id: employeeId,
 		notes: '',
-		scheduled_time: new Date(Date.now() + 120000).toLocaleString('en-GB', { hour12: false }),
+		scheduled_time: new Date(Date.now() + 120000).toLocaleString('en-GB', {
+			hour12: false,
+		}),
 	})
 	const [completeSessionId, setCompleteSessionId] = useState<string | null>(
 		null
@@ -156,7 +158,7 @@ export default function UserSessionsCard({
 		try {
 			// Make sure scheduled_time is in the future
 			const scheduledDate = new Date(formData.scheduled_time)
-			const now = new Date(Date.now() + 12000);
+			const now = new Date(Date.now() + 12000)
 
 			if (scheduledDate < now) {
 				toast({
