@@ -33,6 +33,7 @@ import {
 	PopoverTrigger,
 } from '@/components/ui/popover'
 import Calendar from '@/components/ui/calendar'
+import Link from 'next/link'
 
 // Props interface
 interface UserSessionsCardProps {
@@ -780,10 +781,17 @@ export default function UserSessionsCard({
 					</Dialog>
 
 					{activeChains.length > 0 && (
-						<div className="mt-2 mb-4 p-3 bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all duration-200 flex items-center">
-							<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
-							<span>This Employee has an active chain</span>
-						</div>
+						<Link href={`/chat-page/${activeChains[0].session_ids[0]}`}>
+							<div className="mt-2 mb-4 p-3 bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all duration-200 flex items-center justify-between group">
+								<div className="flex items-center">
+									<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+									<span>
+										This Employee has an active session - Click to join
+									</span>
+								</div>
+								<ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+							</div>
+						</Link>
 					)}
 
 					{/* Chain Summary */}
