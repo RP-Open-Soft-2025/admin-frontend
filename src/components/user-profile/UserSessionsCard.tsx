@@ -284,7 +284,7 @@ export default function UserSessionsCard({
 		setIsCompletingChain(true)
 		try {
 			const response = await fetch(
-				`${API_URL}/admin/chains/${chainId}/complete`,
+				`${API_URL}/admin/chains/${chainId}/escalate`,
 				{
 					method: 'POST',
 					headers: {
