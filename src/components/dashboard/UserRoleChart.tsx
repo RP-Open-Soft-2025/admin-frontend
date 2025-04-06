@@ -1,44 +1,23 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
-import { User } from '@/services/adminService'
 import { ApexOptions } from 'apexcharts'
 
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
 interface UserRoleChartProps {
-	users: User[] | 'UNAVAILABLE'
-	isLoading?: boolean
+	users: {
+		total_admins: number
+		total_hrs: number
+		total_employees: number
+		active_employees: number
+	}
+	isLoading: boolean
 }
 
 const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
-	const calculateRoleDistribution = () => {
-		if (
-			users === 'UNAVAILABLE' ||
-			!Array.isArray(users) ||
-			users.length === 0
-		) {
-			return {
-				series: [1, 1, 1],
-				labels: ['No Data', '', ''],
-			}
-		}
-
-		// Count users by role
-		const roleCount: Record<string, number> = {}
-		users.forEach(user => {
-			const role = user.role || 'unknown'
-			roleCount[role] = (roleCount[role] || 0) + 1
-		})
-
-		// Convert to series and labels
-		const labels = Object.keys(roleCount)
-		const series = Object.values(roleCount)
-
-		return { series, labels }
-	}
-
-	const { series, labels } = calculateRoleDistribution()
+	const series = [users.total_employees, users.total_hrs, users.total_admins]
+	const labels = ['Employees', 'HRs', 'Admins']
 
 	const options: ApexOptions = {
 		chart: {
