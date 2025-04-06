@@ -83,7 +83,7 @@ export default function UserSessionsCard({
 	const [formData, setFormData] = useState({
 		employee_id: employeeId,
 		notes: '',
-		scheduled_time: new Date().toISOString().slice(0, 16),
+		scheduled_time: new Date(Date.now() + 120000).toLocaleString('en-GB', { hour12: false }),
 	})
 	const [completeSessionId, setCompleteSessionId] = useState<string | null>(
 		null
@@ -156,7 +156,7 @@ export default function UserSessionsCard({
 		try {
 			// Make sure scheduled_time is in the future
 			const scheduledDate = new Date(formData.scheduled_time)
-			const now = new Date()
+			const now = new Date(Date.now() + 12000);
 
 			if (scheduledDate < now) {
 				toast({
@@ -565,7 +565,7 @@ export default function UserSessionsCard({
 						{role === 'admin' || role === 'hr' ? (
 							<Button
 								onClick={() => setIsModalOpen(true)}
-								className="flex items-center gap-1 dark:text-white bg-blue-500"
+								className="flex items-center gap-1 text-white bg-blue-500"
 								size="sm"
 							>
 								<Plus className="w-4 h-4" />
