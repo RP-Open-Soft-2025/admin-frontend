@@ -979,7 +979,7 @@ export default function UserSessionsCard({
 				open={!!completeChainId}
 				onOpenChange={open => !open && setCompleteChainId(null)}
 			>
-				<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
+				<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white">
 					<DialogHeader>
 						<DialogTitle className="dark:text-white">
 							Complete Chain
@@ -1013,7 +1013,7 @@ export default function UserSessionsCard({
 						<Button
 							onClick={() => completeChainId && completeChain(completeChainId)}
 							disabled={isCompletingChain}
-							className="relative bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+							className="relative bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white"
 						>
 							{isCompletingChain && (
 								<div className="absolute inset-0 flex items-center justify-center">
