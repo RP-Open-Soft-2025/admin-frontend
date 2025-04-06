@@ -103,7 +103,6 @@ export default function UserVibeMeterCard({
 								{/* Score points with colored indicators */}
 								<div className="flex justify-between w-full px-0 relative">
 									{[1, 2, 3, 4, 5].map(value => {
-
 										const getColorForPoint = (point: number) => {
 											switch (point) {
 												case 1:

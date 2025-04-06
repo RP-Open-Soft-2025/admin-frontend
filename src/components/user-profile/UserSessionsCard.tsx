@@ -900,7 +900,7 @@ export default function UserSessionsCard({
 																	}}
 																>
 																	<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-																	Complete
+																	Mark as Complete
 																</Button>
 															)}
 													</td>
