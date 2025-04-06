@@ -91,7 +91,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 							</Badge>
 						</div>
 
-						{userData.blocked_at && (
+						{userData.blocked_at && userData.is_blocked && (
 							<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
 								<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 									<Calendar className="h-3.5 w-3.5" />
@@ -103,7 +103,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 							</div>
 						)}
 
-						{userData.blocked_by && (
+						{userData.blocked_by && userData.is_blocked && (
 							<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
 								<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 									<UserCircle className="h-3.5 w-3.5" />
@@ -115,7 +115,7 @@ export default function UserInfoCard({ userData }: UserInfoCardProps) {
 							</div>
 						)}
 
-						{userData.blocked_reason && (
+						{userData.blocked_reason && userData.is_blocked && (
 							<div className="group p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200">
 								<p className="mb-2 text-lg leading-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
 									<Info className="h-3.5 w-3.5" />
