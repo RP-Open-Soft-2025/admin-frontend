@@ -768,7 +768,7 @@ export default function UserSessionsCard({
 					{activeChains.length > 0 && (
 						<div className="mt-2 mb-4 p-3 bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 rounded-lg border border-blue-200 dark:border-blue-800 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all duration-200 flex items-center">
 							<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
-							<span>You have active chains</span>
+							<span>This Employee has an active chains</span>
 						</div>
 					)}
 
