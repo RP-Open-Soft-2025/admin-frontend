@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import store from '@/redux/store'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -10,7 +9,6 @@ import rehypeSanitize from 'rehype-sanitize'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChevronLeft, FileText } from 'lucide-react'
-import Link from 'next/link'
 
 // Add custom styles for markdown content
 const markdownStyles = `
@@ -161,7 +159,6 @@ const ReportPage = () => {
 	const [report, setReport] = useState<string>('')
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const { auth } = store.getState()
 	const router = useRouter()
 
 	useEffect(() => {
@@ -171,12 +168,10 @@ const ReportPage = () => {
 			try {
 				setLoading(true)
 
-				const response = await fetch(
-					`https://storage.googleapis.com/opensoft-reports/${id}.md`,
-					{
-						method: 'GET',
-					}
-				)
+				// Use our API proxy to avoid CORS issues
+				const response = await fetch(`https://storage.googleapis.com/opensoft-reports/${id}.md`, {
+					method: 'GET',
+				})
 
 				if (!response.ok) {
 					throw new Error(`Error: ${response.status}`)
@@ -195,7 +190,7 @@ const ReportPage = () => {
 		}
 
 		fetchReport()
-	}, [id, auth.user?.accessToken])
+	}, [id])
 
 	if (loading) {
 		return (
