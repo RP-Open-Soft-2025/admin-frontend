@@ -7,6 +7,7 @@ import store from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 import Select from 'react-select'
 import { useRouter } from 'next/navigation'
+import { Input } from '@/components/ui/input'
 
 interface FormErrors {
 	employee_id?: string
@@ -15,6 +16,7 @@ interface FormErrors {
 	password?: string
 	role?: string
 	manager_id?: string
+	meeting_link?: string
 }
 
 interface LocalHR {
@@ -44,6 +46,7 @@ export default function FormLayout() {
 		manager_id: '',
 	})
 	const [errors, setErrors] = useState<FormErrors>({})
+	const [meetLink, setMeetLink] = useState<string>('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [missingEmployeeIds, setMissingEmployeeIds] = useState<string[]>([])
 	const [missingHRIds, setMissingHRIds] = useState<string[]>([])
@@ -239,6 +242,13 @@ export default function FormLayout() {
 			}
 		}
 
+		// Meeting link validation for HR role
+		if (formData.role === Role.HR) {
+			if (!meetLink.trim()) {
+				newErrors.meeting_link = 'Meeting link is required'
+			}
+		}
+
 		setFormData(trimmedData) // Update with trimmed values
 		setErrors(newErrors)
 		return Object.keys(newErrors).length === 0
@@ -255,13 +265,18 @@ export default function FormLayout() {
 
 		try {
 			const { auth } = store.getState()
+			const requestData = {
+				...formData,
+				...(formData.role === Role.HR ? { meeting_link: meetLink } : {}),
+			}
+
 			const response = await fetch(`${API_URL}/admin/create-user`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${auth.user?.accessToken}`,
 				},
-				body: JSON.stringify(formData),
+				body: JSON.stringify(requestData),
 			})
 
 			const data = await response.json()
@@ -318,6 +333,7 @@ export default function FormLayout() {
 			role: '',
 			manager_id: '',
 		})
+		setMeetLink('')
 		setErrors({})
 	}
 
@@ -610,6 +626,26 @@ export default function FormLayout() {
 									{errors.manager_id && (
 										<p className="mt-1 text-sm text-error-500">
 											{errors.manager_id}
+										</p>
+									)}
+								</div>
+							)}
+
+							{formData.role == Role.HR && (
+								<div>
+									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+										Meeting Link*
+									</label>
+									<Input
+										type="text"
+										onChange={e => setMeetLink(e.target.value)}
+										value={meetLink}
+										placeholder="Add a meeting link..."
+										className={`w-full ${errors.meeting_link ? 'border-error-500' : ''}`}
+									/>
+									{errors.meeting_link && (
+										<p className="mt-1 text-sm text-error-500">
+											{errors.meeting_link}
 										</p>
 									)}
 								</div>
