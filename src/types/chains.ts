@@ -18,4 +18,12 @@ export interface ChainType {
     cancelled_at?: string | null;
     notes?: string | null;
     isExpanded?: boolean; // UI state for dropdown
+}
+
+export interface EscalatedChain {
+    chain_id: string;
+    session_ids: string[];
+    employee_id: string;
+    escalation_reason: string;
+    escalated_at: string;
 } 

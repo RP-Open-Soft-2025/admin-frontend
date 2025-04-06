@@ -14,6 +14,7 @@ import {
 	PlusCircle,
 	Users,
 	Video,
+	AlertTriangle,
 } from 'lucide-react'
 import DeloitteLogo from './deloitte-logo.png'
 import DeloitteLogoDark from './deloitte-logo-dark.png'
@@ -57,6 +58,11 @@ const navItems: NavItem[] = [
 		name: 'Meetings',
 		icon: <Video />,
 		path: '/meets',
+	},
+	{
+		name: 'Escalated Chains',
+		icon: <AlertTriangle />,
+		path: '/escalated-chains',
 	},
 	// {
 	// 	icon: <PieChartIcon />,
