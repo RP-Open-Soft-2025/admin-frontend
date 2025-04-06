@@ -171,7 +171,7 @@ export default function UserSessionsCard({
 		try {
 			// Make sure scheduled_time is in the future
 			const scheduledDate = new Date(formData.scheduled_time)
-			const now = new Date(Date.now() + 12000)
+			const now = new Date(Date.now() + 120000)
 
 			if (scheduledDate < now) {
 				toast({
