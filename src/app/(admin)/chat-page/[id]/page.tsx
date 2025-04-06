@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import Select from '@/components/form/Select'
 
 // Define session history type
 type SessionHist = {
@@ -157,7 +156,7 @@ const ChatPage = () => {
 	const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false)
 	const [endSessionNotes, setEndSessionNotes] = useState('')
 	const [isEndingSession, setIsEndingSession] = useState(false)
-	const [sessionAction, setSessionAction] = useState<string>('complete')
+	const [sessionAction, setSessionAction] = useState<string>('escalate');
 
 	// Scroll to latest message
 	useEffect(() => {
@@ -587,7 +586,7 @@ const ChatPage = () => {
 					<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
 						<DialogHeader>
 							<DialogTitle className="dark:text-white">
-								Session Action
+								Escalate Session
 							</DialogTitle>
 						</DialogHeader>
 						<form
@@ -597,7 +596,7 @@ const ChatPage = () => {
 							}}
 							className="space-y-4"
 						>
-							<div className="grid w-full items-center gap-2">
+							{/* <div className="grid w-full items-center gap-2">
 								<label
 									htmlFor="session_action"
 									className="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -607,9 +606,7 @@ const ChatPage = () => {
 								<div className="relative">
 									<Select
 										options={[
-											{ value: 'complete', label: 'Complete' },
 											{ value: 'escalate', label: 'Escalate' },
-											{ value: 'cancel', label: 'Cancel' },
 										]}
 										placeholder="Select action"
 										onChange={value => setSessionAction(value)}
@@ -632,7 +629,7 @@ const ChatPage = () => {
 										</svg>
 									</span>
 								</div>
-							</div>
+							</div> */}
 
 							<div className="grid w-full items-center gap-2">
 								<label
