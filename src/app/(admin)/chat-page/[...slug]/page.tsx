@@ -248,7 +248,7 @@ const ChatMessages = ({
 				setError(null)
 				
 				// Get messages for this specific chat
-				const messagesUrl = `${API_URL}/llm/chat/messages/${chatId}`
+				const messagesUrl = `${API_URL}/chat/history/${chatId}`
 				console.log("Fetching messages from:", messagesUrl)
 				
 				const messagesResponse = await fetch(messagesUrl, {
@@ -367,16 +367,13 @@ const ChatMessages = ({
 const ChatPage = () => {
 	const params = useParams()
 	const paramsArray: string[] = params.slug as string[]
-
+	
 	// Extract employee ID and chain ID from the URL
 	const employeeId = paramsArray[0] // First part is employee ID (e.g., EMP2001)
 	const chainId = paramsArray[1] // Second part is chain ID (e.g., CHAIN18925A)
-
-	const [messages, setMessages] = useState<MessageResp[]>([])
-	const chatEndRef = useRef<HTMLDivElement>(null)
+	
 	const messagesContainerRef = useRef<HTMLDivElement>(null)
 	const { auth } = store.getState()
-	const [isLoading, setIsLoading] = useState(true)
 	const [sidebarOpen, setSidebarOpen] = useState(true)
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
 	const [chatid, setChatId] = useState<string>('')
@@ -384,24 +381,13 @@ const ChatPage = () => {
 	const [endSessionNotes, setEndSessionNotes] = useState('')
 	const [isEndingSession, setIsEndingSession] = useState(false)
 	const [sessionAction, setSessionAction] = useState<string>('escalate')
-
-	// New state for chains and expanded chains
+	
+	// State for chains and expanded chains
 	const [chains, setChains] = useState<Chain[]>([])
-	const [expandedChainIds, setExpandedChainIds] = useState<Set<string>>(
-		new Set()
-	)
+	const [expandedChainIds, setExpandedChainIds] = useState<Set<string>>(new Set())
 	const [selectedChain, setSelectedChain] = useState<Chain | null>(null)
 	const [selectedSession, setSelectedSession] = useState<Session | null>(null)
 	const [chainsLoading, setChainsLoading] = useState(false)
-
-	// Scroll to latest message
-	useEffect(() => {
-		if (chatEndRef.current) {
-			chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
-		}
-	}, [messages])
-
-	// Scroll to selected chat's system message
 
 	// Get sidebar state from localStorage on component mount
 	useEffect(() => {
@@ -423,29 +409,17 @@ const ChatPage = () => {
 		}
 	}, [employeeId, auth.user?.accessToken])
 
-	// Fetch chat history when component mounts or chainId changes
-	useEffect(() => {
-		if (chainId && auth.user?.accessToken) {
-			// We'll only fetch chain data now, not messages
-			// Message fetching will happen after we select a session
-			fetchChains()
-		}
-	}, [chainId, auth.user?.accessToken])
-
 	// Fetch chains for the employee
 	const fetchChains = async () => {
 		try {
 			setChainsLoading(true)
-			const response = await fetch(
-				`${API_URL}/admin/chains/employee/${employeeId}`,
-				{
-					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-						'Content-Type': 'application/json',
-					},
-				}
-			)
+			const response = await fetch(`${API_URL}/admin/chains/employee/${employeeId}`, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+					'Content-Type': 'application/json',
+				},
+			})
 
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`)
@@ -456,13 +430,11 @@ const ChatPage = () => {
 			
 			// Auto-expand the current chain
 			if (chainId) {
-				const currentChain = data.find(
-					(chain: Chain) => chain.chain_id === chainId
-				)
+				const currentChain = data.find((chain: Chain) => chain.chain_id === chainId)
 				if (currentChain) {
 					setExpandedChainIds(new Set([chainId]))
 					setSelectedChain(currentChain)
-
+					
 					// Find the first session of this chain
 					if (currentChain.sessions && currentChain.sessions.length > 0) {
 						const firstSession = currentChain.sessions[0];
@@ -471,7 +443,7 @@ const ChatPage = () => {
 						// Set chatId to first session's chat_id for WebSocket connection
 						if (firstSession.chat_id) {
 							setChatId(firstSession.chat_id)
-							
+							setSelectedChatId(firstSession.chat_id)
 						}
 					}
 				}
@@ -484,119 +456,6 @@ const ChatPage = () => {
 			})
 		} finally {
 			setChainsLoading(false)
-		}
-	}
-
-	// Update fetchChatHistory function
-	const fetchChatHistory = async (chainId: string) => {
-		try {
-			setIsLoading(true)
-			
-			// First get the chain to find all its sessions
-			const chainResponse = await fetch(
-				`${API_URL}/admin/chains/employee/${chainId}`,
-				{
-					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-						'Content-Type': 'application/json',
-					},
-				}
-			)
-
-			if (!chainResponse.ok) {
-				throw new Error(`HTTP error! status: ${chainResponse.status}`)
-			}
-
-			const chainData = await chainResponse.json()
-			
-			// No sessions in this chain
-			if (!chainData.sessions || chainData.sessions.length === 0) {
-				setMessages([])
-				setSelectedChatId(chainId)
-				return
-			}
-			
-			const allMessages: ExtendedMessageResp[] = []
-			const messagesWithSeparators: ExtendedMessageResp[] = []
-			
-			// Use Promise.all to fetch chat history for all sessions concurrently
-			const historyPromises = chainData.sessions.map(async (session: Session) => {
-				if (!session.chat_id) return null
-				
-				try {
-					const historyResponse = await fetch(
-						`${API_URL}/chat/history/${session.chat_id}`,
-						{
-							method: 'GET',
-							headers: {
-								Authorization: `Bearer ${auth.user?.accessToken}`,
-								'Content-Type': 'application/json',
-							},
-						}
-					)
-					
-					if (historyResponse.ok) {
-						const sessionMessages = await historyResponse.json()
-						
-						// Add session info to each message
-						return {
-							session,
-							messages: sessionMessages.map((msg: MessageResp) => ({
-								...msg,
-								session_id: session.session_id,
-							})),
-						}
-					}
-					return null
-				} catch (error) {
-					console.error(`Error fetching history for chat ${session.chat_id}:`, error)
-					return null
-				}
-			})
-			
-			const results = await Promise.all(historyPromises)
-			
-			// Process results to add session separators and merge messages
-			results.filter(Boolean).forEach(result => {
-				if (!result) return // Skip null results
-				
-				const { session, messages } = result
-				
-				if (messages && messages.length > 0) {
-					// Add a system message to mark the beginning of a session
-					messagesWithSeparators.push({
-						sender: SenderType.SYSTEM,
-						text: `Session: ${session.session_id} - Started at: ${new Date(session.scheduled_at).toLocaleString()} - Status: ${session.status}`,
-						timestamp: messages[0].timestamp, // Use the timestamp of the first message
-						session_id: session.session_id
-					})
-					
-					// Add all messages from this session
-					messagesWithSeparators.push(...messages)
-					
-					// Add all messages to the combined array for sorting
-					allMessages.push(...messages)
-				}
-			})
-			
-			// Sort all messages by timestamp
-			messagesWithSeparators.sort((a, b) => {
-				const dateA = new Date(a.timestamp).getTime()
-				const dateB = new Date(b.timestamp).getTime()
-				return dateA - dateB
-			})
-			
-			setMessages(messagesWithSeparators)
-			setSelectedChatId(chainId)
-		} catch (error) {
-			console.error('Error fetching chain history:', error)
-			toast({
-				type: 'error',
-				description: 'Failed to load chat history',
-			})
-		} finally {
-			setIsLoading(false)
 		}
 	}
 
@@ -613,12 +472,16 @@ const ChatPage = () => {
 		})
 	}
 
-	// Update handleSessionSelect function
+	// Handle session selection
 	const handleSessionSelect = (chain: Chain, session: Session) => {
 		setSelectedChain(chain)
 		setSelectedSession(session)
+		
 		// Set chatId to the session's chat_id for WebSocket connection
-		setChatId(session.chat_id)
+		if (session.chat_id) {
+			setChatId(session.chat_id)
+			setSelectedChatId(session.chat_id)
+		}
 	}
 
 	const endSession = async () => {
@@ -666,7 +529,7 @@ const ChatPage = () => {
 			setIsEndSessionModalOpen(false)
 			setEndSessionNotes('')
 			setSessionAction('complete')
-
+			
 			// Refresh chains data
 			fetchChains()
 		} catch (error) {
@@ -778,7 +641,7 @@ const ChatPage = () => {
 				</div>
 
 				{/* Chat Input */}
-				{selectedChain && (
+				{selectedSession && (
 					<div className="dark:bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700 bg-white">
 						<button
 							className="px-4 py-2 dark:bg-[#1e293b] dark:text-white rounded-md shadow-md text-sm bg-blue-200 text-black
