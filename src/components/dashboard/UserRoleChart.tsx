@@ -16,7 +16,9 @@ interface UserRoleChartProps {
 }
 
 const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
-	const series = [users.total_employees, users.total_hrs, users.total_admins]
+	const regularEmployees =
+		users.total_employees - users.total_hrs - users.total_admins
+	const series = [regularEmployees, users.total_hrs, users.total_admins]
 	const labels = ['Employees', 'HRs', 'Admins']
 
 	const options: ApexOptions = {
@@ -33,15 +35,21 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 						show: true,
 						name: {
 							show: true,
+							fontSize: '14px',
+							fontWeight: 600,
 						},
 						value: {
 							show: true,
+							fontSize: '16px',
+							fontWeight: 600,
 							formatter: (val: string) => val,
 						},
 						total: {
 							show: true,
 							showAlways: true,
 							label: 'Total Employees',
+							fontSize: '14px',
+							fontWeight: 600,
 							// eslint-disable-next-line @typescript-eslint/no-explicit-any
 							formatter: (w: any) => {
 								return w.globals.seriesTotals.reduce(
@@ -60,13 +68,13 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 		legend: {
 			position: 'bottom' as const,
 			horizontalAlign: 'center' as const,
-			fontSize: '14px',
+			fontSize: '12px',
 			markers: {
-				size: 12,
-				strokeWidth: 12,
+				size: 8,
+				strokeWidth: 8,
 			},
 			itemMargin: {
-				horizontal: 10,
+				horizontal: 8,
 				vertical: 0,
 			},
 		},
@@ -81,10 +89,35 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 				breakpoint: 480,
 				options: {
 					chart: {
-						width: 300,
+						width: '100%',
+					},
+					plotOptions: {
+						pie: {
+							donut: {
+								size: '65%',
+								labels: {
+									name: {
+										fontSize: '12px',
+									},
+									value: {
+										fontSize: '14px',
+									},
+									total: {
+										fontSize: '12px',
+									},
+								},
+							},
+						},
 					},
 					legend: {
-						position: 'bottom',
+						fontSize: '11px',
+						markers: {
+							size: 6,
+							strokeWidth: 6,
+						},
+						itemMargin: {
+							horizontal: 6,
+						},
 					},
 				},
 			},
@@ -113,7 +146,7 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 					Employees Distribution by Role
 				</h3>
 			</div>
-			<div className="h-80">
+			<div className="h-80 ">
 				{typeof window !== 'undefined' && (
 					<Chart options={options} series={series} type="donut" height="100%" />
 				)}
