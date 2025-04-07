@@ -148,7 +148,7 @@ const ChainItem = ({
 			>
 				<div>
 					<h3 className="font-medium dark:text-white text-gray-900 text-sm">
-						Chain: {chain.chain_id}
+						{new Date(chain.created_at).toDateString()}
 					</h3>
 					<p className="text-xs dark:text-gray-400 text-gray-600">
 						Status: {chain.status}
@@ -184,7 +184,7 @@ const ChainItem = ({
 							<div className="flex flex-col">
 								<div className="flex justify-between">
 									<span className="font-medium dark:text-white text-gray-900">
-										Session {session.session_id}
+										{new Date(session.scheduled_at).toLocaleTimeString()}
 									</span>
 									<span
 										className={`text-xs px-1.5 py-0.5 rounded-full ${
@@ -686,7 +686,7 @@ const ChatPage = () => {
 							dark:hover:bg-[#334155] transition-colors hover:bg-blue-light-500"
 							onClick={() => setIsEndSessionModalOpen(true)}
 						>
-							End Session
+							Escalate Session
 						</button>
 					</div>
 				)}
