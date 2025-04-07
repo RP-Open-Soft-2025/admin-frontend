@@ -13,6 +13,7 @@ import {
 	MessageSquare,
 	PlusCircle,
 	Users,
+	AlertTriangle,
 	Video,
 } from 'lucide-react'
 import DeloitteLogo from './deloitte-logo.png'
@@ -54,9 +55,9 @@ const navItems: NavItem[] = [
 		path: '/sessions',
 	},
 	{
-		name: 'Meetings',
-		icon: <Video />,
-		path: '/meets',
+		name: 'Escalated Chains',
+		icon: <AlertTriangle />,
+		path: '/escalated-chains',
 	},
 	// {
 	// 	icon: <PieChartIcon />,
