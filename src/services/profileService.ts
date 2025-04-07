@@ -233,44 +233,32 @@ export function getOnboardingData(profileData: EmployeeAPI) {
 		: null
 }
 
-export const getSessionsData = async (
+export const getActiveAndPendingSessionsData = async (
 	employeeId: string
 ): Promise<SessionType[]> => {
 	const { auth } = store.getState()
 
 	try {
 		// Fetch from consistent admin endpoints
-		const [activeAndPendingResponse, completedResponse] = await Promise.all([
-			fetch(`${API_URL}/admin/sessions`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${auth.user?.accessToken}`,
-				},
-			}),
-			fetch(`${API_URL}/admin/sessions/completed`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${auth.user?.accessToken}`,
-				},
-			}),
-		])
+		const activeAndPendingResponse = await fetch(`${API_URL}/admin/sessions`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${auth.user?.accessToken}`,
+			},
+		})
 
 		// Check if any of the responses failed
-		if (!activeAndPendingResponse.ok || !completedResponse.ok) {
+		if (!activeAndPendingResponse.ok) {
 			throw new Error('Failed to fetch sessions data')
 		}
 
 		// Parse all responses
-		const [activeAndPendingData, completedData] = await Promise.all([
-			activeAndPendingResponse.json(),
-			completedResponse.json(),
-		])
+		const activeAndPendingData = await activeAndPendingResponse.json()
 
 		// Combine all sessions and filter by employee_id
-		const allSessions = [...activeAndPendingData, ...completedData]
-		return allSessions.filter(
+		const allActiveAndPendingSessions = [...activeAndPendingData]
+		return allActiveAndPendingSessions.filter(
 			(session: SessionType) => session.employee_id === employeeId
 		)
 	} catch (error) {
