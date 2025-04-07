@@ -11,6 +11,16 @@ interface UserVibeMeterCardProps {
 export default function UserVibeMeterCard({
 	vibeMeterData,
 }: UserVibeMeterCardProps) {
+	// Function to format date
+	const formatDate = (dateString: string) => {
+		const date = new Date(new Date(dateString).getTime() + 19800000)
+		return date.toLocaleDateString('en-GB', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric',
+		})
+	}
+
 	return (
 		<div className="h-full p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6 transition-all duration-300 hover:shadow-lg bg-white dark:bg-gray-900">
 			<div className="flex flex-col">
@@ -187,15 +197,7 @@ export default function UserVibeMeterCard({
 										Last Update
 									</p>
 									<p className="text-sm text-gray-600 dark:text-gray-400">
-										{new Date(
-											vibeMeterData[0].Response_Date
-										).toLocaleDateString('en-GB', {
-											day: '2-digit',
-											month: '2-digit',
-											year: 'numeric',
-											hour: '2-digit',
-											minute: '2-digit',
-										})}
+										{formatDate(vibeMeterData[0].Response_Date)}
 									</p>
 								</div>
 							</div>

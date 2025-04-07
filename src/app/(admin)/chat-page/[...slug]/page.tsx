@@ -109,12 +109,13 @@ const MessageComp = ({ message }: { message: MessageResp }) => {
 										? 'HR'
 										: ''}
 						</span>
-						<span className="text-xs opacity-50 ml-2">
-							{new Date(timestamp).toLocaleTimeString([], {
+						<div className="text-xs text-gray-500 ml-2">
+							{new Date(new Date(timestamp).getTime() + 19800000).toLocaleTimeString([], {
 								hour: '2-digit',
 								minute: '2-digit',
+								hour12: true,
 							})}
-						</span>
+						</div>
 					</div>
 				)}
 				<p className="text-sm font-medium text-left">
@@ -200,9 +201,9 @@ const ChainItem = ({
 										{session.status}
 									</span>
 								</div>
-								<span className="text-xs dark:text-gray-400 text-gray-600 mt-1">
-									{new Date(session.scheduled_at).toLocaleString()}
-								</span>
+								<div className="text-gray-500 text-xs">
+									{new Date(new Date(session.scheduled_at).getTime() + 19800000).toLocaleString()}
+								</div>
 								<span className="text-xs dark:text-gray-400 text-gray-600 mt-1">
 									Chat ID: {session.chat_id}
 								</span>

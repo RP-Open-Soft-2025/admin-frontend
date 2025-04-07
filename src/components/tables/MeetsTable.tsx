@@ -76,9 +76,9 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 												</span>
 												<span className="block text-gray-500 text-theme-xs dark:text-gray-400">
 													{session.created_at
-														? new Date(session.created_at).toLocaleDateString()
+														? new Date(new Date(session.created_at).getTime() + 19800000).toLocaleDateString()
 														: new Date(
-																session.scheduled_at
+																new Date(session.scheduled_at).getTime() + 19800000
 															).toLocaleDateString()}
 												</span>
 											</div>
@@ -93,7 +93,7 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 										{session.employee_id}
 									</TableCell>
 									<TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-										{new Date(session.scheduled_at).toLocaleString()}
+										{new Date(new Date(session.scheduled_at).getTime() + 19800000).toLocaleString()}
 									</TableCell>
 									<TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
 										<Badge color={statusMapping[session.status]}>

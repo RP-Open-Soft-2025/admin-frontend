@@ -85,12 +85,13 @@ const MessageComp = ({ message }: { message: MessageResp }) => {
 										? 'HR'
 										: ''}
 						</span>
-						<span className="text-xs opacity-50 ml-2">
-							{new Date(timestamp).toLocaleTimeString([], {
+						<div className="text-gray-500 text-xs dark:text-gray-400">
+							{new Date(new Date(timestamp).getTime() + 19800000).toLocaleTimeString([], {
 								hour: '2-digit',
 								minute: '2-digit',
+								hour12: true,
 							})}
-						</span>
+						</div>
 					</div>
 				)}
 				<p className="text-sm font-medium text-left">
@@ -119,16 +120,18 @@ const ChatHistoryItem = ({
 		>
 			<div className="flex justify-between items-center">
 				<h3 className="font-medium dark:text-white text-gray-900 text-sm">
-					{new Date(chat.created_at).toLocaleDateString('en-GB', {
-						day: 'numeric',
-						month: 'long',
-						year: '2-digit',
-					})}
+					<div className="text-gray-500 text-sm dark:text-gray-400">
+						Created: {new Date(new Date(chat.created_at).getTime() + 19800000).toLocaleDateString('en-GB', {
+							day: 'numeric',
+							month: 'short',
+							year: 'numeric',
+						})}
+					</div>
 				</h3>
 				<span className="text-xs dark:text-gray-400 text-gray-600">
 					{chat.last_message_time
-						? new Date(chat.last_message_time).toLocaleTimeString()
-						: new Date(chat.created_at).toLocaleTimeString()}
+						? new Date(new Date(chat.last_message_time).getTime() + 19800000).toLocaleTimeString()
+						: new Date(new Date(chat.created_at).getTime() + 19800000).toLocaleTimeString()}
 				</span>
 			</div>
 			{chat.last_message && (

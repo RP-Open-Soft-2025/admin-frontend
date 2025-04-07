@@ -432,7 +432,7 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 type FilterType = 'all' | 'meetings' | 'sessions'
 
 const formatTimeInIST = (dateString: string) => {
-	const date = new Date(dateString)
+	const date = new Date(new Date(dateString).getTime() + 19800000)
 	return date.toLocaleTimeString('en-US', {
 		hour: '2-digit',
 		minute: '2-digit',
@@ -837,7 +837,7 @@ const Calendar: React.FC = () => {
 
 	// Function to format date for display
 	const formatDate = (dateStr: string) => {
-		const date = new Date(dateStr)
+		const date = new Date(new Date(dateStr).getTime() + 19800000)
 		return date.toLocaleDateString('en-US', {
 			weekday: 'long',
 			year: 'numeric',

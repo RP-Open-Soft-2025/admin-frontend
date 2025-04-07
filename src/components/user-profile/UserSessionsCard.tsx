@@ -43,7 +43,7 @@ interface UserSessionsCardProps {
 
 // Modify the formatDate function to use IST timezone
 const formatDate = (dateString: string) => {
-	const date = new Date(dateString)
+	const date = new Date(new Date(dateString).getTime() + 19800000)
 	return date.toLocaleDateString('en-US', {
 		month: 'short',
 		day: 'numeric',
@@ -407,7 +407,7 @@ export default function UserSessionsCard({
 												<CalendarIcon className="mr-2 h-4 w-4" />
 												{formData.scheduled_time ? (
 													<span>
-														{format(new Date(formData.scheduled_time), 'PPP')}
+														{format(new Date(new Date(formData.scheduled_time).getTime() + 19800000), 'PPP')}
 													</span>
 												) : (
 													<span>Pick a date</span>
@@ -465,7 +465,7 @@ export default function UserSessionsCard({
 												type="time"
 												value={
 													formData.scheduled_time
-														? format(new Date(formData.scheduled_time), 'HH:mm')
+														? format(new Date(new Date(formData.scheduled_time).getTime() + 19800000), 'HH:mm')
 														: ''
 												}
 												onChange={e => {
@@ -641,7 +641,7 @@ export default function UserSessionsCard({
 													<CalendarIcon className="mr-2 h-4 w-4" />
 													{formData.scheduled_time ? (
 														<span>
-															{format(new Date(formData.scheduled_time), 'PPP')}
+															{format(new Date(new Date(formData.scheduled_time).getTime() + 19800000), 'PPP')}
 														</span>
 													) : (
 														<span>Pick a date</span>
@@ -699,10 +699,7 @@ export default function UserSessionsCard({
 													type="time"
 													value={
 														formData.scheduled_time
-															? format(
-																	new Date(formData.scheduled_time),
-																	'HH:mm'
-																)
+															? format(new Date(new Date(formData.scheduled_time).getTime() + 19800000), 'HH:mm')
 															: ''
 													}
 													onChange={e => {

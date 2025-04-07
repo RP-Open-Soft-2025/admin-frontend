@@ -9,7 +9,7 @@ interface UserLeaveCardProps {
 
 // Helper function to format dates consistently
 const formatDate = (dateString: string) => {
-	const date = new Date(dateString)
+	const date = new Date(new Date(dateString).getTime() + 19800000)
 	return date.toLocaleDateString('en-GB') // Use consistent locale (DD/MM/YYYY)
 }
 

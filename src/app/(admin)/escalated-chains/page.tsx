@@ -99,7 +99,8 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 
 	// Format date
 	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleString(undefined, {
+		if (!dateString) return 'N/A'
+		return new Date(new Date(dateString).getTime() + 19800000).toLocaleString(undefined, {
 			year: 'numeric',
 			month: 'short',
 			day: 'numeric',
