@@ -43,17 +43,17 @@ export interface ProfileApiResponse {
 export async function getProfileData(): Promise<EmployeeAPI> {
 	try {
 		// Use API_URL from constants
-		console.log('API URL:', API_URL) // Debug log
+		// console.log('API URL:', API_URL) // Debug log
 
 		// Get auth token from Redux store
 		const authState = store.getState().auth
-		console.log(
-			'Auth state:',
-			JSON.stringify({
-				isAuthenticated: authState.isAuthenticated,
-				hasToken: !!authState.user?.accessToken,
-			})
-		) // Debug log - avoiding logging the actual token for security
+		// console.log(
+		// 	'Auth state:',
+		// 	JSON.stringify({
+		// 		isAuthenticated: authState.isAuthenticated,
+		// 		hasToken: !!authState.user?.accessToken,
+		// 	})
+		// ) // Debug log - avoiding logging the actual token for security
 
 		const token = authState.user?.accessToken
 
@@ -61,7 +61,7 @@ export async function getProfileData(): Promise<EmployeeAPI> {
 			throw new Error('Authentication token not found. Please log in.')
 		}
 
-		console.log('Making API request to /employee/profile') // Debug log
+		// console.log('Making API request to /employee/profile') // Debug log
 
 		const response = await fetch(`${API_URL}/employee/profile`, {
 			method: 'GET',
@@ -71,7 +71,7 @@ export async function getProfileData(): Promise<EmployeeAPI> {
 			},
 		})
 
-		console.log('API Response status:', response.status) // Debug log
+		// console.log('API Response status:', response.status) // Debug log
 
 		if (response.status === 401) {
 			throw new Error(
@@ -84,7 +84,7 @@ export async function getProfileData(): Promise<EmployeeAPI> {
 		}
 
 		const data: EmployeeAPI = await response.json()
-		console.log('Profile data received successfully') // Debug log
+		// console.log('Profile data received successfully') // Debug log
 		return data
 	} catch (error) {
 		console.error('Failed to fetch profile data:', error)
@@ -95,17 +95,17 @@ export async function getProfileData(): Promise<EmployeeAPI> {
 export async function getUserProfileData(userId: string): Promise<EmployeeAPI> {
 	try {
 		// Use API_URL from constants
-		console.log('API URL:', API_URL) // Debug log
+		// console.log('API URL:', API_URL) // Debug log
 
 		// Get auth token from Redux store
 		const authState = store.getState().auth
-		console.log(
-			'Auth state:',
-			JSON.stringify({
-				isAuthenticated: authState.isAuthenticated,
-				hasToken: !!authState.user?.accessToken,
-			})
-		) // Debug log - avoiding logging the actual token for security
+		// console.log(
+		// 	'Auth state:',
+		// 	JSON.stringify({
+		// 		isAuthenticated: authState.isAuthenticated,
+		// 		hasToken: !!authState.user?.accessToken,
+		// 	})
+		// ) // Debug log - avoiding logging the actual token for security
 
 		const token = authState.user?.accessToken
 
@@ -113,7 +113,7 @@ export async function getUserProfileData(userId: string): Promise<EmployeeAPI> {
 			throw new Error('Authentication token not found. Please log in.')
 		}
 
-		console.log('Making API request to /admin/user-det') // Debug log
+		// console.log('Making API request to /admin/user-det') // Debug log
 
 		const response = await fetch(`${API_URL}/admin/user-det/${userId}`, {
 			method: 'GET',
@@ -123,7 +123,7 @@ export async function getUserProfileData(userId: string): Promise<EmployeeAPI> {
 			},
 		})
 
-		console.log('API Response status:', response.status) // Debug log
+		// console.log('API Response status:', response.status) // Debug log
 
 		if (response.status === 401) {
 			throw new Error(
@@ -136,7 +136,7 @@ export async function getUserProfileData(userId: string): Promise<EmployeeAPI> {
 		}
 
 		const data: EmployeeAPI = await response.json()
-		console.log('Profile data received successfully') // Debug log
+		// console.log('Profile data received successfully') // Debug log
 		return data
 	} catch (error) {
 		console.error('Failed to fetch profile data:', error)
@@ -184,22 +184,23 @@ export function getUserInfoData(profileData: EmployeeAPI) {
 
 // Function to transform API data into the format expected by UserVibeMeterCard
 export function getVibeMeterData(profileData: EmployeeAPI) {
-	console.log(
-		'Transforming VibeMeter data:',
-		profileData.company_data.vibemeter
-	)
+	// console.log(
+	// 	'Transforming VibeMeter data:',
+	// 	profileData.company_data.vibemeter
+	// )
 	return profileData.company_data.vibemeter
 }
 
 // Function to transform API data into the format expected by UserActivityCard
 export function getActivityData(profileData: EmployeeAPI) {
-	console.log('Transforming Activity data:', profileData.company_data.activity)
+	// console.log('Transforming Activity data:', profileData.company_data.activity)
 	return profileData.company_data.activity
 }
 
 // Function to transform API data into the format expected by UserLeaveCard
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getLeaveData(profileData: EmployeeAPI) {
-	console.log('Transforming Leave data:', profileData.company_data.leave)
+	// console.log('Transforming Leave data:', profileData.company_data.leave)
 	return {
 		usedLeave: 0,
 		totalLeave: 0,
@@ -209,25 +210,25 @@ export function getLeaveData(profileData: EmployeeAPI) {
 
 // Function to transform API data into the format expected by UserPerformanceCard
 export function getPerformanceData(profileData: EmployeeAPI) {
-	console.log(
-		'Transforming Performance data:',
-		profileData.company_data.performance
-	)
+	// console.log(
+	// 	'Transforming Performance data:',
+	// 	profileData.company_data.performance
+	// )
 	return profileData.company_data.performance
 }
 
 // Function to transform API data into the format expected by UserRewardsCard
 export function getRewardsData(profileData: EmployeeAPI) {
-	console.log('Transforming Rewards data:', profileData.company_data.rewards)
+	// console.log('Transforming Rewards data:', profileData.company_data.rewards)
 	return profileData.company_data.rewards
 }
 
 // Function to transform API data into the format expected by UserOnboardingCard
 export function getOnboardingData(profileData: EmployeeAPI) {
-	console.log(
-		'Transforming Onboarding data:',
-		profileData.company_data.onboarding
-	)
+	// console.log(
+	// 	'Transforming Onboarding data:',
+	// 	profileData.company_data.onboarding
+	// )
 	return profileData.company_data.onboarding.length > 0
 		? profileData.company_data.onboarding[0]
 		: null

@@ -19,8 +19,8 @@ export default function Page() {
 	const isAuthenticated = useSelector(
 		(state: RootState) => state.auth.isAuthenticated
 	)
-	const error = useSelector((state: RootState) => state.auth.error)
-	console.log(error)
+	// const error = useSelector((state: RootState) => state.auth.error)
+	// console.log(error)
 	// Check authentication status on component mount
 	useEffect(() => {
 		dispatch(checkAuth())
@@ -44,7 +44,7 @@ export default function Page() {
 			password: formData.get('password') as string,
 		}
 
-		console.log(data)
+		// console.log(data)
 
 		try {
 			// dispatch(
@@ -65,7 +65,7 @@ export default function Page() {
 
 			const result = await response.json()
 
-			console.log(result)
+			// console.log(result)
 
 			if (response.ok) {
 				if (result.access_token) {
@@ -80,7 +80,7 @@ export default function Page() {
 							refreshToken,
 						})
 					)
-					console.log('Logged in successfully')
+					// console.log('Logged in successfully')
 					setIsSuccessful(true)
 					// The isAuthenticated effect will handle redirecting
 				} else {
@@ -99,7 +99,7 @@ export default function Page() {
 					description: result.detail,
 				})
 			} else if (response.status === 307) {
-				console.log('First time login - redirecting to password reset')
+				// console.log('First time login - redirecting to password reset')
 				toast({
 					type: 'error',
 					description: 'First time login - Please reset your password',

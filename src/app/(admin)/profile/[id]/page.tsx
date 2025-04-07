@@ -53,23 +53,23 @@ export default function Profile() {
 				setLoading(false)
 
 				// Debug logs for component data
-				console.log('Profile Data:', {
-					onboarding: data.company_data.onboarding,
-					activity: data.company_data.activity,
-					performance: data.company_data.performance,
-					rewards: data.company_data.rewards,
-					vibemeter: data.company_data.vibemeter,
-					leave: data.company_data.leave,
-				})
+				// console.log('Profile Data:', {
+				// 	onboarding: data.company_data.onboarding,
+				// 	activity: data.company_data.activity,
+				// 	performance: data.company_data.performance,
+				// 	rewards: data.company_data.rewards,
+				// 	vibemeter: data.company_data.vibemeter,
+				// 	leave: data.company_data.leave,
+				// })
 
 				// Debug logs for transformed data
-				console.log('Transformed Data:', {
-					onboarding: getOnboardingData(data),
-					activity: getActivityData(data),
-					performance: getPerformanceData(data),
-					rewards: getRewardsData(data),
-					vibemeter: getVibeMeterData(data),
-				})
+				// console.log('Transformed Data:', {
+				// 	onboarding: getOnboardingData(data),
+				// 	activity: getActivityData(data),
+				// 	performance: getPerformanceData(data),
+				// 	rewards: getRewardsData(data),
+				// 	vibemeter: getVibeMeterData(data),
+				// })
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} catch (err: any) {
 				const errorMessage =
@@ -91,7 +91,7 @@ export default function Profile() {
 					errorMessage.includes('401') ||
 					errorMessage.includes('expired')
 				) {
-					console.log('Authentication error, redirecting to login')
+					// console.log('Authentication error, redirecting to login')
 					router.push('/login')
 				}
 			}

@@ -101,7 +101,7 @@ export default function UserSessionsCard({
 		const fetchChains = async () => {
 			try {
 				const data = await getEmployeeChains(employeeId)
-				console.log('Chains data:', data)
+				// console.log('Chains data:', data)
 				setChainsData(data)
 			} catch (err) {
 				setError('Failed to load chains data')
@@ -191,7 +191,7 @@ export default function UserSessionsCard({
 				scheduled_time: scheduledDate.toISOString(),
 			}
 
-			console.log('Sending data to server:', formattedData)
+			// console.log('Sending data to server:', formattedData)
 
 			const response = await fetch(`${API_URL}/admin/chains/create`, {
 				method: 'POST',
@@ -229,7 +229,7 @@ export default function UserSessionsCard({
 				)
 			}
 
-			const result = await response.json()
+			// const result = await response.json()
 
 			// Show success message
 			toast({
@@ -249,7 +249,7 @@ export default function UserSessionsCard({
 				scheduled_time: new Date().toISOString(),
 			})
 
-			console.log('Chain created:', result)
+			// console.log('Chain created:', result)
 		} catch (error) {
 			console.error('Error creating chain:', error)
 			toast({

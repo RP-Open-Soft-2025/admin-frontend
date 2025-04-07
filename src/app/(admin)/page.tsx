@@ -96,7 +96,7 @@ function AdminDashboard() {
 	// First useEffect
 	useEffect(() => {
 		if (!auth.isAuthenticated) {
-			console.log('User is not authenticated, redirecting to login')
+			// console.log('User is not authenticated, redirecting to login')
 			router.push('/login')
 			return
 		}

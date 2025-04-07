@@ -13,8 +13,10 @@ export default function InputGroup() {
 		{ code: 'CA', label: '+1' },
 		{ code: 'AU', label: '+61' },
 	]
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const handlePhoneNumberChange = (phoneNumber: string) => {
-		console.log('Updated phone number:', phoneNumber)
+		// console.log('Updated phone number:', phoneNumber)
 	}
 	return (
 		<ComponentCard title="Input Group">

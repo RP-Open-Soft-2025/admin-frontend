@@ -441,6 +441,7 @@ const ChatPage = () => {
 		if (employeeId && auth.user?.accessToken) {
 			fetchChains()
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [employeeId, auth.user?.accessToken])
 
 	// Fetch chains for the employee

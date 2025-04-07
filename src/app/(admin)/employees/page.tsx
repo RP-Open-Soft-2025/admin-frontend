@@ -80,7 +80,7 @@ function Page() {
 				.catch(error => {
 					// This will only catch network errors and AbortController errors now
 					if (error.name === 'AbortError') {
-						console.log('Request timed out')
+						// console.log('Request timed out')
 					}
 					setHistoryLoading(false)
 					setHasError(true)
