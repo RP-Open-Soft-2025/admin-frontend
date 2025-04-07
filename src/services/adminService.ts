@@ -355,38 +355,6 @@ export async function deleteUser(
 	}
 }
 
-export async function createSession(userId: string): Promise<Session> {
-	try {
-		const token = await getAuthToken()
-		const userRole = 'admin'
-
-		const response = await fetch(`${API_URL}/${userRole}/session/${userId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error creating session: ${response.statusText}`)
-		}
-
-		const data = await response.json()
-		return {
-			session_id: data.session_id,
-			employee_id: userId,
-			chat_id: data.chat_id || '',
-			status: 'pending',
-			scheduled_at: new Date().toISOString(),
-			...data,
-		}
-	} catch (error) {
-		console.error('Failed to create session:', error)
-		throw error
-	}
-}
-
 export async function reassignHR(
 	userId: string,
 	newHrId: string
