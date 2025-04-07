@@ -181,10 +181,7 @@ function AdminDashboard() {
 			{/* Stats Overview */}
 			<StatsOverview
 				totalUsers={dashBoard.employee_stats.total_employees}
-				activeUsers={
-					dashBoard.employee_stats.total_employees -
-					dashBoard.employee_stats.active_employees
-				}
+				activeUsers={dashBoard.employee_stats.active_employees}
 				totalSessions={dashBoard.session_stats.total_sessions}
 				activeSessions={dashBoard.session_stats.active_sessions}
 				pendingSessions={dashBoard.session_stats.pending_sessions}
