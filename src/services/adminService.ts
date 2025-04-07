@@ -351,3 +351,27 @@ export async function unblockUser(
 		throw error
 	}
 }
+
+export async function fetchEscalatedChains() {
+	try {
+		const token = await getAuthToken()
+
+		const response = await fetch(`https://fastapi-service-402737687767.us-central1.run.app/admin/escalated-chains`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+		})
+
+		if (!response.ok) {
+			throw new Error(`Error fetching escalated chains: ${response.statusText}`)
+		}
+
+		const data = await response.json()
+		return data || []
+	} catch (error) {
+		console.error('Failed to fetch escalated chains:', error)
+		throw error
+	}
+}
