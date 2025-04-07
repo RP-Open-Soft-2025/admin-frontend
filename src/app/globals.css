@@ -194,12 +194,14 @@ layer(base);
 		@apply relative font-normal font-outfit z-1 bg-gray-50;
 	}
 
-	/* Make dark mode transitions instant */
+	/* Allow transitions for UI elements */
+	/*
 	*,
 	*::before,
 	*::after {
 		transition: none !important;
 	}
+	*/
 }
 
 @utility menu-item {
