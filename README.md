@@ -18,27 +18,30 @@ A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Ta
 ## 🚀 Features
 
 - **Modern Tech Stack**
-
   - Next.js 15 with App Router
   - TypeScript for type safety
-  - Tailwind CSS for styling
+  - Tailwind CSS 4 for styling
   - Redux Toolkit for state management
   - FullCalendar for calendar functionality
   - ApexCharts for data visualization
   - React Dropzone for file uploads
   - WebSocket support for real-time features
+  - React Vector Maps for geographical data visualization
+  - React Day Picker for date selection
+  - React Markdown for content rendering
 
 - **UI Components**
   - Radix UI components for accessible interfaces
-  - Heroicons for beautiful icons
-  - Lucide React for additional icon sets
+  - Heroicons and Lucide React for icons
   - Sonner for toast notifications
   - Dark mode support with next-themes
+  - React Select for enhanced select inputs
+  - Class Variance Authority for component variants
 
 ## 🛠️ Prerequisites
 
 - Node.js (Latest LTS version recommended)
-- npm or yarn package manager
+- npm package manager
 
 ## 📦 Installation
 
@@ -59,7 +62,7 @@ npm install
    Create a `.env` file in the root directory with the following variables:
 
 ```env
-NEXT_PUBLIC_API_URL=your_api_url
+NEXT_PUBLIC_API_URL=backend_url
 ```
 
 ## 🚀 Development
@@ -91,7 +94,8 @@ deloconnect-admin-panel/
 │   ├── lib/              # Utility functions and configurations
 │   └── store/            # Redux store and slices
 ├── public/               # Static assets
-└── ...config files       # Various configuration files
+├── .github/             # GitHub configuration
+└── ...config files      # Various configuration files
 ```
 
 ## 🔧 Configuration Files
@@ -101,6 +105,8 @@ deloconnect-admin-panel/
 - `tailwind.config.ts` - Tailwind CSS configuration
 - `eslint.config.mjs` - ESLint configuration
 - `.prettierrc.json` - Prettier configuration
+- `postcss.config.mjs` - PostCSS configuration
+- `components.json` - Component configuration
 
 ## 🤝 Contributing
 
