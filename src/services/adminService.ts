@@ -18,6 +18,8 @@ export interface HRUser {
 	hrId: string
 	name: string
 	currentAssignedUsers: number
+	currentAssignedUsersCount: number
+	avgVibeScore: number
 }
 
 export interface Session {
