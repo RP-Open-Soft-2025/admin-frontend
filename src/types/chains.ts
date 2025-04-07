@@ -9,6 +9,13 @@ export interface ChainType {
 	chain_id: string
 	employee_id: string
 	session_ids: string[]
+	sessions: {
+		chat_id: string,
+		employee_id: string,
+		scheduled_at: string,
+		session_id: string,
+		status: string
+	}[]
 	status: ChainStatus
 	context?: string | null
 	created_at: string
