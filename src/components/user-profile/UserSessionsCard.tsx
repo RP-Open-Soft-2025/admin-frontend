@@ -310,7 +310,7 @@ export default function UserSessionsCard({
 					{role === 'admin' || role === 'hr' ? (
 						<Button
 							onClick={() => setIsModalOpen(true)}
-							className="flex items-center gap-1 dark:text-white bg-blue-500"
+							className="flex items-center gap-1 text-white bg-blue-500"
 							size="sm"
 						>
 							<Plus className="w-4 h-4" />
@@ -492,7 +492,7 @@ export default function UserSessionsCard({
 								<Button
 									type="submit"
 									disabled={isSubmitting}
-									className="relative dark:bg-blue-600 dark:hover:bg-blue-700"
+									className="relative text-white bg-blue-600 dark:hover:bg-blue-700"
 								>
 									{isSubmitting && (
 										<div className="absolute inset-0 flex items-center justify-center">
