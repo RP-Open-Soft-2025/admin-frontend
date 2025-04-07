@@ -221,58 +221,6 @@ export async function fetchActiveSessions(): Promise<Session[]> {
 	}
 }
 
-export async function fetchPendingSessions(): Promise<Session[]> {
-	try {
-		const token = await getAuthToken()
-		const userRole = 'admin'
-
-		const response = await fetch(`${API_URL}/${userRole}/sessions/pending`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error fetching pending sessions: ${response.statusText}`)
-		}
-
-		const sessions: Session[] = await response.json()
-		return sessions || []
-	} catch (error) {
-		console.error('Failed to fetch pending sessions:', error)
-		throw error
-	}
-}
-
-export async function fetchCompletedSessions(): Promise<Session[]> {
-	try {
-		const token = await getAuthToken()
-		const userRole = 'admin'
-
-		const response = await fetch(`${API_URL}/${userRole}/sessions/completed`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(
-				`Error fetching completed sessions: ${response.statusText}`
-			)
-		}
-
-		const sessions: Session[] = await response.json()
-		return sessions || []
-	} catch (error) {
-		console.error('Failed to fetch completed sessions:', error)
-		throw error
-	}
-}
-
 export async function fetchMeets(): Promise<Meet[]> {
 	try {
 		const token = await getAuthToken()
