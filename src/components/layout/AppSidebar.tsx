@@ -100,11 +100,11 @@ const AppSidebar: React.FC = () => {
 	) => (
 		<ul className="flex flex-col gap-4">
 			{navItems.map((nav, index) => (
-				<li key={nav.name}>
+				<li key={nav.name} className="transition-all duration-300">
 					{nav.subItems ? (
 						<button
 							onClick={() => handleSubmenuToggle(index, menuType)}
-							className={`menu-item group  ${
+							className={`menu-item group transition-all duration-300 ${
 								openSubmenu?.type === menuType && openSubmenu?.index === index
 									? 'menu-item-active'
 									: 'menu-item-inactive'
@@ -119,12 +119,12 @@ const AppSidebar: React.FC = () => {
 									openSubmenu?.type === menuType && openSubmenu?.index === index
 										? 'menu-item-icon-active'
 										: 'menu-item-icon-inactive'
-								}`}
+									} transition-all duration-300`}
 							>
 								{nav.icon}
 							</span>
 							{(isExpanded || isHovered || isMobileOpen) && (
-								<span className={`menu-item-text`}>{nav.name}</span>
+								<span className={`menu-item-text transition-opacity duration-300`}>{nav.name}</span>
 							)}
 							{(isExpanded || isHovered || isMobileOpen) && (
 								<ChevronDownIcon
@@ -155,12 +155,12 @@ const AppSidebar: React.FC = () => {
 										isActive(nav.path)
 											? 'menu-item-icon-active'
 											: 'menu-item-icon-inactive'
-									}`}
+										} transition-all duration-300`}
 								>
 									{nav.icon}
 								</span>
 								{(isExpanded || isHovered || isMobileOpen) && (
-									<span className={`menu-item-text`}>{nav.name}</span>
+									<span className={`menu-item-text transition-opacity duration-300`}>{nav.name}</span>
 								)}
 							</Link>
 						)
@@ -312,7 +312,7 @@ const AppSidebar: React.FC = () => {
 
 	return (
 		<aside
-			className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen ease-in-out z-50 border-r border-gray-200 overflow-hidden
+			className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 overflow-hidden
         ${
 					isExpanded || isMobileOpen
 						? 'w-[290px]'
@@ -327,7 +327,7 @@ const AppSidebar: React.FC = () => {
 		>
 			{/* Only show logo in desktop view */}
 			<div
-				className={`py-8 hidden lg:flex ${
+				className={`py-8 hidden lg:flex transition-all duration-300 ${
 					!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
 				}`}
 			>
