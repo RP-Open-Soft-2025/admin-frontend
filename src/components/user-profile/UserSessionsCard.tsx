@@ -8,7 +8,7 @@ import {
 	ChevronDown,
 	Plus,
 	Clock,
-	CheckCircle,
+	TriangleAlert,
 	FileText,
 } from 'lucide-react'
 import { Calendar as CalendarIcon } from 'lucide-react'
@@ -95,9 +95,7 @@ export default function UserSessionsCard({
 	const [formData, setFormData] = useState({
 		employee_id: employeeId,
 		notes: '',
-		scheduled_time: new Date(Date.now() + 120000).toLocaleString('en-GB', {
-			hour12: false,
-		}),
+		scheduled_time: new Date().toISOString(),
 	})
 	const [escalateChainId, setEscalateChainId] = useState<string | null>(null)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -105,6 +103,8 @@ export default function UserSessionsCard({
 	const [isEscalatingChain, setIsEscalatingChain] = useState(false)
 	const router = useRouter()
 	const { auth } = store.getState()
+	const [calendarOpen, setCalendarOpen] = useState(false)
+	const [calendarOpen2, setCalendarOpen2] = useState(false)
 
 	// Actually use role in a comment to avoid the unused variable warning
 	// Role: ${role} is used for authorization checks
@@ -152,6 +152,20 @@ export default function UserSessionsCard({
 		e.preventDefault()
 		setIsSubmitting(true)
 
+		const activeChains = chainsData.filter(
+			chain => chain.status === ChainStatus.ACTIVE
+		)
+
+		if (activeChains.length > 0) {
+			toast({
+				description: 'This employee already has an active chain. You cannot schedule a new session until the existing one is completed.',
+				type: 'error',
+			})
+			setIsSubmitting(false)
+			setIsModalOpen(false)
+			return
+		}
+
 		// Basic validation
 		if (!formData.notes.trim() || !formData.scheduled_time) {
 			toast({
@@ -165,11 +179,14 @@ export default function UserSessionsCard({
 		try {
 			// Make sure scheduled_time is in the future
 			const scheduledDate = new Date(formData.scheduled_time)
-			const now = new Date(Date.now() + 120000)
+			const now = new Date()
+			
+			// Add 2 minutes buffer
+			const minScheduleTime = new Date(now.getTime() + 120000)
 
-			if (scheduledDate < now) {
+			if (scheduledDate < minScheduleTime) {
 				toast({
-					description: 'Scheduled time must be in the future',
+					description: 'Scheduled time must be at least 2 minutes in the future',
 					type: 'error',
 				})
 				setIsSubmitting(false)
@@ -179,8 +196,13 @@ export default function UserSessionsCard({
 			// Format the data properly
 			const formattedData = {
 				...formData,
+				employee_id: employeeId, // Make sure this is explicitly set
+				chain_type: "SCHEDULED", // This field might be required by the API
+				status: "ACTIVE", // This field might be required by the API
 				scheduled_time: scheduledDate.toISOString(),
 			}
+
+			console.log('Sending data to server:', formattedData)
 
 			const response = await fetch(`${API_URL}/admin/chains/create`, {
 				method: 'POST',
@@ -192,7 +214,27 @@ export default function UserSessionsCard({
 			})
 
 			if (!response.ok) {
-				throw new Error(`Error: ${response.status}`)
+				const errorData = await response.text()
+				console.error('Server error response:', errorData)
+				
+				// Check if error is due to existing active chain
+				if (errorData.includes("Employee already has an active chain")) {
+					toast({
+						description: 'This employee already has an active chain. You cannot schedule a new session until the existing one is completed.',
+						type: 'error',
+					})
+					// Refresh the data to show the active chain
+					const updatedChains = await getEmployeeChains(employeeId)
+					setChainsData(updatedChains)
+					setIsModalOpen(false)
+				} else {
+					toast({
+						description: 'Failed to schedule session',
+						type: 'error',
+					})
+				}
+				
+				throw new Error(`Server responded with status: ${response.status}. Details: ${errorData}`)
 			}
 
 			const result = await response.json()
@@ -212,7 +254,7 @@ export default function UserSessionsCard({
 			setFormData({
 				employee_id: employeeId,
 				notes: '',
-				scheduled_time: new Date().toISOString().slice(0, 16),
+				scheduled_time: new Date().toISOString(),
 			})
 
 			console.log('Chain created:', result)
@@ -360,12 +402,12 @@ export default function UserSessionsCard({
 									Scheduled Time
 								</label>
 								<div className="space-y-2">
-									<Popover>
+									<Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
 										<PopoverTrigger asChild>
 											<Button
 												variant={'outline'}
 												className={cn(
-													'w-full justify-start text-left font-normal dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
+													'w-full justify-start text-left font-normal dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700',
 													!formData.scheduled_time && 'text-muted-foreground'
 												)}
 											>
@@ -379,7 +421,7 @@ export default function UserSessionsCard({
 												)}
 											</Button>
 										</PopoverTrigger>
-										<PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700">
+										<PopoverContent className="w-[320px] p-3 dark:bg-gray-800 dark:border-gray-700" style={{ position: 'fixed', zIndex: 9999999, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', left: '50%', transform: 'translateX(-50%)' }}>
 											<Calendar
 												mode="single"
 												selected={
@@ -401,9 +443,12 @@ export default function UserSessionsCard({
 															...prev,
 															scheduled_time: newDate.toISOString(),
 														}))
+														
+														// Close the popover
+														setCalendarOpen(false);
 													}
 												}}
-												className="dark:bg-gray-800 dark:text-gray-300"
+												className="dark:bg-gray-800 dark:text-gray-300 rounded-md border border-gray-200 dark:border-gray-700"
 												initialFocus
 											/>
 										</PopoverContent>
@@ -445,6 +490,9 @@ export default function UserSessionsCard({
 											className="dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
 											onClick={() => {
 												const now = new Date()
+												// Add 2 minutes to the current time
+												now.setMinutes(now.getMinutes() + 2)
+												
 												if (formData.scheduled_time) {
 													const date = new Date(formData.scheduled_time)
 													date.setHours(now.getHours())
@@ -578,12 +626,12 @@ export default function UserSessionsCard({
 										Scheduled Time
 									</label>
 									<div className="space-y-2">
-										<Popover>
+										<Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
 											<PopoverTrigger asChild>
 												<Button
 													variant={'outline'}
 													className={cn(
-														'w-full justify-start text-left font-normal dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
+														'w-full justify-start text-left font-normal dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700',
 														!formData.scheduled_time && 'text-muted-foreground'
 													)}
 												>
@@ -597,7 +645,7 @@ export default function UserSessionsCard({
 													)}
 												</Button>
 											</PopoverTrigger>
-											<PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700">
+											<PopoverContent className="w-[320px] p-3 dark:bg-gray-800 dark:border-gray-700" style={{ position: 'fixed', zIndex: 9999999, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', left: '50%', transform: 'translateX(-50%)' }}>
 												<Calendar
 													mode="single"
 													selected={
@@ -619,9 +667,12 @@ export default function UserSessionsCard({
 																...prev,
 																scheduled_time: newDate.toISOString(),
 															}))
+															
+															// Close the popover
+															setCalendarOpen(false);
 														}
 													}}
-													className="dark:bg-gray-800 dark:text-gray-300"
+													className="dark:bg-gray-800 dark:text-gray-300 rounded-md border border-gray-200 dark:border-gray-700"
 													initialFocus
 												/>
 											</PopoverContent>
@@ -635,10 +686,7 @@ export default function UserSessionsCard({
 													type="time"
 													value={
 														formData.scheduled_time
-															? format(
-																	new Date(formData.scheduled_time),
-																	'HH:mm'
-																)
+															? format(new Date(formData.scheduled_time), 'HH:mm')
 															: ''
 													}
 													onChange={e => {
@@ -666,6 +714,9 @@ export default function UserSessionsCard({
 												className="dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
 												onClick={() => {
 													const now = new Date()
+													// Add 2 minutes to the current time
+													now.setMinutes(now.getMinutes() + 2)
+													
 													if (formData.scheduled_time) {
 														const date = new Date(formData.scheduled_time)
 														date.setHours(now.getHours())
@@ -735,7 +786,7 @@ export default function UserSessionsCard({
 								<div className="flex items-center">
 									<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
 									<span>
-										This Employee has an active session - Click to join
+										This Employee has an active session - Click to view
 									</span>
 								</div>
 								<ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -842,14 +893,14 @@ export default function UserSessionsCard({
 																<Button
 																	size="sm"
 																	variant="outline"
-																	className="h-8 px-3 text-xs bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800 shadow-sm hover:shadow transition-all"
+																	className="h-8 px-3 text-xs bg-yellow-50 text-yellow-600 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 dark:hover:bg-yellow-900/40 border-yellow-200 dark:border-yellow-800 shadow-sm hover:shadow transition-all"
 																	onClick={e => {
 																		e.stopPropagation()
 																		setEscalateChainId(chain.chain_id)
 																	}}
 																>
-																	<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-																	Mark as Complete
+																	<TriangleAlert className="h-3.5 w-3.5 mr-1.5" />
+																	Escalate
 																</Button>
 															)}
 													</td>
@@ -931,7 +982,7 @@ export default function UserSessionsCard({
 				<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white">
 					<DialogHeader>
 						<DialogTitle className="dark:text-white">
-							Complete Chain
+							Escalate Chain
 						</DialogTitle>
 					</DialogHeader>
 					<div className="py-3">
@@ -945,7 +996,7 @@ export default function UserSessionsCard({
 						</div>
 
 						<p className="text-sm text-gray-600 dark:text-gray-400">
-							Are you sure you want to complete this chain? This action cannot
+							Are you sure you want to Escalate this chain? This action cannot
 							be undone.
 						</p>
 					</div>
@@ -962,7 +1013,7 @@ export default function UserSessionsCard({
 						<Button
 							onClick={() => escalateChainId && escalateChain(escalateChainId)}
 							disabled={isEscalatingChain}
-							className="relative bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white"
+							className="relative bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-800 text-white"
 						>
 							{isEscalatingChain && (
 								<div className="absolute inset-0 flex items-center justify-center">
@@ -970,7 +1021,7 @@ export default function UserSessionsCard({
 								</div>
 							)}
 							<span className={isEscalatingChain ? 'opacity-0' : ''}>
-								Complete Chain
+								Escalate Chain
 							</span>
 						</Button>
 					</DialogFooter>

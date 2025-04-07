@@ -44,7 +44,7 @@ export default function Calendar({
 		return (
 			<div
 				className={cn(
-					'p-3 w-full h-[350px] bg-gray-50 dark:bg-gray-900 rounded-md',
+					'p-3 w-full h-[300px] bg-gray-50 dark:bg-gray-900 rounded-md',
 					className
 				)}
 			/>
@@ -153,6 +153,9 @@ export default function Calendar({
 		if (onSelect) {
 			onSelect(date)
 		}
+		
+		// Close the popover immediately
+		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	}
 
 	const isSelected = (date: Date) => {
@@ -204,14 +207,14 @@ export default function Calendar({
 					<div className="flex space-x-1">
 						<button
 							onClick={handlePrevMonth}
-							className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+							className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
 							aria-label="Previous month"
 						>
 							<ChevronLeft className="h-4 w-4" />
 						</button>
 						<button
 							onClick={handleNextMonth}
-							className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+							className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
 							aria-label="Next month"
 						>
 							<ChevronRight className="h-4 w-4" />
@@ -223,7 +226,7 @@ export default function Calendar({
 					{daysOfWeek.map((day, i) => (
 						<div
 							key={i}
-							className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 h-8 flex items-center justify-center"
+							className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 h-7 flex items-center justify-center"
 						>
 							{day}
 						</div>
@@ -240,7 +243,7 @@ export default function Calendar({
 									handleDateSelect(date)
 								}}
 								className={cn(
-									'text-center text-sm rounded-md h-8 w-8 p-0 flex items-center justify-center focus:outline-none focus-visible:ring focus-visible:ring-blue-500',
+									'text-center text-sm rounded-md h-7 w-7 p-0 flex items-center justify-center focus:outline-none focus-visible:ring focus-visible:ring-blue-500',
 									isSelected(date) &&
 										'bg-blue-600 text-white hover:bg-blue-700',
 									isToday(date) &&
@@ -248,12 +251,10 @@ export default function Calendar({
 										'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-200 font-semibold',
 									!isCurrentMonth &&
 										isOutside &&
-										'text-gray-400 dark:text-gray-500 opacity-50',
+										'text-gray-400 dark:text-gray-600',
 									!isSelected(date) &&
 										!isToday(date) &&
-										isCurrentMonth &&
-										'hover:bg-gray-100 dark:hover:bg-gray-800',
-									isDisabled(date) && 'opacity-25 cursor-not-allowed'
+										'hover:bg-gray-100 dark:hover:bg-gray-700'
 								)}
 							>
 								{date.getDate()}
