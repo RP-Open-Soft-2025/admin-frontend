@@ -937,7 +937,7 @@ export default function UserSessionsCard({
 																						onClick={e => {
 																							e.stopPropagation()
 																							router.push(
-																								`/report/${employeeId}${session.session_id}${chain.status.toLowerCase()}`
+																								`/report/${session.session_id}`
 																							)
 																						}}
 																					>
