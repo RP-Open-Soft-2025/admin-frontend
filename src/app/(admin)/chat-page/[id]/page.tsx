@@ -156,7 +156,7 @@ const ChatPage = () => {
 	const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false)
 	const [endSessionNotes, setEndSessionNotes] = useState('')
 	const [isEndingSession, setIsEndingSession] = useState(false)
-	const [sessionAction, setSessionAction] = useState<string>('escalate');
+	const [sessionAction, setSessionAction] = useState<string>('escalate')
 
 	// Scroll to latest message
 	useEffect(() => {
