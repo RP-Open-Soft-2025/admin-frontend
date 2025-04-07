@@ -282,8 +282,15 @@ const ChatMessages = ({
 					timestamp: msg.timestamp
 				}))
 				
+				// Add system message at the beginning showing chat ID and current datetime
+				const systemMessage: MessageResp = {
+					sender: SenderType.SYSTEM,
+					text: `${chatId}`,
+					timestamp: new Date().toISOString()
+				}
+				
 				console.log(`Processed ${formattedMessages.length} messages for display`)
-				setMessages(formattedMessages)
+				setMessages([systemMessage, ...formattedMessages])
 			} catch (err) {
 				console.error(`Error fetching messages for chat ${chatId}:`, err)
 				setError(`Failed to load messages: ${err instanceof Error ? err.message : 'Unknown error'}`)
@@ -346,6 +353,7 @@ const ChatMessages = ({
 				</div>
 			) : (
 				<>
+				
 					{messages.length > 0 ? (
 						messages.map((message, index) => (
 							<div key={index} data-chat-id={message.text}>
