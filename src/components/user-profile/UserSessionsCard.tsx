@@ -635,10 +635,7 @@ export default function UserSessionsCard({
 													type="time"
 													value={
 														formData.scheduled_time
-															? format(
-																	new Date(formData.scheduled_time),
-																	'HH:mm'
-																)
+															? format(new Date(formData.scheduled_time), 'HH:mm')
 															: ''
 													}
 													onChange={e => {
@@ -818,7 +815,7 @@ export default function UserSessionsCard({
 															{chain.status === ChainStatus.ACTIVE && (
 																<span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
 															)}
-															{chain.status}
+															{chain.status.charAt(0).toUpperCase() + chain.status.slice(1).toLowerCase()}
 														</span>
 													</td>
 													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white/90">
@@ -854,7 +851,7 @@ export default function UserSessionsCard({
 															)}
 													</td>
 												</tr>
-												{chain.isExpanded && chain.session_ids.length > 0 && (
+												{chain.isExpanded && chain.sessions.length > 0 && (
 													<tr className="bg-gray-50 dark:bg-gray-800/80">
 														<td colSpan={4} className="px-6 py-3">
 															<div className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300 flex items-center">
@@ -862,12 +859,12 @@ export default function UserSessionsCard({
 																Sessions:
 															</div>
 															<div className="grid gap-2">
-																{chain.session_ids.map(sessionId => {
+																{chain.sessions.map(session => {
 																	const sessionStatus =
 																		getSessionStatusFromChain(chain)
 																	return (
 																		<div
-																			key={sessionId}
+																			key={session.session_id}
 																			onClick={() =>
 																				router.push(
 																					`/chat-page/${employeeId}/${chain.chain_id}`
@@ -876,8 +873,21 @@ export default function UserSessionsCard({
 																			className="p-2.5 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow"
 																		>
 																			<span className="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-gray-800 dark:text-white/90">
-																				{sessionId}
+																				{session.session_id}
 																			</span>
+																			<div className="flex items-center gap-4">
+																				<div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+																					<Clock className="h-3.5 w-3.5 text-gray-400" />
+																					{formatDate(session.scheduled_at)}
+																				</div>
+																				<span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+																					session.status === 'COMPLETED' 
+																						? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+																						: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+																				}`}>
+																					{session.status.charAt(0).toUpperCase() + session.status.slice(1).toLowerCase()}
+																				</span>
+																			</div>
 																			<div className="flex items-center gap-2">
 																				{sessionStatus === 'COMPLETED' && (
 																					<Button
@@ -887,7 +897,7 @@ export default function UserSessionsCard({
 																						onClick={e => {
 																							e.stopPropagation()
 																							router.push(
-																								`/report/${employeeId}${sessionId}${sessionStatus.toLowerCase()}`
+																								`/report/${employeeId}${session.session_id}${sessionStatus.toLowerCase()}`
 																							)
 																						}}
 																					>

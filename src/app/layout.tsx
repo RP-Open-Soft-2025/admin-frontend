@@ -2,7 +2,7 @@
 import { Outfit } from 'next/font/google'
 import './globals.css'
 import { useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { SidebarProvider } from '@/components/context/SidebarContext'
 import { ThemeProvider } from '@/components/context/ThemeContext'
 import StateProvider from '@/components/context/ReduxContext'
