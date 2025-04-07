@@ -26,7 +26,7 @@ export default function RootLayout({
 				<link rel="icon" href="/images/favicon.ico" />
 			</head>
 			<title>Admin - Vibemeter</title>
-			<body className={`${outfit.variable} dark:bg-gray-900`}>
+			<body className={`${outfit.variable} dark:bg-gray-900 transition-colors duration-150`}>
 				<ThemeProvider>
 					<StateProvider>
 						<SidebarProvider>{children}</SidebarProvider>
