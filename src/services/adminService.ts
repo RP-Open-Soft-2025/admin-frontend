@@ -76,11 +76,11 @@ export async function getAuthToken() {
 
 export async function fetchUsers(): Promise<User[]> {
 	try {
-		const response = await api.get('/admin/list-users');
-		return response.data.users || [];
+		const response = await api.get('/admin/list-users')
+		return response.data.users || []
 	} catch (error) {
-		console.error('Error fetching users:', error);
-		throw error;
+		console.error('Error fetching users:', error)
+		throw error
 	}
 }
 
@@ -356,13 +356,16 @@ export async function fetchEscalatedChains() {
 	try {
 		const token = await getAuthToken()
 
-		const response = await fetch(`https://fastapi-service-402737687767.us-central1.run.app/admin/escalated-chains`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
+		const response = await fetch(
+			`https://fastapi-service-402737687767.us-central1.run.app/admin/escalated-chains`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		)
 
 		if (!response.ok) {
 			throw new Error(`Error fetching escalated chains: ${response.statusText}`)

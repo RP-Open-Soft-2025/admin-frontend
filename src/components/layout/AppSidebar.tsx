@@ -89,10 +89,10 @@ const AppSidebar: React.FC = () => {
 	const filteredNavItems = navItems.filter(item => {
 		// Only show Add Employee button to admin users
 		if (item.name === 'Add Employee' && userRole !== 'admin') {
-			return false;
+			return false
 		}
-		return true;
-	});
+		return true
+	})
 
 	const renderMenuItems = (
 		navItems: NavItem[],

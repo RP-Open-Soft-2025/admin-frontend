@@ -21,9 +21,9 @@ export interface ChainType {
 }
 
 export interface EscalatedChain {
-	chain_id: string;
-	session_ids: string[];
-	employee_id: string;
-	escalation_reason: string;
-	escalated_at: string;
-} 
+	chain_id: string
+	session_ids: string[]
+	employee_id: string
+	escalation_reason: string
+	escalated_at: string
+}
