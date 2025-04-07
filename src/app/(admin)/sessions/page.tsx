@@ -6,7 +6,7 @@ import { API_URL, MAX_PER_PAGE_SESSION } from '@/constants'
 import { SessionType } from '@/types/sessions'
 import store from '@/redux/store'
 
-type State = 'pending' | 'completed' | 'active'
+type State = 'pending' | 'active'
 
 const TableSession = ({ state }: { state: State }) => {
 	const [currData, setCurrData] = useState<SessionType[]>([])
@@ -20,12 +20,8 @@ const TableSession = ({ state }: { state: State }) => {
 		const fetchSessions = async () => {
 			try {
 				// Use consistent admin endpoints for both HR and admin users
-				// For completed sessions, use /admin/sessions/completed
 				// For active and pending sessions, use /admin/sessions and filter by status
-				const endpoint =
-					state === 'completed'
-						? `${API_URL}/admin/sessions/completed`
-						: `${API_URL}/admin/sessions`
+				const endpoint = `${API_URL}/admin/sessions`
 
 				fetch(endpoint, {
 					method: 'GET',
@@ -37,11 +33,9 @@ const TableSession = ({ state }: { state: State }) => {
 						resp.json().then((result: SessionType[]) => {
 							// If using the /admin/sessions endpoint for active or pending,
 							// filter the results by status
-							if (state !== 'completed') {
-								result = result.filter(
-									session => session.status.toLowerCase() === state
-								)
-							}
+							result = result.filter(
+								session => session.status.toLowerCase() === state
+							)
 
 							setCurrData(result)
 							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE_SESSION))
@@ -94,7 +88,6 @@ const Page = () => {
 	return (
 		<>
 			<TableSession state="active" />
-			<TableSession state="completed" />
 			<TableSession state="pending" />
 		</>
 	)

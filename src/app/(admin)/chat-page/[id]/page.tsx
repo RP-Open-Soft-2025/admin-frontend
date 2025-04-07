@@ -219,8 +219,7 @@ const ChatPage = () => {
 			}
 
 			// Step 2: If not a chat ID, try to find it in the sessions
-			const endpoint =
-				auth.user.userRole === 'admin' ? 'admin' : auth.user.userRole
+			const endpoint = 'admin'
 			console.log(
 				`Using endpoint: ${endpoint}/sessions for user role: ${auth.user.userRole}`
 			)

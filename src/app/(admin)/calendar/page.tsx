@@ -491,30 +491,19 @@ const Calendar: React.FC = () => {
 				})
 
 				// Fetch sessions using the admin endpoints
-				const [activeAndPendingResponse, completedResponse] = await Promise.all(
-					[
-						fetch(`${API_URL}/admin/sessions`, {
-							headers: {
-								Authorization: `Bearer ${auth.user.accessToken}`,
-							},
-						}),
-						fetch(`${API_URL}/admin/sessions/completed`, {
-							headers: {
-								Authorization: `Bearer ${auth.user.accessToken}`,
-							},
-						}),
-					]
+				const activeAndPendingResponse = await fetch(
+					`${API_URL}/admin/sessions`,
+					{
+						headers: {
+							Authorization: `Bearer ${auth.user.accessToken}`,
+						},
+					}
 				)
 
-				if (
-					!meetingsResponse.ok ||
-					!activeAndPendingResponse.ok ||
-					!completedResponse.ok
-				) {
+				if (!meetingsResponse.ok || !activeAndPendingResponse.ok) {
 					if (
 						meetingsResponse.status === 401 ||
-						activeAndPendingResponse.status === 401 ||
-						completedResponse.status === 401
+						activeAndPendingResponse.status === 401
 					) {
 						handleAuthError()
 						return
@@ -523,9 +512,7 @@ const Calendar: React.FC = () => {
 				}
 
 				const meetingsData = await meetingsResponse.json()
-				const [activeAndPendingSessions, completedSessions] = await Promise.all(
-					[activeAndPendingResponse.json(), completedResponse.json()]
-				)
+				const activeAndPendingSessions = await activeAndPendingResponse.json()
 
 				// Format meetings
 				const formattedMeetings = meetingsData.map((meet: Meeting) => {
@@ -577,9 +564,6 @@ const Calendar: React.FC = () => {
 				const formattedSessions = [
 					...activeSessions.map((session: SessionType) =>
 						formatSession(session, SessionStatus.ACTIVE)
-					),
-					...completedSessions.map((session: SessionType) =>
-						formatSession(session, SessionStatus.COMPLETED)
 					),
 					...pendingSessions.map((session: SessionType) =>
 						formatSession(session, SessionStatus.PENDING)
@@ -845,6 +829,7 @@ const Calendar: React.FC = () => {
 				;(api as any).off('eventDidMount', addEventListenersToMoreLinks)
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [calendarRef, getEventsForDate])
 
 	// Function to format date for display
