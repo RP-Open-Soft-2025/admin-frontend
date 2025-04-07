@@ -72,15 +72,27 @@ export default function EscalatedChainsPage() {
 
 const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 	const [currentPage, setCurrentPage] = useState(0)
-	const [expandedEmployees, setExpandedEmployees] = useState<
+	const [expandedSessions, setExpandedSessions] = useState<
 		Record<string, boolean>
 	>({})
-	const itemsPerPage = 10
-	const totalPages = Math.ceil(chains.length / itemsPerPage)
-	const currentData = chains.slice(
+	const itemsPerPage = 5 // Reduced to show fewer employees per page
+	
+	// Group chains by employee_id
+	const groupedChains = chains.reduce((acc, chain) => {
+		if (!acc[chain.employee_id]) {
+			acc[chain.employee_id] = [];
+		}
+		acc[chain.employee_id].push(chain);
+		return acc;
+	}, {} as Record<string, EscalatedChain[]>);
+	
+	// Convert to array for pagination
+	const employeeEntries = Object.entries(groupedChains);
+	const totalPages = Math.ceil(employeeEntries.length / itemsPerPage);
+	const currentData = employeeEntries.slice(
 		currentPage * itemsPerPage,
 		(currentPage + 1) * itemsPerPage
-	)
+	);
 
 	// Format date
 	const formatDate = (dateString: string) => {
@@ -93,10 +105,10 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 		})
 	}
 
-	const toggleEmployeeExpansion = (chain_id: string) => {
-		setExpandedEmployees(prev => ({
+	const toggleSessionsExpansion = (chainId: string) => {
+		setExpandedSessions(prev => ({
 			...prev,
-			[chain_id]: !prev[chain_id],
+			[chainId]: !prev[chainId],
 		}))
 	}
 
@@ -110,110 +122,198 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 					<span>Escalated Chains</span>
 				</h1>
 
-				<div className="grid gap-5">
+				<div className="grid gap-6">
 					{currentData.length > 0 ? (
-						currentData.map((chain, index) => (
+						currentData.map(([employeeId, employeeChains]) => (
 							<div
-								key={index}
+								key={employeeId}
 								className="bg-white rounded-lg shadow-md border border-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white overflow-hidden"
 							>
 								<div className="flex justify-between items-center py-4 px-5 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700">
 									<h2 className="text-xl font-bold text-blue-900 dark:text-blue-300">
 										Employee ID:{' '}
-										<span className="ml-2 font-mono">{chain.employee_id}</span>
+										<span className="ml-2 font-mono">{employeeId}</span>
 									</h2>
+									<span className="text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 py-1 px-2.5 rounded-full font-medium">
+										{employeeChains.length} {employeeChains.length === 1 ? 'chain' : 'chains'}
+									</span>
 								</div>
 
-								<div className="p-5">
-									{/* Display chain details with sessions dropdown inside */}
-									<div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-										<div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300 text-sm">
-											<p className="flex flex-col">
-												<span className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-													Chain ID
-												</span>
-												<span className="font-medium text-gray-900 dark:text-white font-mono">
-													{chain.chain_id}
-												</span>
-											</p>
-											<p className="flex flex-col">
-												<span className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-													Escalation Reason
-												</span>
-												<span className="font-medium text-red-600 dark:text-red-400">
-													{chain.escalation_reason}
-												</span>
-											</p>
-											<p className="flex flex-col md:col-span-2">
-												<span className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-													Escalated At
-												</span>
-												<span className="font-medium text-gray-900 dark:text-white">
-													{formatDate(chain.escalated_at)}
-												</span>
-											</p>
-										</div>
-
-										{/* Sessions dropdown inside chain card */}
-										<div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-											<div className="flex items-center justify-between mb-3">
-												<div className="flex items-center">
-													<h3 className="text-sm font-semibold mr-2 text-gray-800 dark:text-white">
-														Sessions
-													</h3>
-													<span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 py-0.5 px-2 rounded-full font-medium">
-														{chain.session_ids.length}
-													</span>
+								<div className="max-h-96 overflow-y-auto">
+									{employeeChains.map((chain) => (
+										<div key={chain.chain_id} className="p-4 border-b border-gray-100 dark:border-gray-700 last:border-0">
+											{/* Display chain details with sessions dropdown inside */}
+											<div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300 text-sm">
+													<p className="flex flex-col">
+														<span className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+															Chain ID
+														</span>
+														<span className="font-medium text-gray-900 dark:text-white font-mono">
+															{chain.chain_id}
+														</span>
+													</p>
+													<p className="flex flex-col">
+														<span className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+															Escalation Reason
+														</span>
+														<span className="font-medium text-red-600 dark:text-red-400">
+															{chain.escalation_reason}
+														</span>
+													</p>
+													<p className="flex flex-col md:col-span-2">
+														<span className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+															Escalated At
+														</span>
+														<span className="font-medium text-gray-900 dark:text-white">
+															{formatDate(chain.escalated_at)}
+														</span>
+													</p>
 												</div>
-												<button
-													onClick={() =>
-														toggleEmployeeExpansion(chain.chain_id)
-													}
-													className="flex items-center justify-center w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-gray-600 transition-colors duration-200"
-													aria-label={
-														expandedEmployees[chain.chain_id]
-															? 'Collapse sessions'
-															: 'Expand sessions'
-													}
-												>
-													{expandedEmployees[chain.chain_id] ? (
-														<ChevronUp size={14} />
-													) : (
-														<ChevronDown size={14} />
-													)}
-												</button>
-											</div>
 
-											<div
-												className={`transition-all duration-300 ${expandedEmployees[chain.chain_id] ? 'opacity-100 max-h-72 overflow-y-auto' : 'opacity-0 max-h-0 overflow-hidden'}`}
-											>
-												{expandedEmployees[chain.chain_id] && (
-													<div className="grid gap-3">
-														<div
-															key={chain.chain_id}
-															className="pl-3 border-l-2 border-red-300 dark:border-red-800/50 py-2"
-														>
-															<div className="space-y-2">
-																{chain.session_ids.map(sessionId => (
-																	<div key={sessionId} className="group">
-																		<Link
-																			href={`/sessions/${sessionId}`}
-																			className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200 text-xs"
-																		>
-																			<span className="inline-block w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full mr-1.5 group-hover:animate-pulse"></span>
-																			<span className="font-mono group-hover:underline">
-																				{sessionId}
-																			</span>
-																		</Link>
-																	</div>
-																))}
-															</div>
+												{/* Meeting details section - only show if meeting data exists */}
+												{chain.meet && (
+													<div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+														<h3 className="text-sm font-semibold mb-3 text-gray-800 dark:text-white flex items-center">
+															<span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+															Meeting Details
+															<span className="ml-2 text-xs py-0.5 px-1.5 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 rounded font-medium">
+																{chain.meet.status}
+															</span>
+														</h3>
+														
+														<div className="grid grid-cols-1 md:grid-cols-2 gap-3 ml-1 text-sm">
+															<p className="flex flex-col">
+																<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+																	Meeting ID
+																</span>
+																<span className="font-medium text-gray-900 dark:text-white font-mono">
+																	{chain.meet.meet_id}
+																</span>
+															</p>
+															<p className="flex flex-col">
+																<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+																	With Employee
+																</span>
+																<span className="font-medium text-gray-900 dark:text-white">
+																	{chain.meet.with_user_id}
+																</span>
+															</p>
+															<p className="flex flex-col">
+																<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+																	Scheduled At
+																</span>
+																<span className="font-medium text-gray-900 dark:text-white">
+																	{formatDate(chain.meet.scheduled_at)}
+																</span>
+															</p>
+															<p className="flex flex-col">
+																<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+																	Duration
+																</span>
+																<span className="font-medium text-gray-900 dark:text-white">
+																	{chain.meet.duration_minutes} minutes
+																</span>
+															</p>
+															{chain.meet.meeting_link && (
+																<p className="flex flex-col md:col-span-2">
+																	<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+																		Meeting Link
+																	</span>
+																	<a 
+																		href={chain.meet.meeting_link} 
+																		target="_blank" 
+																		rel="noopener noreferrer"
+																		className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 truncate"
+																	>
+																		{chain.meet.meeting_link}
+																	</a>
+																</p>
+															)}
+															{chain.meet.location && (
+																<p className="flex flex-col md:col-span-2">
+																	<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+																		Location
+																	</span>
+																	<span className="font-medium text-gray-900 dark:text-white">
+																		{chain.meet.location}
+																	</span>
+																</p>
+															)}
+															{chain.meet.notes && (
+																<p className="flex flex-col md:col-span-2">
+																	<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+																		Notes
+																	</span>
+																	<span className="font-medium text-gray-900 dark:text-white">
+																		{chain.meet.notes}
+																	</span>
+																</p>
+															)}
 														</div>
 													</div>
 												)}
+
+												{/* Sessions dropdown inside chain card */}
+												<div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+													<div className="flex items-center justify-between mb-3">
+														<div className="flex items-center">
+															<h3 className="text-sm font-semibold mr-2 text-gray-800 dark:text-white">
+																Sessions
+															</h3>
+															<span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 py-0.5 px-2 rounded-full font-medium">
+																{chain.session_ids.length}
+															</span>
+														</div>
+														<button
+															onClick={() => toggleSessionsExpansion(chain.chain_id)}
+															className="flex items-center justify-center w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-gray-600 transition-colors duration-200"
+															aria-label={
+																expandedSessions[chain.chain_id]
+																	? 'Collapse sessions'
+																	: 'Expand sessions'
+															}
+														>
+															{expandedSessions[chain.chain_id] ? (
+																<ChevronUp size={14} />
+															) : (
+																<ChevronDown size={14} />
+															)}
+														</button>
+													</div>
+
+													<div
+														className={`transition-all duration-300 ${expandedSessions[chain.chain_id] ? 'opacity-100 max-h-40 overflow-y-auto' : 'opacity-0 max-h-0 overflow-hidden'}`}
+													>
+														{expandedSessions[chain.chain_id] && (
+															<div className="grid gap-3">
+																<div
+																	key={chain.chain_id}
+																	className="pl-3 border-l-2 border-red-300 dark:border-red-800/50 py-2"
+																>
+																	<div className="space-y-2">
+																		{chain.session_ids.map(sessionId => (
+																			<div key={sessionId} className="group">
+																				<Link
+																					href={`/sessions/${sessionId}`}
+																					className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200 text-xs"
+																				>
+																					<span className="inline-block w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full mr-1.5 group-hover:animate-pulse"></span>
+																					<span className="font-mono group-hover:underline">
+																						{sessionId}
+																					</span>
+																				</Link>
+																			</div>
+																		))}
+																	</div>
+																</div>
+															</div>
+														)}
+													</div>
+												</div>
 											</div>
 										</div>
-									</div>
+									))}
 								</div>
 							</div>
 						))
