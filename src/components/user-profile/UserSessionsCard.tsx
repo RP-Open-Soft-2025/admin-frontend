@@ -71,17 +71,6 @@ const getChainStatusColor = (status: ChainStatus) => {
 	}
 }
 
-// Add a helper function to get session data
-const getSessionStatusFromChain = (chain: ChainType) => {
-	// If chain is completed, we assume all sessions in it are completed
-	if (chain.status === ChainStatus.COMPLETED) {
-		return 'COMPLETED'
-	}
-	// For active chains, we need to check the session status
-	// This is a simplified implementation - you might need to adjust based on your data structure
-	return 'ACTIVE'
-}
-
 export default function UserSessionsCard({
 	employeeId,
 	role,
@@ -860,8 +849,6 @@ export default function UserSessionsCard({
 															</div>
 															<div className="grid gap-2">
 																{chain.sessions.map(session => {
-																	const sessionStatus =
-																		getSessionStatusFromChain(chain)
 																	return (
 																		<div
 																			key={session.session_id}
@@ -881,7 +868,7 @@ export default function UserSessionsCard({
 																					{formatDate(session.scheduled_at)}
 																				</div>
 																				<span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-																					session.status === 'COMPLETED' 
+																					session.status === 'completed' 
 																						? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
 																						: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
 																				}`}>
@@ -889,7 +876,7 @@ export default function UserSessionsCard({
 																				</span>
 																			</div>
 																			<div className="flex items-center gap-2">
-																				{sessionStatus === 'COMPLETED' && (
+																				{session.status === 'completed' && (
 																					<Button
 																						size="sm"
 																						variant="outline"
@@ -897,7 +884,7 @@ export default function UserSessionsCard({
 																						onClick={e => {
 																							e.stopPropagation()
 																							router.push(
-																								`/report/${employeeId}${session.session_id}${sessionStatus.toLowerCase()}`
+																								`/report/${employeeId}${session.session_id}${chain.status.toLowerCase()}`
 																							)
 																						}}
 																					>
