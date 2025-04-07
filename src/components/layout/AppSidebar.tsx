@@ -89,10 +89,10 @@ const AppSidebar: React.FC = () => {
 	const filteredNavItems = navItems.filter(item => {
 		// Only show Add Employee button to admin users
 		if (item.name === 'Add Employee' && userRole !== 'admin') {
-			return false;
+			return false
 		}
-		return true;
-	});
+		return true
+	})
 
 	const renderMenuItems = (
 		navItems: NavItem[],
@@ -119,12 +119,16 @@ const AppSidebar: React.FC = () => {
 									openSubmenu?.type === menuType && openSubmenu?.index === index
 										? 'menu-item-icon-active'
 										: 'menu-item-icon-inactive'
-									} transition-all duration-300`}
+								} transition-all duration-300`}
 							>
 								{nav.icon}
 							</span>
 							{(isExpanded || isHovered || isMobileOpen) && (
-								<span className={`menu-item-text transition-opacity duration-300`}>{nav.name}</span>
+								<span
+									className={`menu-item-text transition-opacity duration-300`}
+								>
+									{nav.name}
+								</span>
 							)}
 							{(isExpanded || isHovered || isMobileOpen) && (
 								<ChevronDownIcon
@@ -155,12 +159,16 @@ const AppSidebar: React.FC = () => {
 										isActive(nav.path)
 											? 'menu-item-icon-active'
 											: 'menu-item-icon-inactive'
-										} transition-all duration-300`}
+									} transition-all duration-300`}
 								>
 									{nav.icon}
 								</span>
 								{(isExpanded || isHovered || isMobileOpen) && (
-									<span className={`menu-item-text transition-opacity duration-300`}>{nav.name}</span>
+									<span
+										className={`menu-item-text transition-opacity duration-300`}
+									>
+										{nav.name}
+									</span>
 								)}
 							</Link>
 						)

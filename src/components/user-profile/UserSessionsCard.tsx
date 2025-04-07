@@ -140,13 +140,14 @@ export default function UserSessionsCard({
 		e.preventDefault()
 		setIsSubmitting(true)
 
-		const activeChains = chainsData && chainsData.filter(
-			chain => chain.status === ChainStatus.ACTIVE
-		)
+		const activeChains =
+			chainsData &&
+			chainsData.filter(chain => chain.status === ChainStatus.ACTIVE)
 
 		if (activeChains && activeChains.length > 0) {
 			toast({
-				description: 'This employee already has an active chain. You cannot schedule a new session until the existing one is completed.',
+				description:
+					'This employee already has an active chain. You cannot schedule a new session until the existing one is completed.',
 				type: 'error',
 			})
 			setIsSubmitting(false)
@@ -168,13 +169,14 @@ export default function UserSessionsCard({
 			// Make sure scheduled_time is in the future
 			const scheduledDate = new Date(formData.scheduled_time)
 			const now = new Date()
-			
+
 			// Add 2 minutes buffer
 			const minScheduleTime = new Date(now.getTime() + 120000)
 
 			if (scheduledDate < minScheduleTime) {
 				toast({
-					description: 'Scheduled time must be at least 2 minutes in the future',
+					description:
+						'Scheduled time must be at least 2 minutes in the future',
 					type: 'error',
 				})
 				setIsSubmitting(false)
@@ -185,8 +187,8 @@ export default function UserSessionsCard({
 			const formattedData = {
 				...formData,
 				employee_id: employeeId, // Make sure this is explicitly set
-				chain_type: "SCHEDULED", // This field might be required by the API
-				status: "ACTIVE", // This field might be required by the API
+				chain_type: 'SCHEDULED', // This field might be required by the API
+				status: 'ACTIVE', // This field might be required by the API
 				scheduled_time: scheduledDate.toISOString(),
 			}
 
@@ -204,11 +206,12 @@ export default function UserSessionsCard({
 			if (!response.ok) {
 				const errorData = await response.text()
 				console.error('Server error response:', errorData)
-				
+
 				// Check if error is due to existing active chain
-				if (errorData.includes("Employee already has an active chain")) {
+				if (errorData.includes('Employee already has an active chain')) {
 					toast({
-						description: 'This employee already has an active chain. You cannot schedule a new session until the existing one is completed.',
+						description:
+							'This employee already has an active chain. You cannot schedule a new session until the existing one is completed.',
 						type: 'error',
 					})
 					// Refresh the data to show the active chain
@@ -221,8 +224,10 @@ export default function UserSessionsCard({
 						type: 'error',
 					})
 				}
-				
-				throw new Error(`Server responded with status: ${response.status}. Details: ${errorData}`)
+
+				throw new Error(
+					`Server responded with status: ${response.status}. Details: ${errorData}`
+				)
 			}
 
 			const result = await response.json()
@@ -409,7 +414,17 @@ export default function UserSessionsCard({
 												)}
 											</Button>
 										</PopoverTrigger>
-										<PopoverContent className="w-[320px] p-3 dark:bg-gray-800 dark:border-gray-700" style={{ position: 'fixed', zIndex: 9999999, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', left: '50%', transform: 'translateX(-50%)' }}>
+										<PopoverContent
+											className="w-[320px] p-3 dark:bg-gray-800 dark:border-gray-700"
+											style={{
+												position: 'fixed',
+												zIndex: 9999999,
+												boxShadow:
+													'0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+												left: '50%',
+												transform: 'translateX(-50%)',
+											}}
+										>
 											<Calendar
 												mode="single"
 												selected={
@@ -431,9 +446,9 @@ export default function UserSessionsCard({
 															...prev,
 															scheduled_time: newDate.toISOString(),
 														}))
-														
+
 														// Close the popover
-														setCalendarOpen(false);
+														setCalendarOpen(false)
 													}
 												}}
 												className="dark:bg-gray-800 dark:text-gray-300 rounded-md border border-gray-200 dark:border-gray-700"
@@ -480,7 +495,7 @@ export default function UserSessionsCard({
 												const now = new Date()
 												// Add 2 minutes to the current time
 												now.setMinutes(now.getMinutes() + 2)
-												
+
 												if (formData.scheduled_time) {
 													const date = new Date(formData.scheduled_time)
 													date.setHours(now.getHours())
@@ -633,7 +648,17 @@ export default function UserSessionsCard({
 													)}
 												</Button>
 											</PopoverTrigger>
-											<PopoverContent className="w-[320px] p-3 dark:bg-gray-800 dark:border-gray-700" style={{ position: 'fixed', zIndex: 9999999, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)', left: '50%', transform: 'translateX(-50%)' }}>
+											<PopoverContent
+												className="w-[320px] p-3 dark:bg-gray-800 dark:border-gray-700"
+												style={{
+													position: 'fixed',
+													zIndex: 9999999,
+													boxShadow:
+														'0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+													left: '50%',
+													transform: 'translateX(-50%)',
+												}}
+											>
 												<Calendar
 													mode="single"
 													selected={
@@ -655,9 +680,9 @@ export default function UserSessionsCard({
 																...prev,
 																scheduled_time: newDate.toISOString(),
 															}))
-															
+
 															// Close the popover
-															setCalendarOpen(false);
+															setCalendarOpen(false)
 														}
 													}}
 													className="dark:bg-gray-800 dark:text-gray-300 rounded-md border border-gray-200 dark:border-gray-700"
@@ -674,7 +699,10 @@ export default function UserSessionsCard({
 													type="time"
 													value={
 														formData.scheduled_time
-															? format(new Date(formData.scheduled_time), 'HH:mm')
+															? format(
+																	new Date(formData.scheduled_time),
+																	'HH:mm'
+																)
 															: ''
 													}
 													onChange={e => {
@@ -704,7 +732,7 @@ export default function UserSessionsCard({
 													const now = new Date()
 													// Add 2 minutes to the current time
 													now.setMinutes(now.getMinutes() + 2)
-													
+
 													if (formData.scheduled_time) {
 														const date = new Date(formData.scheduled_time)
 														date.setHours(now.getHours())
@@ -920,12 +948,19 @@ export default function UserSessionsCard({
 																					<Clock className="h-3.5 w-3.5 text-gray-400" />
 																					{formatDate(session.scheduled_at)}
 																				</div>
-																				<span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-																					session.status === 'completed' 
-																						? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-																						: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
-																				}`}>
-																					{session.status.charAt(0).toUpperCase() + session.status.slice(1).toLowerCase()}
+																				<span
+																					className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+																						session.status === 'completed'
+																							? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+																							: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+																					}`}
+																				>
+																					{session.status
+																						.charAt(0)
+																						.toUpperCase() +
+																						session.status
+																							.slice(1)
+																							.toLowerCase()}
 																				</span>
 																			</div>
 																			<div className="flex items-center gap-2">

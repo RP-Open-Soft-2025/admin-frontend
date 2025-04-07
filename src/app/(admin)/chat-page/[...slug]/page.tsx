@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
 // Define session history type
+// eslint-disable-next-line
 type SessionHist = {
 	chat_id: string
 	last_message: string
@@ -54,6 +55,7 @@ type Chain = {
 }
 
 // Define an extended message response type that includes session_id
+// eslint-disable-next-line
 type ExtendedMessageResp = MessageResp & {
 	session_id?: string
 }
@@ -140,7 +142,7 @@ const ChainItem = ({
 	return (
 		<div className="border-b dark:border-gray-700 border-gray-300">
 			{/* Chain header - clickable to expand/collapse */}
-			<div 
+			<div
 				className="p-3 cursor-pointer flex justify-between items-center dark:hover:bg-[#1E293B] hover:bg-gray-100"
 				onClick={onToggle}
 			>
@@ -154,7 +156,8 @@ const ChainItem = ({
 				</div>
 				<div className="flex items-center">
 					<span className="text-xs mr-2 dark:text-gray-400 text-gray-600">
-						{chain.sessions.length} {chain.sessions.length === 1 ? 'session' : 'sessions'}
+						{chain.sessions.length}{' '}
+						{chain.sessions.length === 1 ? 'session' : 'sessions'}
 					</span>
 					{isExpanded ? (
 						<ChevronUp className="h-4 w-4 dark:text-gray-400 text-gray-600" />
@@ -163,17 +166,19 @@ const ChainItem = ({
 					)}
 				</div>
 			</div>
-			
+
 			{/* Sessions dropdown */}
 			{isExpanded && chain.sessions.length > 0 && (
 				<div className="pl-4 pr-2 pb-2">
-					{chain.sessions.map((session) => (
-						<div 
+					{chain.sessions.map(session => (
+						<div
 							key={session.session_id}
 							className={`p-2 cursor-pointer rounded-md my-1 text-sm
-								${selectedSessionId === session.session_id 
-									? 'dark:bg-[#1E293B] bg-gray-200' 
-									: 'dark:hover:bg-[#1E293B] hover:bg-gray-100'}`}
+								${
+									selectedSessionId === session.session_id
+										? 'dark:bg-[#1E293B] bg-gray-200'
+										: 'dark:hover:bg-[#1E293B] hover:bg-gray-100'
+								}`}
 							onClick={() => onSelectSession(chain, session)}
 						>
 							<div className="flex flex-col">
@@ -181,12 +186,17 @@ const ChainItem = ({
 									<span className="font-medium dark:text-white text-gray-900">
 										Session {session.session_id}
 									</span>
-									<span className={`text-xs px-1.5 py-0.5 rounded-full ${
-										session.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-										session.status === 'completed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-										session.status === 'escalated' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' :
-										'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-									}`}>
+									<span
+										className={`text-xs px-1.5 py-0.5 rounded-full ${
+											session.status === 'active'
+												? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+												: session.status === 'completed'
+													? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+													: session.status === 'escalated'
+														? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
+														: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+										}`}
+									>
 										{session.status}
 									</span>
 								</div>
@@ -201,7 +211,7 @@ const ChainItem = ({
 					))}
 				</div>
 			)}
-			
+
 			{/* Empty state for sessions */}
 			{isExpanded && chain.sessions.length === 0 && (
 				<div className="pl-4 pr-2 pb-2">
@@ -215,12 +225,12 @@ const ChainItem = ({
 }
 
 // ChatMessages component to handle fetching and displaying messages for a specific chat
-const ChatMessages = ({ 
-	chatId, 
-	accessToken 
-}: { 
-	chatId: string, 
-	accessToken: string 
+const ChatMessages = ({
+	chatId,
+	accessToken,
+}: {
+	chatId: string
+	accessToken: string
 }) => {
 	const [messages, setMessages] = useState<MessageResp[]>([])
 	const [isLoading, setIsLoading] = useState(true)
@@ -246,11 +256,11 @@ const ChatMessages = ({
 			try {
 				setIsLoading(true)
 				setError(null)
-				
+
 				// Get messages for this specific chat
 				const messagesUrl = `${API_URL}/chat/history/${chatId}`
-				console.log("Fetching messages from:", messagesUrl)
-				
+				console.log('Fetching messages from:', messagesUrl)
+
 				const messagesResponse = await fetch(messagesUrl, {
 					method: 'GET',
 					headers: {
@@ -258,42 +268,49 @@ const ChatMessages = ({
 						'Content-Type': 'application/json',
 					},
 				})
-				
+
 				if (!messagesResponse.ok) {
 					throw new Error(`HTTP error! status: ${messagesResponse.status}`)
 				}
-				
+
 				const responseData = await messagesResponse.json()
 				console.log(`Received response for chat ${chatId}:`, responseData)
-				
+
 				// Extract messages from the response - the API returns { chatId, messages: [...] }
 				const chatMessages = responseData.messages || []
-				
+
 				// Map API response format to our MessageResp format
-				const formattedMessages = chatMessages.map((msg: { 
-					sender: string; 
-					text: string; 
-					timestamp: string 
-				}) => ({
-					sender: msg.sender === 'emp' ? SenderType.EMPLOYEE : 
-						   msg.sender === 'bot' ? SenderType.BOT : 
-						   msg.sender === 'hr' ? SenderType.HR : SenderType.SYSTEM,
-					text: msg.text,
-					timestamp: msg.timestamp
-				}))
-				
+				const formattedMessages = chatMessages.map(
+					(msg: { sender: string; text: string; timestamp: string }) => ({
+						sender:
+							msg.sender === 'emp'
+								? SenderType.EMPLOYEE
+								: msg.sender === 'bot'
+									? SenderType.BOT
+									: msg.sender === 'hr'
+										? SenderType.HR
+										: SenderType.SYSTEM,
+						text: msg.text,
+						timestamp: msg.timestamp,
+					})
+				)
+
 				// Add system message at the beginning showing chat ID and current datetime
 				const systemMessage: MessageResp = {
 					sender: SenderType.SYSTEM,
 					text: `${chatId}`,
-					timestamp: new Date().toISOString()
+					timestamp: new Date().toISOString(),
 				}
-				
-				console.log(`Processed ${formattedMessages.length} messages for display`)
+
+				console.log(
+					`Processed ${formattedMessages.length} messages for display`
+				)
 				setMessages([systemMessage, ...formattedMessages])
 			} catch (err) {
 				console.error(`Error fetching messages for chat ${chatId}:`, err)
-				setError(`Failed to load messages: ${err instanceof Error ? err.message : 'Unknown error'}`)
+				setError(
+					`Failed to load messages: ${err instanceof Error ? err.message : 'Unknown error'}`
+				)
 				setMessages([])
 			} finally {
 				setIsLoading(false)
@@ -317,9 +334,14 @@ const ChatMessages = ({
 				setMessages(prev => [
 					...prev,
 					{
-						sender: data.sender === 'emp' ? SenderType.EMPLOYEE : 
-								data.sender === 'bot' ? SenderType.BOT : 
-								data.sender === 'hr' ? SenderType.HR : SenderType.SYSTEM,
+						sender:
+							data.sender === 'emp'
+								? SenderType.EMPLOYEE
+								: data.sender === 'bot'
+									? SenderType.BOT
+									: data.sender === 'hr'
+										? SenderType.HR
+										: SenderType.SYSTEM,
 						text: data.message,
 						timestamp: data.timestamp,
 					},
@@ -341,7 +363,7 @@ const ChatMessages = ({
 			) : error ? (
 				<div className="text-center p-4">
 					<p className="text-red-500 dark:text-red-400">{error}</p>
-					<button 
+					<button
 						onClick={() => {
 							// Re-fetch by triggering a state update
 							setIsLoading(true)
@@ -353,7 +375,6 @@ const ChatMessages = ({
 				</div>
 			) : (
 				<>
-				
 					{messages.length > 0 ? (
 						messages.map((message, index) => (
 							<div key={index} data-chat-id={message.text}>
@@ -375,24 +396,28 @@ const ChatMessages = ({
 const ChatPage = () => {
 	const params = useParams()
 	const paramsArray: string[] = params.slug as string[]
-	
+
 	// Extract employee ID and chain ID from the URL
 	const employeeId = paramsArray[0] // First part is employee ID (e.g., EMP2001)
 	const chainId = paramsArray[1] // Second part is chain ID (e.g., CHAIN18925A)
-	
+
 	const messagesContainerRef = useRef<HTMLDivElement>(null)
 	const { auth } = store.getState()
 	const [sidebarOpen, setSidebarOpen] = useState(true)
+	// eslint-disable-next-line
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
+	// eslint-disable-next-line
 	const [chatid, setChatId] = useState<string>('')
 	const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false)
 	const [endSessionNotes, setEndSessionNotes] = useState('')
 	const [isEndingSession, setIsEndingSession] = useState(false)
 	const [sessionAction, setSessionAction] = useState<string>('escalate')
-	
+
 	// State for chains and expanded chains
 	const [chains, setChains] = useState<Chain[]>([])
-	const [expandedChainIds, setExpandedChainIds] = useState<Set<string>>(new Set())
+	const [expandedChainIds, setExpandedChainIds] = useState<Set<string>>(
+		new Set()
+	)
 	const [selectedChain, setSelectedChain] = useState<Chain | null>(null)
 	const [selectedSession, setSelectedSession] = useState<Session | null>(null)
 	const [chainsLoading, setChainsLoading] = useState(false)
@@ -421,13 +446,16 @@ const ChatPage = () => {
 	const fetchChains = async () => {
 		try {
 			setChainsLoading(true)
-			const response = await fetch(`${API_URL}/admin/chains/employee/${employeeId}`, {
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${auth.user?.accessToken}`,
-					'Content-Type': 'application/json',
-				},
-			})
+			const response = await fetch(
+				`${API_URL}/admin/chains/employee/${employeeId}`,
+				{
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+						'Content-Type': 'application/json',
+					},
+				}
+			)
 
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`)
@@ -435,19 +463,21 @@ const ChatPage = () => {
 
 			const data = await response.json()
 			setChains(data)
-			
+
 			// Auto-expand the current chain
 			if (chainId) {
-				const currentChain = data.find((chain: Chain) => chain.chain_id === chainId)
+				const currentChain = data.find(
+					(chain: Chain) => chain.chain_id === chainId
+				)
 				if (currentChain) {
 					setExpandedChainIds(new Set([chainId]))
 					setSelectedChain(currentChain)
-					
+
 					// Find the first session of this chain
 					if (currentChain.sessions && currentChain.sessions.length > 0) {
-						const firstSession = currentChain.sessions[0];
+						const firstSession = currentChain.sessions[0]
 						setSelectedSession(firstSession)
-						
+
 						// Set chatId to first session's chat_id for WebSocket connection
 						if (firstSession.chat_id) {
 							setChatId(firstSession.chat_id)
@@ -484,7 +514,7 @@ const ChatPage = () => {
 	const handleSessionSelect = (chain: Chain, session: Session) => {
 		setSelectedChain(chain)
 		setSelectedSession(session)
-		
+
 		// Set chatId to the session's chat_id for WebSocket connection
 		if (session.chat_id) {
 			setChatId(session.chat_id)
@@ -500,7 +530,7 @@ const ChatPage = () => {
 			})
 			return
 		}
-		
+
 		setIsEndingSession(true)
 		try {
 			const endpoint = `/admin/sessions/${selectedSession.session_id}/${sessionAction}`
@@ -537,7 +567,7 @@ const ChatPage = () => {
 			setIsEndSessionModalOpen(false)
 			setEndSessionNotes('')
 			setSessionAction('complete')
-			
+
 			// Refresh chains data
 			fetchChains()
 		} catch (error) {
@@ -635,8 +665,8 @@ const ChatPage = () => {
 					className="flex-grow overflow-hidden dark:bg-[#0f172a] bg-white"
 				>
 					{selectedSession?.chat_id ? (
-						<ChatMessages 
-							chatId={selectedSession.chat_id} 
+						<ChatMessages
+							chatId={selectedSession.chat_id}
 							accessToken={auth.user?.accessToken || ''}
 						/>
 					) : (

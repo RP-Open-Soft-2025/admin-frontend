@@ -75,7 +75,7 @@ export async function getAuthToken() {
 
 export async function fetchUsers(): Promise<User[]> {
 	try {
-		const response = await fetch('/admin/list-users');
+		const response = await fetch('/admin/list-users')
 		if (!response.ok) {
 			throw new Error(`Error fetching users: ${response.statusText}`)
 		}
@@ -83,8 +83,8 @@ export async function fetchUsers(): Promise<User[]> {
 		const data = await response.json()
 		return data.users || []
 	} catch (error) {
-		console.error('Error fetching users:', error);
-		throw error;
+		console.error('Error fetching users:', error)
+		throw error
 	}
 }
 

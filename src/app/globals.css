@@ -202,22 +202,31 @@ layer(base);
 		transition: none !important;
 	}
 	*/
-	
+
 	/* Add smooth transition for theme changes */
 	html {
-		transition: background-color 0.15s ease, color 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease;
 	}
-	
+
 	html * {
-		transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease,
+			border-color 0.15s ease,
+			box-shadow 0.15s ease !important;
 	}
-	
+
 	/* Force immediate transition for sidebar and main content */
-	aside, 
-	main, 
+	aside,
+	main,
 	header,
 	body {
-		transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease,
+			border-color 0.15s ease !important;
 	}
 }
 
