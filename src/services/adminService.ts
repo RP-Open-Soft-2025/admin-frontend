@@ -154,7 +154,7 @@ export async function fetchUserDetails(userId: string): Promise<UserDetail> {
 	}
 }
 
-export async function fetchSessions(): Promise<{
+export async function fetchActiveAndPendingSessions(): Promise<{
 	active: Session[]
 	pending: Session[]
 	total: number
@@ -192,31 +192,6 @@ export async function fetchSessions(): Promise<{
 		}
 	} catch (error) {
 		console.error('Failed to fetch sessions:', error)
-		throw error
-	}
-}
-
-export async function fetchActiveSessions(): Promise<Session[]> {
-	try {
-		const token = await getAuthToken()
-		const userRole = 'admin'
-
-		const response = await fetch(`${API_URL}/${userRole}/sessions/active`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error fetching active sessions: ${response.statusText}`)
-		}
-
-		const sessions: Session[] = await response.json()
-		return sessions || []
-	} catch (error) {
-		console.error('Failed to fetch active sessions:', error)
 		throw error
 	}
 }
