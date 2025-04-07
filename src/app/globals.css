@@ -194,11 +194,30 @@ layer(base);
 		@apply relative font-normal font-outfit z-1 bg-gray-50;
 	}
 
-	/* Make dark mode transitions instant */
+	/* Allow transitions for UI elements */
+	/*
 	*,
 	*::before,
 	*::after {
 		transition: none !important;
+	}
+	*/
+	
+	/* Add smooth transition for theme changes */
+	html {
+		transition: background-color 0.15s ease, color 0.15s ease;
+	}
+	
+	html * {
+		transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+	}
+	
+	/* Force immediate transition for sidebar and main content */
+	aside, 
+	main, 
+	header,
+	body {
+		transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
 	}
 }
 
