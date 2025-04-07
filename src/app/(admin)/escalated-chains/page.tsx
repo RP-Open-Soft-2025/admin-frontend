@@ -222,7 +222,7 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 																	{chain.meet.duration_minutes} minutes
 																</span>
 															</p>
-															{chain.meet.meeting_link && (
+															{chain.meet.meeting_link ? (
 																<p className="flex flex-col md:col-span-2">
 																	<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
 																		Meeting Link
@@ -235,6 +235,18 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 																	>
 																		{chain.meet.meeting_link}
 																	</a>
+																</p>
+															) : (
+																<p className="flex flex-col md:col-span-2">
+																	<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+																		Meeting Link
+																	</span>
+																	<div
+																		rel="noopener noreferrer"
+																		className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 truncate"
+																	>
+																		Meeting link not avaiable
+																	</div>
 																</p>
 															)}
 															{chain.meet.location && (
@@ -258,6 +270,24 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 																</p>
 															)}
 														</div>
+														
+														{/* Join Meeting Button - Bottom Right */}
+														{chain.meet.meeting_link && (
+															<div className="flex justify-end mt-4">
+																<a
+																	href={chain.meet.meeting_link}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm transition-colors duration-200 shadow-sm"
+																>
+																	<svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+																		<path d="M15 10l5 5-5 5"></path>
+																		<path d="M4 4v7a4 4 0 0 0 4 4h12"></path>
+																	</svg>
+																	Join Meeting
+																</a>
+															</div>
+														)}
 													</div>
 												)}
 
