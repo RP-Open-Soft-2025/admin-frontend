@@ -170,13 +170,12 @@ export default function UserSessionsCard({
 			const scheduledDate = new Date(formData.scheduled_time)
 			const now = new Date()
 
-			// Add 2 minutes buffer
-			const minScheduleTime = new Date(now.getTime() + 120000)
+			// Add 1 minute buffer
+			const minScheduleTime = new Date(now.getTime() + 60000)
 
 			if (scheduledDate < minScheduleTime) {
 				toast({
-					description:
-						'Scheduled time must be at least 2 minutes in the future',
+					description: 'Scheduled time must be at least 1 minute in the future',
 					type: 'error',
 				})
 				setIsSubmitting(false)
@@ -407,7 +406,7 @@ export default function UserSessionsCard({
 												<CalendarIcon className="mr-2 h-4 w-4" />
 												{formData.scheduled_time ? (
 													<span>
-														{format(new Date(new Date(formData.scheduled_time).getTime() + 19800000), 'PPP')}
+														{format(new Date(formData.scheduled_time), 'PPP')}
 													</span>
 												) : (
 													<span>Pick a date</span>
@@ -465,7 +464,7 @@ export default function UserSessionsCard({
 												type="time"
 												value={
 													formData.scheduled_time
-														? format(new Date(new Date(formData.scheduled_time).getTime() + 19800000), 'HH:mm')
+														? format(new Date(formData.scheduled_time), 'HH:mm')
 														: ''
 												}
 												onChange={e => {
@@ -641,7 +640,7 @@ export default function UserSessionsCard({
 													<CalendarIcon className="mr-2 h-4 w-4" />
 													{formData.scheduled_time ? (
 														<span>
-															{format(new Date(new Date(formData.scheduled_time).getTime() + 19800000), 'PPP')}
+															{format(new Date(formData.scheduled_time), 'PPP')}
 														</span>
 													) : (
 														<span>Pick a date</span>
@@ -699,7 +698,10 @@ export default function UserSessionsCard({
 													type="time"
 													value={
 														formData.scheduled_time
-															? format(new Date(new Date(formData.scheduled_time).getTime() + 19800000), 'HH:mm')
+															? format(
+																	new Date(formData.scheduled_time),
+																	'HH:mm'
+																)
 															: ''
 													}
 													onChange={e => {
