@@ -8,7 +8,7 @@ import {
 	ChevronDown,
 	Plus,
 	Clock,
-	CheckCircle,
+	TriangleAlert,
 	FileText,
 } from 'lucide-react'
 import { Calendar as CalendarIcon } from 'lucide-react'
@@ -735,7 +735,7 @@ export default function UserSessionsCard({
 								<div className="flex items-center">
 									<div className="h-2 w-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
 									<span>
-										This Employee has an active session - Click to join
+										This Employee has an active session - Click to view
 									</span>
 								</div>
 								<ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -842,14 +842,14 @@ export default function UserSessionsCard({
 																<Button
 																	size="sm"
 																	variant="outline"
-																	className="h-8 px-3 text-xs bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800 shadow-sm hover:shadow transition-all"
+																	className="h-8 px-3 text-xs bg-yellow-50 text-yellow-600 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 dark:hover:bg-yellow-900/40 border-yellow-200 dark:border-yellow-800 shadow-sm hover:shadow transition-all"
 																	onClick={e => {
 																		e.stopPropagation()
 																		setEscalateChainId(chain.chain_id)
 																	}}
 																>
-																	<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-																	Mark as Complete
+																	<TriangleAlert className="h-3.5 w-3.5 mr-1.5" />
+																	Escalate
 																</Button>
 															)}
 													</td>
@@ -931,7 +931,7 @@ export default function UserSessionsCard({
 				<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white">
 					<DialogHeader>
 						<DialogTitle className="dark:text-white">
-							Complete Chain
+							Escalate Chain
 						</DialogTitle>
 					</DialogHeader>
 					<div className="py-3">
@@ -945,7 +945,7 @@ export default function UserSessionsCard({
 						</div>
 
 						<p className="text-sm text-gray-600 dark:text-gray-400">
-							Are you sure you want to complete this chain? This action cannot
+							Are you sure you want to Escalate this chain? This action cannot
 							be undone.
 						</p>
 					</div>
@@ -962,7 +962,7 @@ export default function UserSessionsCard({
 						<Button
 							onClick={() => escalateChainId && escalateChain(escalateChainId)}
 							disabled={isEscalatingChain}
-							className="relative bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white"
+							className="relative bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-800 text-white"
 						>
 							{isEscalatingChain && (
 								<div className="absolute inset-0 flex items-center justify-center">
@@ -970,7 +970,7 @@ export default function UserSessionsCard({
 								</div>
 							)}
 							<span className={isEscalatingChain ? 'opacity-0' : ''}>
-								Complete Chain
+								Escalate Chain
 							</span>
 						</Button>
 					</DialogFooter>

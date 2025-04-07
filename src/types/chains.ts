@@ -26,5 +26,15 @@ export interface EscalatedChain {
 	employee_id: string;
 	escalation_reason: string;
 	escalated_at: string;
-	meet: string | null;
+	meet: {
+		meet_id: string;
+		user_id: string;
+		with_user_id: string;
+		scheduled_at: string;
+		duration_minutes: number;
+		status: string;
+		meeting_link: string | null;
+		location: string | null;
+		notes: string | null;
+	} | null;
 } 
