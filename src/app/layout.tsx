@@ -49,13 +49,6 @@ export default function RootLayout({
 
 	return (
 		<html lang="en">
-			<head>
-				<meta charSet="UTF-8" />
-				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<link rel="icon" href="/images/favicon.ico" />
-			</head>
-			<title>Admin - Vibemeter</title>
 			<body
 				className={`${outfit.variable} dark:bg-gray-900 transition-colors duration-150`}
 			>

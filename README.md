@@ -1,6 +1,6 @@
-# GC OpenSoft 2025 Admin Frontend
+# DeloConnect Admin Panel
 
-A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Tailwind CSS. This project serves as the administrative interface for GC OpenSoft 2025.
+A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Tailwind CSS. This project serves as the administrative interface for DeloConnect platform.
 
 ## 📑 Table of Contents
 
@@ -46,7 +46,7 @@ A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Ta
 
 ```bash
 git clone [repository-url]
-cd admin-frontend
+cd deloconnect-admin-panel
 ```
 
 2. Install dependencies:
@@ -84,7 +84,7 @@ The application will be available at [http://localhost:3000](http://localhost:30
 ## 🏗️ Project Structure
 
 ```
-admin-frontend/
+deloconnect-admin-panel/
 ├── src/                    # Source code
 │   ├── app/               # Next.js app router pages
 │   ├── components/        # Reusable components
