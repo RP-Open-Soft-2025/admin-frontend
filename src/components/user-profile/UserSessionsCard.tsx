@@ -8,7 +8,6 @@ import {
 	ChevronDown,
 	Plus,
 	Clock,
-	CheckCircle,
 	TriangleAlert,
 	FileText,
 } from 'lucide-react'
