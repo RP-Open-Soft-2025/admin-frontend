@@ -382,6 +382,7 @@ const ChatPage = () => {
 		}
 
 		fetchSessionHistory()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [auth.user, id])
 
 	useEffect(() => {
