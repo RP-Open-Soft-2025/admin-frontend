@@ -147,8 +147,8 @@ export default function Page() {
 	return (
 		<div className="w-full h-screen md:min-h-screen flex flex-col md:flex-row">
 			{/* Left Section (Green) */}
-			<div className="h-[50vh] md:h-auto w-full md:w-1/2 flex items-center justify-center bg-[#66872B] dark:bg-[#334016] relative">
-				<div className="rounded-none md:rounded-l-2xl rounded-tl-0xl size-full md:size-[400px] bg-[#3B4F17] dark:bg-[#1E2B09] shadow-lg flex flex-col items-center justify-center text-center p-6 md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 py-15">
+			<div className="h-[50vh] md:h-auto w-full md:w-1/2 flex items-center justify-center bg-[#2d6bbd] dark:bg-[#1e3a5f] relative">
+				<div className="rounded-none md:rounded-l-2xl rounded-tl-0xl size-full md:size-[400px] bg-[#1e3a5f] shadow-lg flex flex-col items-center justify-center text-center p-6 md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 py-15">
 					<h1 className="text-3xl font-bold text-white mb-2">Deloitte.</h1>
 					<Image
 						src={DeloitteLogo}

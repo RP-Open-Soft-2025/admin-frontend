@@ -5,7 +5,6 @@ interface UserManagementProps {
 	users: User[] | 'UNAVAILABLE'
 	onDeleteUser?: (userId: string) => void
 	onViewDetails?: (userId: string) => void
-	onCreateSession?: (userId: string) => void
 	onCreateUser?: () => void
 	onRefresh?: () => void
 	isLoading?: boolean
@@ -15,7 +14,6 @@ const UserManagement = ({
 	users,
 	onDeleteUser,
 	onViewDetails,
-	onCreateSession,
 	onCreateUser,
 	onRefresh,
 	isLoading = false,
@@ -151,7 +149,7 @@ const UserManagement = ({
 						<input
 							type="search"
 							className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-							placeholder="Search users..."
+							placeholder="Search Employee..."
 							value={searchTerm}
 							onChange={e => setSearchTerm(e.target.value)}
 						/>
@@ -267,28 +265,6 @@ const UserManagement = ({
 																strokeLinejoin="round"
 																strokeWidth={2}
 																d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-															/>
-														</svg>
-													</button>
-												)}
-												{onCreateSession && (
-													<button
-														onClick={() => onCreateSession(user.id)}
-														className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
-														title="Create Session"
-													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															className="h-5 w-5"
-															fill="none"
-															viewBox="0 0 24 24"
-															stroke="currentColor"
-														>
-															<path
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																strokeWidth={2}
-																d="M12 6v6m0 0v6m0-6h6m-6 0H6"
 															/>
 														</svg>
 													</button>

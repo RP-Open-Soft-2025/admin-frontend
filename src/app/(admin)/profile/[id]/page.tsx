@@ -23,6 +23,7 @@ import { useParams, useRouter } from 'next/navigation'
 import store from '@/redux/store'
 import { toast } from '@/components/ui/sonner'
 import { EmployeeAPI } from '@/types/UserProfile'
+import { DEL_TIME } from '@/constants'
 
 export default function Profile() {
 	const [profileData, setProfileData] = useState<EmployeeAPI | null>()
@@ -34,16 +35,20 @@ export default function Profile() {
 	const { auth } = store.getState()
 
 	useEffect(() => {
-		// Check if user is authenticated
-		if (!auth.isAuthenticated) {
-			console.log('User is not authenticated, redirecting to login')
-			router.push('/login')
-			return
-		}
+		const fetchData = async () => {
+			if (!auth.isAuthenticated) {
+				router.push('/login')
+				return
+			}
 
-		async function fetchProfileData() {
+			if (!id) {
+				console.error('No ID provided')
+				return
+			}
+
+			setLoading(true)
 			try {
-				const data: EmployeeAPI = await getUserProfileData(id)
+				const data = await getUserProfileData(id)
 				setProfileData(data)
 				setLoading(false)
 
@@ -92,10 +97,18 @@ export default function Profile() {
 			}
 		}
 
-		fetchProfileData()
-	}, [auth.isAuthenticated, router])
+		// Initial fetch
+		fetchData()
 
-	if (loading) {
+		const intervalId = setInterval(() => {
+			fetchData()
+		}, DEL_TIME)
+
+		return () => clearInterval(intervalId)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
+	if (loading && profileData == null) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
 				<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>

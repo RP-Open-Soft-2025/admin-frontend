@@ -1,12 +1,21 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
-import { ChatResp, MessageResp, SenderType } from '@/types/chat'
+import { MessageResp, SenderType } from '@/types/chat'
 import { API_URL, WS_URL } from '@/constants'
 import store from '@/redux/store'
-import { Role } from '@/types/employee'
 import { toast } from '@/components/ui/sonner'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 
+// Define session history type
 type SessionHist = {
 	chat_id: string
 	last_message: string
@@ -16,6 +25,15 @@ type SessionHist = {
 	chat_mode: 'BOT' | 'HUMAN' // Assuming only these two modes
 	is_escalated: boolean
 	created_at: string // ISO timestamp
+}
+
+// Define a Session interface to properly type the session data
+interface Session {
+	session_id: string
+	employee_id: string
+	chat_id: string
+	status: string
+	scheduled_at: string
 }
 
 const MessageComp = ({ message }: { message: MessageResp }) => {
@@ -126,16 +144,19 @@ const ChatPage = () => {
 	const params = useParams()
 	const id = params.id as string
 	const [messages, setMessages] = useState<MessageResp[]>([])
-	const [newMessage, setNewMessage] = useState('')
 	const chatEndRef = useRef<HTMLDivElement>(null)
 	const messagesContainerRef = useRef<HTMLDivElement>(null)
 	const { auth } = store.getState()
 	const [isLoading, setIsLoading] = useState(true)
-	const [takeOver, setTakeOver] = useState<boolean>(false)
 	const [sidebarOpen, setSidebarOpen] = useState(true)
 	const [sessions, setSessions] = useState<SessionHist[]>([])
 	const [historyLoading, setHistoryLoading] = useState(false)
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
+	const [chatid, setChatId] = useState<string>('')
+	const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false)
+	const [endSessionNotes, setEndSessionNotes] = useState('')
+	const [isEndingSession, setIsEndingSession] = useState(false)
+	const [sessionAction, setSessionAction] = useState<string>('escalate');
 
 	// Scroll to latest message
 	useEffect(() => {
@@ -179,74 +200,193 @@ const ChatPage = () => {
 		setHistoryLoading(true)
 
 		const fetchSessionHistory = async () => {
-			try {
-				console.log('Fetching session history for ID:', id);
-				
-				if (!auth.user?.accessToken) {
-					toast({
-						type: 'error',
-						description: 'Authentication token is missing. Please log in again.'
-					});
-					return;
-				}
-
-				const response = await fetch(`${API_URL}/chat/history/${id}`, {
-					method: 'GET',
-					headers: {
-						'Authorization': `Bearer ${auth.user.accessToken}`,
-						'Content-Type': 'application/json'
-					}
-				});
-
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
-				}
-
-				const data = await response.json();
-				console.log('Session history data:', data);
-
-				// Handle the new data format with chatId and messages
-				if (data && data.chatId && Array.isArray(data.messages)) {
-					// Create a single session from the chat data
-					const session: SessionHist = {
-						chat_id: data.chatId,
-						last_message: data.messages[data.messages.length - 1]?.text || '',
-						last_message_time: data.messages[data.messages.length - 1]?.timestamp || null,
-						unread_count: 0,
-						total_messages: data.messages.length,
-						chat_mode: 'BOT',
-						is_escalated: false,
-						created_at: data.messages[0]?.timestamp || new Date().toISOString()
-					};
-					
-					setSessions([session]);
-					
-					// Set messages directly since we already have them
-					setMessages(data.messages);
-				} else {
-					console.error('Invalid data format received:', data);
-					toast({
-						type: 'error',
-						description: 'Invalid data format received from server'
-					});
-				}
-			} catch (error) {
-				console.error('Error fetching session history:', error);
+			if (!auth.user?.accessToken) {
 				toast({
 					type: 'error',
-					description: 'Failed to load chat history. Please try again.'
-				});
-			} finally {
-				setHistoryLoading(false);
-				setIsLoading(false);
+					description: 'Authentication token is missing. Please log in again.',
+				})
+				setHistoryLoading(false)
+				setIsLoading(false)
+				return
 			}
-		};
+
+			// Step 1: Check if ID is already a chat ID first
+			if (id.startsWith('CHAT')) {
+				console.log('ID appears to be a chat ID, using it directly:', id)
+				// Skip to fetching chat history using the ID directly
+				await fetchChatHistory(id)
+				return
+			}
+
+			// Step 2: If not a chat ID, try to find it in the sessions
+			const endpoint = 'admin'
+			console.log(
+				`Using endpoint: ${endpoint}/sessions for user role: ${auth.user.userRole}`
+			)
+
+			try {
+				// Try with the regular sessions endpoint first
+				let matchingSession = null
+				let sessionsData = []
+
+				// Try regular sessions first
+				console.log(`Fetching from ${API_URL}/${endpoint}/sessions`)
+				const sessionsResponse = await fetch(
+					`${API_URL}/${endpoint}/sessions`,
+					{
+						method: 'GET',
+						headers: {
+							Authorization: `Bearer ${auth.user.accessToken}`,
+							'Content-Type': 'application/json',
+						},
+					}
+				)
+
+				if (sessionsResponse.ok) {
+					sessionsData = await sessionsResponse.json()
+					console.log(`Received ${sessionsData.length} active/pending sessions`)
+
+					// Try to find the session
+					matchingSession = sessionsData.find(
+						(session: Session) => session.session_id === id
+					)
+				} else {
+					console.error(
+						`Failed to fetch regular sessions: ${sessionsResponse.status}`
+					)
+				}
+
+				// If not found, try the completed sessions endpoint
+				if (!matchingSession) {
+					console.log(
+						`Session not found in active sessions, trying completed sessions endpoint`
+					)
+					console.log(`Fetching from ${API_URL}/${endpoint}/sessions/completed`)
+
+					const completedSessionsResponse = await fetch(
+						`${API_URL}/${endpoint}/sessions/completed`,
+						{
+							method: 'GET',
+							headers: {
+								Authorization: `Bearer ${auth.user.accessToken}`,
+								'Content-Type': 'application/json',
+							},
+						}
+					)
+
+					if (completedSessionsResponse.ok) {
+						const completedSessionsData = await completedSessionsResponse.json()
+						console.log(
+							`Received ${completedSessionsData.length} completed sessions`
+						)
+
+						// Try to find the session in completed sessions
+						matchingSession = completedSessionsData.find(
+							(session: Session) => session.session_id === id
+						)
+
+						if (matchingSession) {
+							console.log(`Found session ${id} in completed sessions`)
+						}
+					} else {
+						console.error(
+							`Failed to fetch completed sessions: ${completedSessionsResponse.status}`
+						)
+					}
+				}
+
+				// If we still don't have a matching session after checking both endpoints
+				if (!matchingSession) {
+					console.error(`Session ID "${id}" not found in any sessions list`)
+					toast({
+						type: 'error',
+						description: `Session ${id} not found in active or completed sessions. Please check the session ID.`,
+					})
+					setHistoryLoading(false)
+					setIsLoading(false)
+					return
+				}
+
+				// Step 3: Extract the chat ID
+				const chatId = matchingSession.chat_id
+				console.log('Found chat ID:', chatId, 'for session ID:', id)
+
+				// Step 4: Fetch chat history
+				await fetchChatHistory(chatId)
+			} catch (error) {
+				console.error('Error fetching sessions:', error)
+				toast({
+					type: 'error',
+					description: 'Failed to load sessions. Please try again.',
+				})
+				setHistoryLoading(false)
+				setIsLoading(false)
+			}
+
+			// Function to fetch chat history once we have the chat ID
+			async function fetchChatHistory(chatId: string) {
+				try {
+					console.log('Fetching chat history for chat ID:', chatId)
+
+					const response = await fetch(`${API_URL}/chat/history/${chatId}`, {
+						method: 'GET',
+						headers: {
+							Authorization: `Bearer ${auth.user?.accessToken}`,
+							'Content-Type': 'application/json',
+						},
+					})
+
+					if (!response.ok) {
+						throw new Error(`HTTP error! status: ${response.status}`)
+					}
+
+					const data = await response.json()
+					console.log('Chat history data received for chat ID:', chatId)
+
+					// Handle the data as before
+					if (data && data.chatId && Array.isArray(data.messages)) {
+						const session: SessionHist = {
+							chat_id: data.chatId,
+							last_message: data.messages[data.messages.length - 1]?.text || '',
+							last_message_time:
+								data.messages[data.messages.length - 1]?.timestamp || null,
+							unread_count: 0,
+							total_messages: data.messages.length,
+							chat_mode: 'BOT',
+							is_escalated: false,
+							created_at:
+								data.messages[0]?.timestamp || new Date().toISOString(),
+						}
+
+						setSessions([session])
+						if (chatid == '') setChatId(session.chat_id)
+						setMessages(data.messages)
+					} else {
+						console.error('Invalid data format received:', data)
+						toast({
+							type: 'error',
+							description: 'Invalid data format received from server',
+						})
+					}
+				} catch (error) {
+					console.error('Error fetching chat history:', error)
+					toast({
+						type: 'error',
+						description: 'Failed to load chat history. Please try again.',
+					})
+				} finally {
+					setHistoryLoading(false)
+					setIsLoading(false)
+				}
+			}
+		}
 
 		fetchSessionHistory()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [auth.user, id])
 
 	useEffect(() => {
-		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + id)
+		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + chatid)
 
 		ws.onmessage = event => {
 			const data = JSON.parse(event.data)
@@ -267,47 +407,54 @@ const ChatPage = () => {
 		return () => {
 			ws.close()
 		}
-	}, [id])
+	}, [chatid])
 
-	// Handle message sending
-	const sendMessage = () => {
-		if (newMessage.trim() !== '') {
-			console.log(API_URL)
-			fetch(`${API_URL}/chat/message-to-employee`, {
+	const endSession = async () => {
+		setIsEndingSession(true)
+		try {
+			const endpoint = `/admin/chains/${id}/${sessionAction}`
+
+			const response = await fetch(`${API_URL}${endpoint}`, {
 				method: 'POST',
 				headers: {
-					'Content-type': 'Application/json',
+					'Content-Type': 'application/json',
 					Authorization: `Bearer ${auth.user?.accessToken}`,
 				},
 				body: JSON.stringify({
-					chatId: id,
-					message: newMessage.trim(),
+					notes: endSessionNotes,
 				}),
-			}).then(resp => {
-				if (resp.ok) {
-					const message: MessageResp = {
-						sender: SenderType.HR,
-						text: newMessage.trim(),
-						timestamp: new Date().toISOString(),
-					}
-					setMessages(prevMessages => [...prevMessages, message])
-					setNewMessage('')
-				}
 			})
-		}
-	}
 
-	// Send message on Enter key press
-	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			e.preventDefault()
-			sendMessage()
-		}
-	}
+			if (!response.ok) {
+				throw new Error(`Error: ${response.status}`)
+			}
 
-	const initTakeOver = () => {
-		console.log('Chat Taken Over')
-		setTakeOver(true)
+			// Show success message with appropriate action
+			const actionText =
+				sessionAction === 'complete'
+					? 'completed'
+					: sessionAction === 'escalate'
+						? 'escalated'
+						: 'cancelled'
+
+			toast({
+				description: `Session ${actionText} successfully`,
+				type: 'success',
+			})
+
+			// Close modal and reset state
+			setIsEndSessionModalOpen(false)
+			setEndSessionNotes('')
+			setSessionAction('complete')
+		} catch (error) {
+			console.error(`Error ${sessionAction}ing session:`, error)
+			toast({
+				description: `Failed to ${sessionAction} session`,
+				type: 'error',
+			})
+		} finally {
+			setIsEndingSession(false)
+		}
 	}
 
 	const navigateToChat = (chatId: string) => {
@@ -447,38 +594,124 @@ const ChatPage = () => {
 				</div>
 
 				{/* Chat Input */}
-				{auth.user?.userRole == Role.HR && takeOver ? (
-					<div className="p-2 bg-[#162040] border-t border-gray-700">
-						<div className="flex space-x-2">
-							<input
-								type="text"
-								className="flex-grow p-2 rounded dark:bg-[#1e293b] bg-white
-                border border-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-white text-sm"
-								value={newMessage}
-								onChange={e => setNewMessage(e.target.value)}
-								onKeyDown={handleKeyDown}
-								placeholder="Type your message..."
-							/>
-							<button
-								className="px-3 py-2 bg-indigo-500 text-white rounded text-sm
-                hover:bg-indigo-600 transition-colors"
-								onClick={sendMessage}
-							>
-								Send
-							</button>
-						</div>
-					</div>
-				) : (
-					<div className="dark:bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700 bg-white">
-						<button
-							className="px-4 py-2 dark:bg-[#1e293b] dark:text-white rounded-md shadow-md text-sm bg-blue-200 text-black
+
+				<div className="dark:bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700 bg-white">
+					<button
+						className="px-4 py-2 dark:bg-[#1e293b] dark:text-white rounded-md shadow-md text-sm bg-blue-200 text-black
               dark:hover:bg-[#334155] transition-colors hover:bg-blue-light-500"
-							onClick={() => initTakeOver()}
+						onClick={() => setIsEndSessionModalOpen(true)}
+					>
+						End Session
+					</button>
+				</div>
+
+				{/* End Session Modal */}
+				<Dialog
+					open={isEndSessionModalOpen}
+					onOpenChange={setIsEndSessionModalOpen}
+				>
+					<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
+						<DialogHeader>
+							<DialogTitle className="dark:text-white">
+								Escalate Session
+							</DialogTitle>
+						</DialogHeader>
+						<form
+							onSubmit={e => {
+								e.preventDefault()
+								endSession()
+							}}
+							className="space-y-4"
 						>
-							TakeOver
-						</button>
-					</div>
-				)}
+							{/* <div className="grid w-full items-center gap-2">
+								<label
+									htmlFor="session_action"
+									className="text-sm font-medium text-gray-700 dark:text-gray-300"
+								>
+									Action
+								</label>
+								<div className="relative">
+									<Select
+										options={[
+											{ value: 'escalate', label: 'Escalate' },
+										]}
+										placeholder="Select action"
+										onChange={value => setSessionAction(value)}
+										defaultValue={sessionAction}
+									/>
+									<span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+										<svg
+											className="size-5"
+											xmlns="http://www.w3.org/2000/svg"
+											width="24"
+											height="24"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
+											<path d="m6 9 6 6 6-6" />
+										</svg>
+									</span>
+								</div>
+							</div> */}
+
+							<div className="grid w-full items-center gap-2">
+								<label
+									htmlFor="end_session_notes"
+									className="text-sm font-medium text-gray-700 dark:text-gray-300"
+								>
+									Notes
+								</label>
+								<Textarea
+									id="end_session_notes"
+									value={endSessionNotes}
+									onChange={e => setEndSessionNotes(e.target.value)}
+									placeholder="Enter any notes about this action..."
+									className="resize-none min-h-[100px] dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:placeholder-gray-500"
+								/>
+							</div>
+
+							<DialogFooter className="gap-2 sm:gap-0">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setIsEndSessionModalOpen(false)}
+									className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+								>
+									Cancel
+								</Button>
+								<Button
+									type="submit"
+									disabled={isEndingSession}
+									className={`relative ${
+										sessionAction === 'complete'
+											? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
+											: sessionAction === 'escalate'
+												? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800'
+												: 'bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800'
+									}`}
+								>
+									{isEndingSession && (
+										<div className="absolute inset-0 flex items-center justify-center">
+											<div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white dark:border-gray-300"></div>
+										</div>
+									)}
+									<span className={isEndingSession ? 'opacity-0' : ''}>
+										{sessionAction === 'complete'
+											? 'Complete'
+											: sessionAction === 'escalate'
+												? 'Escalate'
+												: 'Cancel'}{' '}
+										Session
+									</span>
+								</Button>
+							</DialogFooter>
+						</form>
+					</DialogContent>
+				</Dialog>
 			</div>
 		</div>
 	)

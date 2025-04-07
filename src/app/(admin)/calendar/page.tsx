@@ -30,11 +30,11 @@ interface CalendarEvent extends EventInput {
 
 // Add this interface after the CalendarEvent interface
 interface TodayEvent {
-    title: string
-    time: string
-    type: 'meeting' | 'session'
-    status: string
-    redirectUrl: string
+	title: string
+	time: string
+	type: 'meeting' | 'session'
+	status: string
+	redirectUrl: string
 }
 
 // Add CSS for event styling
@@ -359,6 +359,38 @@ body.fc-popover-open {
 .dark .fc-daygrid-day:hover {
 	background-color: rgba(255,255,255,0.02) !important;
 }
+
+/* The scrollbar styles have been moved to globals.css */
+
+.fc-popover {
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+}
+
+body.fc-popover-open {
+    overflow: hidden !important;
+}
+
+/* Prevent calendar from becoming too narrow */
+.fc-view-harness {
+  min-width: 800px !important; /* Minimum viable width */
+}
+
+.fc-daygrid-day-frame {
+  min-width: 120px !important; /* Prevent column collapse */
+}
+
+/* Responsive toolbar for mobile */
+@media (max-width: 768px) {
+  .fc-toolbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .fc-header-toolbar {
+    flex-wrap: wrap;
+  }
+}
 `
 
 const RenderEventContent = (eventInfo: EventContentArg) => {
@@ -385,14 +417,16 @@ const RenderEventContent = (eventInfo: EventContentArg) => {
 	}
 
 	return (
-		<a
-			className={`event-fc-color fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full flex items-center`}
-			href={eventInfo.event.extendedProps.redirectUrl}
-		>
-			<div className="text-white text-xs overflow-hidden text-ellipsis whitespace-nowrap">
-				{title}
-			</div>
-		</a>
+		<>
+			<a
+				className={`event-fc-color fc-event-main fc-bg-${calendarType} p-1 rounded-sm w-full flex items-center`}
+				href={eventInfo.event.extendedProps.redirectUrl}
+			>
+				<div className="text-white text-xs overflow-hidden text-ellipsis whitespace-nowrap">
+					{title}
+				</div>
+			</a>
+		</>
 	)
 }
 
@@ -404,7 +438,7 @@ const formatTimeInIST = (dateString: string) => {
 		hour: '2-digit',
 		minute: '2-digit',
 		hour12: true,
-		timeZone: 'Asia/Kolkata'
+		timeZone: 'Asia/Kolkata',
 	})
 }
 
@@ -420,7 +454,7 @@ const Calendar: React.FC = () => {
 	const [eventLevel, setEventLevel] = useState('')
 	const [events, setEvents] = useState<CalendarEvent[]>([])
 	const [allEvents, setAllEvents] = useState<CalendarEvent[]>([])
-	const [activeFilter, setActiveFilter] = useState<FilterType>('all')
+	const [activeFilter, setActiveFilter] = useState<FilterType>('meetings')
 	const [isLoading, setIsLoading] = useState(true)
 	const calendarRef = useRef<FullCalendar>(null)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -431,6 +465,8 @@ const Calendar: React.FC = () => {
 	const [selectedDate, setSelectedDate] = useState<string>('')
 	const [showTodayModal, setShowTodayModal] = useState(false)
 	const [todayEvents, setTodayEvents] = useState<TodayEvent[]>([])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [isDashboardExpanded, setIsDashboardExpanded] = useState(true)
 
 	const handleAuthError = useCallback(() => {
 		toast({
@@ -449,8 +485,15 @@ const Calendar: React.FC = () => {
 			}
 			try {
 				// Fetch meetings
-				const meetingsResponse = await fetch(
-					`${API_URL}/${auth.user.userRole}/meets`,
+				const meetingsResponse = await fetch(`${API_URL}/admin/meets`, {
+					headers: {
+						Authorization: `Bearer ${auth.user.accessToken}`,
+					},
+				})
+
+				// Fetch sessions using the admin endpoints
+				const activeAndPendingResponse = await fetch(
+					`${API_URL}/admin/sessions`,
 					{
 						headers: {
 							Authorization: `Bearer ${auth.user.accessToken}`,
@@ -458,37 +501,10 @@ const Calendar: React.FC = () => {
 					}
 				)
 
-				// Fetch all session types
-				const [activeResponse, completedResponse, pendingResponse] =
-					await Promise.all([
-						fetch(`${API_URL}/${auth.user.userRole}/sessions/active`, {
-							headers: {
-								Authorization: `Bearer ${auth.user.accessToken}`,
-							},
-						}),
-						fetch(`${API_URL}/${auth.user.userRole}/sessions/completed`, {
-							headers: {
-								Authorization: `Bearer ${auth.user.accessToken}`,
-							},
-						}),
-						fetch(`${API_URL}/${auth.user.userRole}/sessions/pending`, {
-							headers: {
-								Authorization: `Bearer ${auth.user.accessToken}`,
-							},
-						}),
-					])
-
-				if (
-					!meetingsResponse.ok ||
-					!activeResponse.ok ||
-					!completedResponse.ok ||
-					!pendingResponse.ok
-				) {
+				if (!meetingsResponse.ok || !activeAndPendingResponse.ok) {
 					if (
 						meetingsResponse.status === 401 ||
-						activeResponse.status === 401 ||
-						completedResponse.status === 401 ||
-						pendingResponse.status === 401
+						activeAndPendingResponse.status === 401
 					) {
 						handleAuthError()
 						return
@@ -497,12 +513,7 @@ const Calendar: React.FC = () => {
 				}
 
 				const meetingsData = await meetingsResponse.json()
-				const [activeSessions, completedSessions, pendingSessions] =
-					await Promise.all([
-						activeResponse.json(),
-						completedResponse.json(),
-						pendingResponse.json(),
-					])
+				const activeAndPendingSessions = await activeAndPendingResponse.json()
 
 				// Format meetings
 				const formattedMeetings = meetingsData.map((meet: Meeting) => {
@@ -542,12 +553,18 @@ const Calendar: React.FC = () => {
 					}
 				}
 
+				// Separate active and pending sessions based on their status field
+				const activeSessions = activeAndPendingSessions.filter(
+					(session: SessionType) => session.status === SessionStatus.ACTIVE
+				)
+
+				const pendingSessions = activeAndPendingSessions.filter(
+					(session: SessionType) => session.status === SessionStatus.PENDING
+				)
+
 				const formattedSessions = [
 					...activeSessions.map((session: SessionType) =>
 						formatSession(session, SessionStatus.ACTIVE)
-					),
-					...completedSessions.map((session: SessionType) =>
-						formatSession(session, SessionStatus.COMPLETED)
 					),
 					...pendingSessions.map((session: SessionType) =>
 						formatSession(session, SessionStatus.PENDING)
@@ -601,12 +618,12 @@ const Calendar: React.FC = () => {
 		}
 	}
 
-	const resetModalFields = () => {
-		setEventTitle('')
-		setEventStartDate('')
-		setEventLevel('')
-		setSelectedEvent(null)
-	}
+	// const resetModalFields = () => {
+	// 	setEventTitle('')
+	// 	setEventStartDate('')
+	// 	setEventLevel('')
+	// 	setSelectedEvent(null)
+	// }
 
 	useEffect(() => {
 		// Skip if calendarRef isn't available
@@ -714,42 +731,119 @@ const Calendar: React.FC = () => {
 	}, [])
 
 	// Function to get events for a specific date
-	const getEventsForDate = useCallback((date: Date) => {
-		const startOfDay = new Date(date)
-		startOfDay.setHours(0, 0, 0, 0)
-		
-		const endOfDay = new Date(date)
-		endOfDay.setHours(23, 59, 59, 999)
+	const getEventsForDate = useCallback(
+		(date: Date) => {
+			const startOfDay = new Date(date)
+			startOfDay.setHours(0, 0, 0, 0)
 
-		const dateEvents = events.filter(event => {
-			const eventDate = new Date(event.start as string)
-			return eventDate >= startOfDay && eventDate <= endOfDay
-		}).map(event => ({
-			title: event.title || 'Untitled Event',
-			time: formatTimeInIST(event.start as string),
-			type: event.extendedProps.eventType,
-			status: event.extendedProps.calendar,
-			redirectUrl: event.extendedProps.redirectUrl
-		}))
+			const endOfDay = new Date(date)
+			endOfDay.setHours(23, 59, 59, 999)
 
-		// Sort by time
-		dateEvents.sort((a, b) => {
-			const timeA = new Date(`1970/01/01 ${a.time}`).getTime()
-			const timeB = new Date(`1970/01/01 ${b.time}`).getTime()
-			return timeA - timeB
-		})
+			const dateEvents = events
+				.filter(event => {
+					const eventDate = new Date(event.start as string)
+					return eventDate >= startOfDay && eventDate <= endOfDay
+				})
+				.map(event => ({
+					title: event.title || 'Untitled Event',
+					time: formatTimeInIST(event.start as string),
+					type: event.extendedProps.eventType,
+					status: event.extendedProps.calendar,
+					redirectUrl: event.extendedProps.redirectUrl,
+				}))
 
-		return dateEvents
-	}, [events])
+			// Sort by time
+			dateEvents.sort((a, b) => {
+				const timeA = new Date(`1970/01/01 ${a.time}`).getTime()
+				const timeB = new Date(`1970/01/01 ${b.time}`).getTime()
+				return timeA - timeB
+			})
+
+			return dateEvents
+		},
+		[events]
+	)
+
+	// Add this function to handle the "more" links click
+	const handleMoreEventsClick = (date: string) => {
+		// Convert the date cell to a Date object
+		const cellDate = new Date(date)
+		// Get all events for this date
+		const events = getEventsForDate(cellDate)
+		// Set the selected date and events
+		setSelectedDateEvents(events)
+		setSelectedDate(cellDate.toISOString())
+		// Show the modal
+		setShowDateModal(true)
+	}
+
+	// Add event listener after the calendar is rendered
+	useEffect(() => {
+		if (!calendarRef.current) return
+
+		const addEventListenersToMoreLinks = () => {
+			// Find all "more" links in the calendar
+			const moreLinks = document.querySelectorAll('.fc-daygrid-more-link')
+
+			moreLinks.forEach(link => {
+				// Remove any existing listeners to prevent duplicates
+				link.removeEventListener('click', moreClickHandler)
+
+				// Add click event listener
+				link.addEventListener('click', moreClickHandler)
+			})
+		}
+
+		// Handler for the more link clicks
+		const moreClickHandler = (e: Event) => {
+			e.preventDefault()
+			e.stopPropagation()
+
+			// Get the date from the parent cell
+			const dayEl = (e.target as Element).closest('.fc-daygrid-day')
+			if (dayEl) {
+				const dateAttr = dayEl.getAttribute('data-date')
+				if (dateAttr) {
+					handleMoreEventsClick(dateAttr)
+				}
+			}
+		}
+
+		// Initial setup
+		addEventListenersToMoreLinks()
+
+		// Add listeners when view changes
+		const api = calendarRef.current.getApi()
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		;(api as any).on('viewDidMount', addEventListenersToMoreLinks)
+
+		// Also handle when events are rerendered
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		;(api as any).on('eventDidMount', addEventListenersToMoreLinks)
+
+		// Store the current ref value for cleanup
+		const currentRef = calendarRef.current
+
+		return () => {
+			if (currentRef) {
+				const api = currentRef.getApi()
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				;(api as any).off('viewDidMount', addEventListenersToMoreLinks)
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				;(api as any).off('eventDidMount', addEventListenersToMoreLinks)
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [calendarRef, getEventsForDate])
 
 	// Function to format date for display
 	const formatDate = (dateStr: string) => {
 		const date = new Date(dateStr)
-		return date.toLocaleDateString('en-US', { 
-			weekday: 'long', 
-			year: 'numeric', 
-			month: 'long', 
-			day: 'numeric' 
+		return date.toLocaleDateString('en-US', {
+			weekday: 'long',
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
 		})
 	}
 
@@ -757,20 +851,22 @@ const Calendar: React.FC = () => {
 	const getTodayEvents = useCallback(() => {
 		const today = new Date()
 		today.setHours(0, 0, 0, 0)
-		
+
 		const tomorrow = new Date(today)
 		tomorrow.setDate(tomorrow.getDate() + 1)
 
-		const todaysEvents = events.filter(event => {
-			const eventDate = new Date(event.start as string)
-			return eventDate >= today && eventDate < tomorrow
-		}).map(event => ({
-			title: event.title || 'Untitled Event',
-			time: formatTimeInIST(event.start as string),
-			type: event.extendedProps.eventType,
-			status: event.extendedProps.calendar,
-			redirectUrl: event.extendedProps.redirectUrl
-		}))
+		const todaysEvents = events
+			.filter(event => {
+				const eventDate = new Date(event.start as string)
+				return eventDate >= today && eventDate < tomorrow
+			})
+			.map(event => ({
+				title: event.title || 'Untitled Event',
+				time: formatTimeInIST(event.start as string),
+				type: event.extendedProps.eventType,
+				status: event.extendedProps.calendar,
+				redirectUrl: event.extendedProps.redirectUrl,
+			}))
 
 		// Sort by time
 		todaysEvents.sort((a, b) => {
@@ -799,6 +895,33 @@ const Calendar: React.FC = () => {
 		setShowDateModal(true)
 	}
 
+	// Add ResizeObserver to handle calendar size changes
+	useEffect(() => {
+		const handleResize = () => {
+			if (calendarRef.current) {
+				calendarRef.current.getApi().updateSize()
+			}
+		}
+
+		const resizeObserver = new ResizeObserver(handleResize)
+		const calendarEl = document.querySelector('.fc')
+		if (calendarEl) {
+			resizeObserver.observe(calendarEl)
+		}
+
+		return () => resizeObserver.disconnect()
+	}, [])
+	// Update calendar size when dashboard state changes
+	useEffect(() => {
+		if (calendarRef.current) {
+			// Debounce to handle rapid resizing
+			const timeoutId = setTimeout(() => {
+				calendarRef.current?.getApi().updateSize()
+			}, 300)
+			return () => clearTimeout(timeoutId)
+		}
+	}, [isDashboardExpanded]) // Trigger when dashboard state changes
+
 	return (
 		<div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] relative min-h-[400px] md:min-h-[600px]">
 			<style>{calendarStyles}</style>
@@ -807,7 +930,9 @@ const Calendar: React.FC = () => {
 				<div className="absolute inset-0 bg-white/60 dark:bg-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
 					<div className="flex flex-col items-center gap-3">
 						<div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-						<p className="text-sm text-gray-600 dark:text-gray-300">Loading calendar events...</p>
+						<p className="text-sm text-gray-600 dark:text-gray-300">
+							Loading calendar events...
+						</p>
 					</div>
 				</div>
 			)}
@@ -815,12 +940,16 @@ const Calendar: React.FC = () => {
 			{/* Add new modal for selected date events */}
 			{showDateModal && (
 				<>
-					<div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-md" 
-						onClick={() => setShowDateModal(false)} 
+					<div
+						className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-md"
+						onClick={() => setShowDateModal(false)}
 						style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
 					/>
 					<div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
-						<div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg mx-4" style={{ height: '500px' }}>
+						<div
+							className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg mx-4"
+							style={{ height: '500px' }}
+						>
 							<div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
 								<h2 className="text-lg font-semibold text-gray-900 dark:text-white">
 									Events for {formatDate(selectedDate)}
@@ -829,12 +958,22 @@ const Calendar: React.FC = () => {
 									onClick={() => setShowDateModal(false)}
 									className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
 								>
-									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+									<svg
+										className="w-5 h-5"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="2"
+											d="M6 18L18 6M6 6l12 12"
+										/>
 									</svg>
 								</button>
 							</div>
-							<div className="h-[calc(500px-80px)] overflow-y-auto p-4">
+							<div className="h-[calc(500px-80px)] overflow-y-auto p-4 custom-scrollbar">
 								{selectedDateEvents.length > 0 ? (
 									<div className="space-y-3">
 										{selectedDateEvents.map((event, index) => (
@@ -851,11 +990,13 @@ const Calendar: React.FC = () => {
 													<span className="text-sm font-medium text-gray-900 dark:text-white">
 														{event.title.replace(` at ${event.time}`, '')}
 													</span>
-													<span className={`text-xs px-2 py-1 rounded-full ${
-														event.type === 'meeting'
-															? 'bg-primary/20 text-primary dark:text-white'
-															: `bg-${event.status}/20 text-${event.status} dark:text-white`
-													}`}>
+													<span
+														className={`text-xs px-2 py-1 rounded-full ${
+															event.type === 'meeting'
+																? 'bg-primary/20 text-primary dark:text-white'
+																: `bg-${event.status}/20 text-${event.status} dark:text-white`
+														}`}
+													>
 														{event.time}
 													</span>
 												</div>
@@ -875,26 +1016,37 @@ const Calendar: React.FC = () => {
 
 			{showTodayModal && (
 				<>
-					<div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-md" 
-						onClick={() => setShowTodayModal(false)} 
+					<div
+						className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-md"
+						onClick={() => setShowTodayModal(false)}
 						style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
 					/>
 					<div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
 						<div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[80vh] overflow-hidden">
 							<div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
 								<h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-									Today's Events
+									Today&apos;s Events
 								</h2>
 								<button
 									onClick={() => setShowTodayModal(false)}
 									className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
 								>
-									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+									<svg
+										className="w-5 h-5"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="2"
+											d="M6 18L18 6M6 6l12 12"
+										/>
 									</svg>
 								</button>
 							</div>
-							<div className="p-4 overflow-y-auto max-h-[60vh]">
+							<div className="p-4 overflow-y-auto max-h-[60vh] custom-scrollbar">
 								{todayEvents.length > 0 ? (
 									<div className="space-y-3">
 										{todayEvents.map((event, index) => (
@@ -909,13 +1061,15 @@ const Calendar: React.FC = () => {
 											>
 												<div className="flex justify-between items-center">
 													<span className="text-sm font-medium text-gray-900 dark:text-white">
-														{event.title.replace(` at ${event.time}`, '')}
+														{/* {event.title.replace(` at ${event.time}`, '')} */}
 													</span>
-													<span className={`text-xs px-2 py-1 rounded-full ${
-														event.type === 'meeting'
-															? 'bg-primary/20 text-primary dark:text-white'
-															: `bg-${event.status}/20 text-${event.status} dark:text-white`
-													}`}>
+													<span
+														className={`text-xs px-2 py-1 rounded-full ${
+															event.type === 'meeting'
+																? 'bg-primary/20 text-primary dark:text-white'
+																: `bg-${event.status}/20 text-${event.status} dark:text-white`
+														}`}
+													>
 														{event.time}
 													</span>
 												</div>
@@ -933,7 +1087,7 @@ const Calendar: React.FC = () => {
 				</>
 			)}
 
-			<div className="custom-calendar">
+			<div className="custom-calendar custom-scrollbar w-full overflow-x-auto">
 				<FullCalendar
 					ref={calendarRef}
 					plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -941,13 +1095,13 @@ const Calendar: React.FC = () => {
 					headerToolbar={{
 						left: 'prev,next',
 						center: 'title',
-						right: 'todayCustom'
+						right: 'todayCustom',
 					}}
 					customButtons={{
 						todayCustom: {
 							text: 'Today',
-							click: handleTodayClick
-						}
+							click: handleTodayClick,
+						},
 					}}
 					events={events}
 					selectable={true}
@@ -955,8 +1109,10 @@ const Calendar: React.FC = () => {
 					eventClick={handleEventClick}
 					eventContent={RenderEventContent}
 					dayMaxEvents={3}
-					moreLinkClick="popover"
+					moreLinkClick="function"
+					moreLinkContent={arg => `+${arg.num} more`}
 					height="auto"
+					aspectRatio={1.5}
 					displayEventEnd={false}
 					eventDisplay="block"
 					slotDuration="00:30:00"
@@ -970,7 +1126,7 @@ const Calendar: React.FC = () => {
 					selectLongPressDelay={0}
 					eventLongPressDelay={0}
 					selectMinDistance={0}
-					dateClick={(info) => handleDateClick(info.date)}
+					dateClick={info => handleDateClick(info.date)}
 				/>
 			</div>
 		</div>

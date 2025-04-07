@@ -19,6 +19,7 @@ const UserDropdown = () => {
 	const router = useRouter()
 	const user = store.getState().auth.user
 	const [userName, setUserName] = useState('User')
+	const [isOpen, setIsOpen] = useState(false)
 
 	useEffect(() => {
 		// Fetch user profile data when component mounts
@@ -39,13 +40,32 @@ const UserDropdown = () => {
 		}
 	}, [user])
 
+	// Add a global wheel event listener to close the dropdown when scrolling occurs
+	useEffect(() => {
+		const handleWheel = () => {
+			if (isOpen) {
+				setIsOpen(false)
+			}
+		}
+
+		// Add event listener for wheel (scroll) event
+		window.addEventListener('wheel', handleWheel, { passive: true })
+		// Add event listener for touch moves (for mobile)
+		window.addEventListener('touchmove', handleWheel, { passive: true })
+
+		return () => {
+			window.removeEventListener('wheel', handleWheel)
+			window.removeEventListener('touchmove', handleWheel)
+		}
+	}, [isOpen])
+
 	const handleLogout = () => {
 		dispatch(logout())
 		router.push('/login')
 	}
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
 			<DropdownMenuTrigger className="flex items-center gap-2 outline-none hover:opacity-90 transition-all duration-200 bg-white/10 dark:bg-gray-800/40 px-3 py-1 rounded-full">
 				<span className="mr-3 overflow-hidden rounded-full h-11 w-11 ring-2 ring-blue-200 hover:ring-blue-300 transition-all duration-200 dark:ring-blue-400 dark:hover:ring-blue-300">
 					<Image
@@ -65,6 +85,7 @@ const UserDropdown = () => {
 			<DropdownMenuContent
 				className="w-56 p-1.5 mt-2 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl shadow-lg dark:bg-gray-800/95 dark:border-gray-700/50 z-[99999] transition-all duration-200"
 				align="end"
+				sideOffset={5}
 			>
 				{/* <Link href="/profile/edit" className="block">
 					<DropdownMenuItem className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-lg dark:text-gray-200 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 cursor-pointer transition-all duration-200">

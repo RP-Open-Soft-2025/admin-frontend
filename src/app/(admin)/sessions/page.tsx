@@ -6,7 +6,7 @@ import { API_URL, MAX_PER_PAGE_SESSION } from '@/constants'
 import { SessionType } from '@/types/sessions'
 import store from '@/redux/store'
 
-type State = 'pending' | 'completed' | 'active'
+type State = 'pending' | 'active'
 
 const TableSession = ({ state }: { state: State }) => {
 	const [currData, setCurrData] = useState<SessionType[]>([])
@@ -19,7 +19,11 @@ const TableSession = ({ state }: { state: State }) => {
 	useEffect(() => {
 		const fetchSessions = async () => {
 			try {
-				fetch(`${API_URL}/${auth.user!.userRole}/sessions/${state}`, {
+				// Use consistent admin endpoints for both HR and admin users
+				// For active and pending sessions, use /admin/sessions and filter by status
+				const endpoint = `${API_URL}/admin/sessions`
+
+				fetch(endpoint, {
 					method: 'GET',
 					headers: {
 						Authorization: `Bearer ${auth.user?.accessToken}`,
@@ -27,6 +31,12 @@ const TableSession = ({ state }: { state: State }) => {
 				}).then(resp => {
 					if (resp.ok) {
 						resp.json().then((result: SessionType[]) => {
+							// If using the /admin/sessions endpoint for active or pending,
+							// filter the results by status
+							result = result.filter(
+								session => session.status.toLowerCase() === state
+							)
+
 							setCurrData(result)
 							setTotalPages(Math.ceil(result.length / MAX_PER_PAGE_SESSION))
 							setHistoryLoading(false)
@@ -60,17 +70,15 @@ const TableSession = ({ state }: { state: State }) => {
 	return (
 		<div>
 			<h2 className="text-lg font-semibold mb-4 dark:text-white">
-				{state.toUpperCase() == 'pending' ? 'scheduled' : state.toUpperCase()}
+				{state == 'pending' ? 'scheduled'.toUpperCase() : state.toUpperCase()}
 			</h2>
 			<BasicTableOne tableData={paginatedData} />
 			<div className="mt-6 w-full flex justify-center items-center">
-				{state != 'active' && (
-					<Pagination
-						totalPages={totalPages}
-						currentPage={currPage}
-						onPageChange={setCurrentPage}
-					/>
-				)}
+				<Pagination
+					totalPages={totalPages}
+					currentPage={currPage}
+					onPageChange={setCurrentPage}
+				/>
 			</div>
 		</div>
 	)
@@ -80,7 +88,6 @@ const Page = () => {
 	return (
 		<>
 			<TableSession state="active" />
-			<TableSession state="completed" />
 			<TableSession state="pending" />
 		</>
 	)

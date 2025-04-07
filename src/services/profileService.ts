@@ -113,18 +113,15 @@ export async function getUserProfileData(userId: string): Promise<EmployeeAPI> {
 			throw new Error('Authentication token not found. Please log in.')
 		}
 
-		console.log('Making API request to /employee/profile') // Debug log
+		console.log('Making API request to /admin/user-det') // Debug log
 
-		const response = await fetch(
-			`${API_URL}/${authState.user?.userRole}/user-det/${userId}`,
-			{
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-			}
-		)
+		const response = await fetch(`${API_URL}/admin/user-det/${userId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+		})
 
 		console.log('API Response status:', response.status) // Debug log
 
@@ -236,52 +233,32 @@ export function getOnboardingData(profileData: EmployeeAPI) {
 		: null
 }
 
-export const getSessionsData = async (
+export const getActiveAndPendingSessionsData = async (
 	employeeId: string
 ): Promise<SessionType[]> => {
 	const { auth } = store.getState()
+
 	try {
-		// Fetch from all three endpoints
-		const [activeResponse, completedResponse, pendingResponse] =
-			await Promise.all([
-				fetch(`${API_URL}/admin/sessions/active`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-					},
-				}),
-				fetch(`${API_URL}/admin/sessions/completed`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-					},
-				}),
-				fetch(`${API_URL}/admin/sessions/pending`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${auth.user?.accessToken}`,
-					},
-				}),
-			])
+		// Fetch from consistent admin endpoints
+		const activeAndPendingResponse = await fetch(`${API_URL}/admin/sessions`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${auth.user?.accessToken}`,
+			},
+		})
 
 		// Check if any of the responses failed
-		if (!activeResponse.ok || !completedResponse.ok || !pendingResponse.ok) {
+		if (!activeAndPendingResponse.ok) {
 			throw new Error('Failed to fetch sessions data')
 		}
 
 		// Parse all responses
-		const [activeData, completedData, pendingData] = await Promise.all([
-			activeResponse.json(),
-			completedResponse.json(),
-			pendingResponse.json(),
-		])
+		const activeAndPendingData = await activeAndPendingResponse.json()
 
 		// Combine all sessions and filter by employee_id
-		const allSessions = [...activeData, ...completedData, ...pendingData]
-		return allSessions.filter(
+		const allActiveAndPendingSessions = [...activeAndPendingData]
+		return allActiveAndPendingSessions.filter(
 			(session: SessionType) => session.employee_id === employeeId
 		)
 	} catch (error) {
@@ -296,13 +273,16 @@ export const getEmployeeChains = async (
 ): Promise<ChainType[]> => {
 	const { auth } = store.getState()
 	try {
-		const response = await fetch(`${API_URL}/admin/chains/employee/${employeeId}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${auth.user?.accessToken}`,
-			},
-		})
+		const response = await fetch(
+			`${API_URL}/admin/chains/employee/${employeeId}`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+				},
+			}
+		)
 
 		if (!response.ok) {
 			throw new Error(`Error fetching chains: ${response.statusText}`)
@@ -311,7 +291,7 @@ export const getEmployeeChains = async (
 		const data: ChainType[] = await response.json()
 		return data.map(chain => ({
 			...chain,
-			isExpanded: false // Initialize all chains as collapsed
+			isExpanded: false, // Initialize all chains as collapsed
 		}))
 	} catch (error) {
 		console.error('Failed to fetch employee chains:', error)

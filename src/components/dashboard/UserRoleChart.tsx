@@ -1,44 +1,23 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
-import { User } from '@/services/adminService'
 import { ApexOptions } from 'apexcharts'
 
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
 interface UserRoleChartProps {
-	users: User[] | 'UNAVAILABLE'
-	isLoading?: boolean
+	users: {
+		total_admins: number
+		total_hrs: number
+		total_employees: number
+		active_employees: number
+	}
+	isLoading: boolean
 }
 
 const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
-	const calculateRoleDistribution = () => {
-		if (
-			users === 'UNAVAILABLE' ||
-			!Array.isArray(users) ||
-			users.length === 0
-		) {
-			return {
-				series: [1, 1, 1],
-				labels: ['No Data', '', ''],
-			}
-		}
-
-		// Count users by role
-		const roleCount: Record<string, number> = {}
-		users.forEach(user => {
-			const role = user.role || 'unknown'
-			roleCount[role] = (roleCount[role] || 0) + 1
-		})
-
-		// Convert to series and labels
-		const labels = Object.keys(roleCount)
-		const series = Object.values(roleCount)
-
-		return { series, labels }
-	}
-
-	const { series, labels } = calculateRoleDistribution()
+	const series = [users.total_employees, users.total_hrs, users.total_admins]
+	const labels = ['Employees', 'HRs', 'Admins']
 
 	const options: ApexOptions = {
 		chart: {
@@ -62,7 +41,7 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 						total: {
 							show: true,
 							showAlways: true,
-							label: 'Total Users',
+							label: 'Total Employees',
 							// eslint-disable-next-line @typescript-eslint/no-explicit-any
 							formatter: (w: any) => {
 								return w.globals.seriesTotals.reduce(
@@ -117,7 +96,7 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 			<div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
 				<div className="mb-4 flex items-center justify-between">
 					<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-						User Distribution by Role
+						Employees Distribution by Role
 					</h3>
 				</div>
 				<div className="flex h-80 items-center justify-center">
@@ -131,7 +110,7 @@ const UserRoleChart = ({ users, isLoading = false }: UserRoleChartProps) => {
 		<div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
 			<div className="mb-4 flex items-center justify-between">
 				<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-					User Distribution by Role
+					Employees Distribution by Role
 				</h3>
 			</div>
 			<div className="h-80">

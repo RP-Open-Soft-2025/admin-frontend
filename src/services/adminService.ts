@@ -17,6 +17,7 @@ export interface User {
 export interface HRUser {
 	hrId: string
 	name: string
+	currentAssignedUsers: number
 	currentAssignedUsersCount: number
 	avgVibeScore: number
 }
@@ -74,16 +75,7 @@ export async function getAuthToken() {
 
 export async function fetchUsers(): Promise<User[]> {
 	try {
-		const token = await getAuthToken()
-
-		const response = await fetch(`${API_URL}/admin/list-users`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
+		const response = await fetch('/admin/list-users');
 		if (!response.ok) {
 			throw new Error(`Error fetching users: ${response.statusText}`)
 		}
@@ -91,8 +83,8 @@ export async function fetchUsers(): Promise<User[]> {
 		const data = await response.json()
 		return data.users || []
 	} catch (error) {
-		console.error('Failed to fetch users:', error)
-		throw error
+		console.error('Error fetching users:', error);
+		throw error;
 	}
 }
 
@@ -145,15 +137,16 @@ export async function fetchUserDetails(userId: string): Promise<UserDetail> {
 	}
 }
 
-export async function fetchSessions(): Promise<{
+export async function fetchActiveAndPendingSessions(): Promise<{
 	active: Session[]
 	pending: Session[]
 	total: number
 }> {
 	try {
 		const token = await getAuthToken()
+		const userRole = 'admin'
 
-		const response = await fetch(`${API_URL}/admin/sessions`, {
+		const response = await fetch(`${API_URL}/${userRole}/sessions`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -186,85 +179,12 @@ export async function fetchSessions(): Promise<{
 	}
 }
 
-export async function fetchActiveSessions(): Promise<Session[]> {
-	try {
-		const token = await getAuthToken()
-
-		const response = await fetch(`${API_URL}/admin/sessions/active`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error fetching active sessions: ${response.statusText}`)
-		}
-
-		const sessions: Session[] = await response.json()
-		return sessions || []
-	} catch (error) {
-		console.error('Failed to fetch active sessions:', error)
-		throw error
-	}
-}
-
-export async function fetchPendingSessions(): Promise<Session[]> {
-	try {
-		const token = await getAuthToken()
-
-		const response = await fetch(`${API_URL}/admin/sessions/pending`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error fetching pending sessions: ${response.statusText}`)
-		}
-
-		const sessions: Session[] = await response.json()
-		return sessions || []
-	} catch (error) {
-		console.error('Failed to fetch pending sessions:', error)
-		throw error
-	}
-}
-
-export async function fetchCompletedSessions(): Promise<Session[]> {
-	try {
-		const token = await getAuthToken()
-
-		const response = await fetch(`${API_URL}/admin/sessions/completed`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(
-				`Error fetching completed sessions: ${response.statusText}`
-			)
-		}
-
-		const sessions: Session[] = await response.json()
-		return sessions || []
-	} catch (error) {
-		console.error('Failed to fetch completed sessions:', error)
-		throw error
-	}
-}
-
 export async function fetchMeets(): Promise<Meet[]> {
 	try {
 		const token = await getAuthToken()
+		const userRole = 'admin'
 
-		const response = await fetch(`${API_URL}/admin/meets`, {
+		const response = await fetch(`${API_URL}/${userRole}/meets`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -341,37 +261,6 @@ export async function deleteUser(
 	}
 }
 
-export async function createSession(userId: string): Promise<Session> {
-	try {
-		const token = await getAuthToken()
-
-		const response = await fetch(`${API_URL}/admin/session/${userId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error creating session: ${response.statusText}`)
-		}
-
-		const data = await response.json()
-		return {
-			session_id: data.session_id,
-			employee_id: userId,
-			chat_id: data.chat_id || '',
-			status: 'pending',
-			scheduled_at: new Date().toISOString(),
-			...data,
-		}
-	} catch (error) {
-		console.error('Failed to create session:', error)
-		throw error
-	}
-}
-
 export async function reassignHR(
 	userId: string,
 	newHrId: string
@@ -407,7 +296,7 @@ export async function blockUser(
 	try {
 		const token = await getAuthToken()
 
-		const response = await fetch(`${API_URL}/admin-hr/block-user`, {
+		const response = await fetch(`${API_URL}/admin/block-user`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -441,7 +330,7 @@ export async function unblockUser(
 	try {
 		const token = await getAuthToken()
 
-		const response = await fetch(`${API_URL}/admin-hr/unblock-user`, {
+		const response = await fetch(`${API_URL}/admin/unblock-user`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

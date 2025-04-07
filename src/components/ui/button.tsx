@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
-
+import { Slot } from '@/components/ui/slot'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
@@ -45,8 +44,10 @@ function Button({
 	VariantProps<typeof buttonVariants> & {
 		asChild?: boolean
 	}) {
+	// Simpler approach - restore original implementation
 	const Comp = asChild ? Slot : 'button'
 
+	// Using forwardRef pattern that's compatible with React 19
 	return (
 		<Comp
 			data-slot="button"
