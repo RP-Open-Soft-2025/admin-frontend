@@ -205,7 +205,7 @@ const ChainItem = ({
 									{new Date(new Date(session.scheduled_at).getTime() + 19800000).toLocaleString()}
 								</div>
 								<span className="text-xs dark:text-gray-400 text-gray-600 mt-1">
-									Chat ID: {session.chat_id}
+									{session.session_id}
 								</span>
 							</div>
 						</div>
@@ -597,8 +597,8 @@ const ChatPage = () => {
 				{/* Sidebar Content */}
 				<div className="h-full dark:bg-[#0f172a] text-white flex flex-col bg-white">
 					<div className="p-2 border-b border-gray-700 flex items-center">
-						<h2 className="text-lg font-bold dark:text-white text-gray-900 items-center flex justify-center">
-							Chat History
+						<h2 className="text-lg font-bold dark:text-white text-gray-900 items-center flex justify-center flex-col">
+							<div>EmployeeID: {employeeId}</div>
 						</h2>
 					</div>
 
