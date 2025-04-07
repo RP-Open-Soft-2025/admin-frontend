@@ -71,6 +71,57 @@ const navItems: NavItem[] = [
 
 const othersItems: NavItem[] = []
 
+// Create a new component for navigation links that handles loading state
+const NavLink = ({ 
+	href, 
+	children, 
+	isActive, 
+	isMobileOpen, 
+	toggleMobileSidebar,
+	className,
+	itemName
+}: { 
+	href: string, 
+	children: React.ReactNode, 
+	isActive: boolean, 
+	isMobileOpen: boolean, 
+	toggleMobileSidebar: () => void,
+	className?: string,
+	itemName: string
+}) => {
+	const router = useRouter()
+	
+	const handleClick = (e: React.MouseEvent) => {
+		e.preventDefault()
+		
+		// Close mobile sidebar if needed
+		if (isMobileOpen) {
+			toggleMobileSidebar()
+		}
+		
+		// Set loading state in parent component via global event with the name of the clicked item
+		window.dispatchEvent(new CustomEvent('startNavigation', { 
+			detail: { name: itemName } 
+		}))
+		
+		// Navigate after a small delay to allow the loading state to appear
+		setTimeout(() => {
+			router.push(href)
+		}, 50)
+	}
+	
+	return (
+		<Link 
+			href={href} 
+			onClick={handleClick} 
+			className={className || `menu-item group ${isActive ? 'menu-item-active' : 'menu-item-inactive'}`}
+			prefetch={true}
+		>
+			{children}
+		</Link>
+	)
+}
+
 const AppSidebar: React.FC = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
@@ -139,16 +190,12 @@ const AppSidebar: React.FC = () => {
 						</button>
 					) : (
 						nav.path && (
-							<Link
+							<NavLink
 								href={nav.path}
-								onClick={() => {
-									if (isMobileOpen) {
-										toggleMobileSidebar()
-									}
-								}}
-								className={`menu-item group ${
-									isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
-								}`}
+								isActive={isActive(nav.path)}
+								isMobileOpen={isMobileOpen}
+								toggleMobileSidebar={toggleMobileSidebar}
+								itemName={nav.name}
 							>
 								<span
 									className={`${
@@ -162,7 +209,7 @@ const AppSidebar: React.FC = () => {
 								{(isExpanded || isHovered || isMobileOpen) && (
 									<span className={`menu-item-text transition-opacity duration-300`}>{nav.name}</span>
 								)}
-							</Link>
+							</NavLink>
 						)
 					)}
 					{nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
@@ -181,13 +228,12 @@ const AppSidebar: React.FC = () => {
 							<ul className="mt-2 space-y-1 ml-9">
 								{nav.subItems.map(subItem => (
 									<li key={subItem.name}>
-										<Link
+										<NavLink
 											href={subItem.path}
-											onClick={() => {
-												if (isMobileOpen) {
-													toggleMobileSidebar()
-												}
-											}}
+											isActive={isActive(subItem.path)}
+											isMobileOpen={isMobileOpen}
+											toggleMobileSidebar={toggleMobileSidebar}
+											itemName={subItem.name}
 											className={`menu-dropdown-item ${
 												isActive(subItem.path)
 													? 'menu-dropdown-item-active'
@@ -219,7 +265,7 @@ const AppSidebar: React.FC = () => {
 													</span>
 												)}
 											</span>
-										</Link>
+										</NavLink>
 									</li>
 								))}
 							</ul>
@@ -337,6 +383,10 @@ const AppSidebar: React.FC = () => {
 						if (isMobileOpen) {
 							toggleMobileSidebar()
 						}
+						// Set loading state for Dashboard when clicking the logo
+						window.dispatchEvent(new CustomEvent('startNavigation', { 
+							detail: { name: 'Dashboard' } 
+						}))
 					}}
 				>
 					{isExpanded || isHovered || isMobileOpen ? (
