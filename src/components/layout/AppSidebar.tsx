@@ -14,12 +14,12 @@ import {
 	PlusCircle,
 	Users,
 	AlertTriangle,
-	Video,
 } from 'lucide-react'
 import DeloitteLogo from './deloitte-logo.png'
 import DeloitteLogoDark from './deloitte-logo-dark.png'
 import { logout } from '@/redux/features/auth'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
 
 type NavItem = {
 	name: string
@@ -74,6 +74,7 @@ const othersItems: NavItem[] = []
 const AppSidebar: React.FC = () => {
 	const dispatch = useDispatch()
 	const router = useRouter()
+	const userRole = useSelector((state: RootState) => state.auth.user?.userRole)
 	const {
 		isExpanded,
 		isMobileOpen,
@@ -83,6 +84,15 @@ const AppSidebar: React.FC = () => {
 	} = useSidebar()
 	const pathname = usePathname()
 	const [isMobileSize, setIsMobileSize] = useState(false)
+
+	// Filter nav items based on user role
+	const filteredNavItems = navItems.filter(item => {
+		// Only show Add Employee button to admin users
+		if (item.name === 'Add Employee' && userRole !== 'admin') {
+			return false;
+		}
+		return true;
+	});
 
 	const renderMenuItems = (
 		navItems: NavItem[],
@@ -387,7 +397,7 @@ const AppSidebar: React.FC = () => {
 									<GridIcon />
 								)}
 							</h2>
-							{renderMenuItems(navItems, 'main')}
+							{renderMenuItems(filteredNavItems, 'main')}
 						</div>
 
 						{/* User profile section - only visible in mobile/tablet view */}
