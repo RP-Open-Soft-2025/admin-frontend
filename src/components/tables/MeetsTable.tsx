@@ -67,7 +67,7 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 										onClick={() => router.push(`/chat-page/${session.chat_id}`)}
 									>
 										<div className="flex items-center gap-3">
-											<Link href={`./chat-page/${session.chat_id}`}>
+											<Link href={`./chat-page/${session.employee_id}`}>
 												<Video className="w-6 h-6 text-gray-500 dark:text-gray-400" />
 											</Link>
 											<div>

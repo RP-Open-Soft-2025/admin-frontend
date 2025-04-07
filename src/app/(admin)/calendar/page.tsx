@@ -546,7 +546,7 @@ const Calendar: React.FC = () => {
 						url: session.employee_id,
 						extendedProps: {
 							calendar: colorMap[status],
-							redirectUrl: `/chat-page/${session.chat_id}`,
+							redirectUrl: `/session/${session.employee_id}`,
 							eventType: 'session',
 						},
 					}
