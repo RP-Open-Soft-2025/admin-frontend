@@ -61,12 +61,11 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 						{/* Table Body */}
 						<TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
 							{tableData.map(session => (
-								<TableRow
-									key={session.session_id}
-									onClick={() => router.push(`/chat-page/${session.chat_id}`)}
-									className="cursor-pointer"
-								>
-									<TableCell className="px-5 py-4 sm:px-6 text-start">
+								<TableRow key={session.session_id} className="cursor-pointer">
+									<TableCell
+										className="px-5 py-4 sm:px-6 text-start"
+										onClick={() => router.push(`/chat-page/${session.chat_id}`)}
+									>
 										<div className="flex items-center gap-3">
 											<Link href={`./chat-page/${session.chat_id}`}>
 												<Video className="w-6 h-6 text-gray-500 dark:text-gray-400" />
@@ -85,7 +84,12 @@ export function BasicTableOne({ tableData }: { tableData: SessionType[] }) {
 											</div>
 										</div>
 									</TableCell>
-									<TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+									<TableCell
+										className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400"
+										onClick={() => {
+											router.push(`/profile/${session.employee_id}`)
+										}}
+									>
 										{session.employee_id}
 									</TableCell>
 									<TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
