@@ -52,7 +52,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 		// Force a repaint to ensure all elements update simultaneously
 		window.requestAnimationFrame(() => {
 			document.body.style.transition = 'none'
-			const forceRepaint = document.body.offsetHeight
+			void document.body.offsetHeight; // Trigger reflow
 			document.body.style.transition = ''
 		})
 		
