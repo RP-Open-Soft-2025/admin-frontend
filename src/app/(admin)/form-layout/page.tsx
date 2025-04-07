@@ -641,7 +641,13 @@ export default function FormLayout() {
 										onChange={e => setMeetLink(e.target.value)}
 										value={meetLink}
 										placeholder="Add a meeting link..."
-										className={`w-full ${errors.meeting_link ? 'border-error-500' : ''}`}
+										className={`w-full p-3 bg-white dark:bg-gray-900 border ${
+											errors.meeting_link
+												? 'border-error-500'
+												: 'border-gray-200 dark:border-gray-700'
+										} rounded-lg text-gray-900 dark:text-white/90 placeholder-gray-500 dark:placeholder-gray-400
+										focus:ring-2 focus:ring-gray-200/20 focus:border-gray-200 dark:focus:border-gray-700 transition
+										`}
 									/>
 									{errors.meeting_link && (
 										<p className="mt-1 text-sm text-error-500">
