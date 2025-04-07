@@ -1,5 +1,6 @@
 import store from '@/redux/store'
 import { API_URL } from '@/constants'
+import { api } from '@/lib/api'
 
 // Types for API responses
 export interface User {
@@ -74,37 +75,12 @@ export async function getAuthToken() {
 }
 
 export async function fetchUsers(): Promise<User[]> {
-	const controller = new AbortController()
-	const timeoutId = setTimeout(() => controller.abort(), 10000)
-
 	try {
-		const { auth } = store.getState()
-		if (!auth.isAuthenticated) {
-			throw new Error('User is not authenticated')
-		}
-		const endpoint = 'admin/list-users'
-		const response = await fetch(`${API_URL}/${endpoint}`, {
-			headers: {
-				Authorization: `Bearer ${auth.user?.accessToken}`,
-			},
-			signal: controller.signal,
-		})
-
-		if (!response.ok) {
-			throw new Error(`Error fetching users: ${response.status}`)
-		}
-
-		const data = await response.json()
-		return data.users || []
-	} catch (fetchError) {
-		if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-			console.error('Request timeout fetching users')
-			return [] // Return empty array on timeout
-		}
-		console.error('Error fetching users:', fetchError)
-		throw fetchError
-	} finally {
-		clearTimeout(timeoutId)
+		const response = await api.get('/admin/list-users');
+		return response.data.users || [];
+	} catch (error) {
+		console.error('Error fetching users:', error);
+		throw error;
 	}
 }
 
