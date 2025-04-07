@@ -41,24 +41,24 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 	const toggleTheme = () => {
 		// Use a more direct approach to toggle the theme
 		const newTheme = theme === 'light' ? 'dark' : 'light'
- 		
+
 		// Apply the theme change immediately and synchronously to ensure consistency
 		if (newTheme === 'dark') {
 			document.documentElement.classList.add('dark')
 		} else {
 			document.documentElement.classList.remove('dark')
 		}
-		
+
 		// Force a repaint to ensure all elements update simultaneously
 		window.requestAnimationFrame(() => {
 			document.body.style.transition = 'none'
-			void document.body.offsetHeight; // Trigger reflow
+			void document.body.offsetHeight // Trigger reflow
 			document.body.style.transition = ''
 		})
-		
+
 		// Update state after DOM manipulation
 		setTheme(newTheme)
-		
+
 		// Store in localStorage
 		localStorage.setItem('theme', newTheme)
 	}

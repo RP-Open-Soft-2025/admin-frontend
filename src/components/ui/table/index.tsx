@@ -66,10 +66,14 @@ const TableCell: React.FC<TableCellProps> = ({
 	children,
 	isHeader = false,
 	className,
-	onClick
+	onClick,
 }) => {
 	const CellTag = isHeader ? 'th' : 'td'
-	return <CellTag className={` ${className}`} onClick={onClick}>{children}</CellTag>
+	return (
+		<CellTag className={` ${className}`} onClick={onClick}>
+			{children}
+		</CellTag>
+	)
 }
 
 export { Table, TableHeader, TableBody, TableRow, TableCell }

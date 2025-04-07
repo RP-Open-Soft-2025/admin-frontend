@@ -76,23 +76,26 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 		Record<string, boolean>
 	>({})
 	const itemsPerPage = 5 // Reduced to show fewer employees per page
-	
+
 	// Group chains by employee_id
-	const groupedChains = chains.reduce((acc, chain) => {
-		if (!acc[chain.employee_id]) {
-			acc[chain.employee_id] = [];
-		}
-		acc[chain.employee_id].push(chain);
-		return acc;
-	}, {} as Record<string, EscalatedChain[]>);
-	
+	const groupedChains = chains.reduce(
+		(acc, chain) => {
+			if (!acc[chain.employee_id]) {
+				acc[chain.employee_id] = []
+			}
+			acc[chain.employee_id].push(chain)
+			return acc
+		},
+		{} as Record<string, EscalatedChain[]>
+	)
+
 	// Convert to array for pagination
-	const employeeEntries = Object.entries(groupedChains);
-	const totalPages = Math.ceil(employeeEntries.length / itemsPerPage);
+	const employeeEntries = Object.entries(groupedChains)
+	const totalPages = Math.ceil(employeeEntries.length / itemsPerPage)
 	const currentData = employeeEntries.slice(
 		currentPage * itemsPerPage,
 		(currentPage + 1) * itemsPerPage
-	);
+	)
 
 	// Format date
 	const formatDate = (dateString: string) => {
@@ -135,13 +138,17 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 										<span className="ml-2 font-mono">{employeeId}</span>
 									</h2>
 									<span className="text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 py-1 px-2.5 rounded-full font-medium">
-										{employeeChains.length} {employeeChains.length === 1 ? 'chain' : 'chains'}
+										{employeeChains.length}{' '}
+										{employeeChains.length === 1 ? 'chain' : 'chains'}
 									</span>
 								</div>
 
 								<div className="max-h-96 overflow-y-auto">
-									{employeeChains.map((chain) => (
-										<div key={chain.chain_id} className="p-4 border-b border-gray-100 dark:border-gray-700 last:border-0">
+									{employeeChains.map(chain => (
+										<div
+											key={chain.chain_id}
+											className="p-4 border-b border-gray-100 dark:border-gray-700 last:border-0"
+										>
 											{/* Display chain details with sessions dropdown inside */}
 											<div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
 												<div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300 text-sm">
@@ -181,7 +188,7 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 																{chain.meet.status}
 															</span>
 														</h3>
-														
+
 														<div className="grid grid-cols-1 md:grid-cols-2 gap-3 ml-1 text-sm">
 															<p className="flex flex-col">
 																<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
@@ -220,9 +227,9 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 																	<span className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
 																		Meeting Link
 																	</span>
-																	<a 
-																		href={chain.meet.meeting_link} 
-																		target="_blank" 
+																	<a
+																		href={chain.meet.meeting_link}
+																		target="_blank"
 																		rel="noopener noreferrer"
 																		className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 truncate"
 																	>
@@ -266,7 +273,9 @@ const EscalatedChainsList = ({ chains }: { chains: EscalatedChain[] }) => {
 															</span>
 														</div>
 														<button
-															onClick={() => toggleSessionsExpansion(chain.chain_id)}
+															onClick={() =>
+																toggleSessionsExpansion(chain.chain_id)
+															}
 															className="flex items-center justify-center w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-gray-600 transition-colors duration-200"
 															aria-label={
 																expandedSessions[chain.chain_id]

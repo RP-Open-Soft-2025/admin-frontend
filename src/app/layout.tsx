@@ -21,32 +21,32 @@ export default function RootLayout({
 	const [loading, setLoading] = useState(false)
 	const [loadingItemName, setLoadingItemName] = useState('')
 	const pathname = usePathname()
-	
+
 	// Listen for navigation start events
 	useEffect(() => {
 		const handleStartNavigation = (event: Event) => {
-			const customEvent = event as CustomEvent;
+			const customEvent = event as CustomEvent
 			if (customEvent.detail && customEvent.detail.name) {
-				setLoadingItemName(customEvent.detail.name);
+				setLoadingItemName(customEvent.detail.name)
 			} else {
 				// Fallback to pathname
-				setLoadingItemName(getPageTitle(pathname));
+				setLoadingItemName(getPageTitle(pathname))
 			}
-			setLoading(true);
+			setLoading(true)
 		}
-		
+
 		window.addEventListener('startNavigation', handleStartNavigation)
-		
+
 		return () => {
 			window.removeEventListener('startNavigation', handleStartNavigation)
 		}
 	}, [pathname])
-	
+
 	// Reset loading state when path changes (navigation completes)
 	useEffect(() => {
 		setLoading(false)
 	}, [pathname])
-	
+
 	return (
 		<html lang="en">
 			<head>
@@ -56,7 +56,9 @@ export default function RootLayout({
 				<link rel="icon" href="/images/favicon.ico" />
 			</head>
 			<title>Admin - Vibemeter</title>
-			<body className={`${outfit.variable} dark:bg-gray-900 transition-colors duration-150`}>
+			<body
+				className={`${outfit.variable} dark:bg-gray-900 transition-colors duration-150`}
+			>
 				<ThemeProvider>
 					<StateProvider>
 						<SidebarProvider>
@@ -66,9 +68,14 @@ export default function RootLayout({
 									<div className="w-16 h-16 rounded-full border-4 border-gray-200 dark:border-gray-700 border-t-brand-500 dark:border-t-brand-400 animate-spin"></div>
 									<div className="mt-6 text-center">
 										<p className="text-gray-800 dark:text-gray-200 font-semibold text-xl">
-											Loading <span className="text-brand-500 dark:text-brand-400">{loadingItemName}</span>
+											Loading{' '}
+											<span className="text-brand-500 dark:text-brand-400">
+												{loadingItemName}
+											</span>
 										</p>
-										<p className="text-gray-500 dark:text-gray-400 mt-2">Please wait while we prepare your content...</p>
+										<p className="text-gray-500 dark:text-gray-400 mt-2">
+											Please wait while we prepare your content...
+										</p>
 									</div>
 								</div>
 							)}
@@ -90,8 +97,8 @@ function getPageTitle(path: string): string {
 		'/form-layout': 'Add Employee',
 		'/employees': 'Employees',
 		'/sessions': 'Sessions',
-		'/escalated-chains': 'Escalated Chains'
+		'/escalated-chains': 'Escalated Chains',
 	}
-	
+
 	return routes[path] || 'Page'
 }

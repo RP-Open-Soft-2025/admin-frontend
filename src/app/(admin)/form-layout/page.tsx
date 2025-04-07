@@ -643,9 +643,9 @@ export default function FormLayout() {
 										placeholder="Add a meeting link..."
 										className={`w-full p-3 bg-white dark:bg-gray-900 border ${
 											errors.meeting_link
-											? 'border-error-500'
-											: 'border-gray-200 dark:border-gray-700'
-									} rounded-lg text-gray-900 dark:text-white/90 placeholder-gray-500 dark:placeholder-gray-400
+												? 'border-error-500'
+												: 'border-gray-200 dark:border-gray-700'
+										} rounded-lg text-gray-900 dark:text-white/90 placeholder-gray-500 dark:placeholder-gray-400
 									focus:ring-2 focus:ring-brand-500/20 focus:border-black-500 dark:focus:border-brand-500 transition`}
 									/>
 									{errors.meeting_link && (

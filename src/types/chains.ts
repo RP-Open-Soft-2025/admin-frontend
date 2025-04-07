@@ -10,10 +10,10 @@ export interface ChainType {
 	employee_id: string
 	session_ids: string[]
 	sessions: {
-		chat_id: string,
-		employee_id: string,
-		scheduled_at: string,
-		session_id: string,
+		chat_id: string
+		employee_id: string
+		scheduled_at: string
+		session_id: string
 		status: string
 	}[]
 	status: ChainStatus
@@ -28,20 +28,20 @@ export interface ChainType {
 }
 
 export interface EscalatedChain {
-	chain_id: string;
-	session_ids: string[];
-	employee_id: string;
-	escalation_reason: string;
-	escalated_at: string;
+	chain_id: string
+	session_ids: string[]
+	employee_id: string
+	escalation_reason: string
+	escalated_at: string
 	meet: {
-		meet_id: string;
-		user_id: string;
-		with_user_id: string;
-		scheduled_at: string;
-		duration_minutes: number;
-		status: string;
-		meeting_link: string | null;
-		location: string | null;
-		notes: string | null;
-	} | null;
-} 
+		meet_id: string
+		user_id: string
+		with_user_id: string
+		scheduled_at: string
+		duration_minutes: number
+		status: string
+		meeting_link: string | null
+		location: string | null
+		notes: string | null
+	} | null
+}
