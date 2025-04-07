@@ -820,9 +820,12 @@ const Calendar: React.FC = () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		;(api as any).on('eventDidMount', addEventListenersToMoreLinks)
 
+		// Store the current ref value for cleanup
+		const currentRef = calendarRef.current
+
 		return () => {
-			if (calendarRef.current) {
-				const api = calendarRef.current.getApi()
+			if (currentRef) {
+				const api = currentRef.getApi()
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				;(api as any).off('viewDidMount', addEventListenersToMoreLinks)
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any

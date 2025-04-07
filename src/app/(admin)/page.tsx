@@ -90,6 +90,7 @@ function AdminDashboard() {
 		if (isAdmin) {
 			await getHRData()
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isAdmin, isHR, getHRData])
 
 	// First useEffect
@@ -101,6 +102,7 @@ function AdminDashboard() {
 		}
 
 		fetchAllData()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	// Handlers for actions
@@ -164,6 +166,7 @@ function AdminDashboard() {
 				})
 			}
 		})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	if (load) {

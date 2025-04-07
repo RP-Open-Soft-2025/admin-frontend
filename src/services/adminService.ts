@@ -1,6 +1,5 @@
 import store from '@/redux/store'
 import { API_URL } from '@/constants'
-import { api } from '@/lib/api'
 
 // Types for API responses
 export interface User {
@@ -76,8 +75,13 @@ export async function getAuthToken() {
 
 export async function fetchUsers(): Promise<User[]> {
 	try {
-		const response = await api.get('/admin/list-users')
-		return response.data.users || []
+		const response = await fetch('/admin/list-users');
+		if (!response.ok) {
+			throw new Error(`Error fetching users: ${response.statusText}`)
+		}
+
+		const data = await response.json()
+		return data.users || []
 	} catch (error) {
 		console.error('Error fetching users:', error)
 		throw error

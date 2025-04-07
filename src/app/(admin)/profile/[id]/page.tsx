@@ -105,7 +105,8 @@ export default function Profile() {
 		}, DEL_TIME)
 
 		return () => clearInterval(intervalId)
-	}, [auth.isAuthenticated])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	if (loading && profileData == null) {
 		return (
