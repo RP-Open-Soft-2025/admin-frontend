@@ -13,7 +13,6 @@ import { SubmitButton } from '@/components/auth-form/button'
 import DeloitteLogo from './deloitte-logo.png' // Update the path to the actual logo location
 import { API_URL } from '@/constants'
 
-// Use environment variable for API URL with fallback
 export default function Page() {
 	const router = useRouter()
 	const dispatch = useDispatch()

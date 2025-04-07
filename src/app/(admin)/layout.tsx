@@ -1,48 +1,16 @@
-'use client'
+import { Metadata } from 'next'
+import AdminLayoutClient from '@/components/layout/AdminLayoutClient'
 
-import { useSidebar } from '@/components/context/SidebarContext'
-import Backdrop from '@/components/layout/Backdrop'
-import AppSidebar from '@/components/layout/AppSidebar'
-import AppHeader from '@/components/layout/AppHeader'
-import React from 'react'
-import { useEffect } from 'react'
-import store from '@/redux/store'
-import { useRouter } from 'next/navigation'
+export const metadata: Metadata = {
+	title: 'Admin Dashboard | DeloConnect',
+	description: 'Administrative dashboard for managing employees, sessions, and HR operations in DeloConnect',
+	keywords: ['admin', 'dashboard', 'management', 'employees', 'sessions', 'HR', 'DeloConnect'],
+}
 
 export default function AdminLayout({
 	children,
 }: {
 	children: React.ReactNode
 }) {
-	const router = useRouter()
-	const { isExpanded, isHovered, isMobileOpen } = useSidebar()
-	useEffect(() => {
-		const { auth } = store.getState()
-		if (!auth.isAuthenticated) router.push('./login')
-	})
-	// Dynamic class for main content margin based on sidebar state
-	const mainContentMargin = isMobileOpen
-		? 'ml-0'
-		: isExpanded || isHovered
-			? 'lg:ml-[290px]'
-			: 'lg:ml-[90px]'
-
-	return (
-		<div className="min-h-screen xl:flex">
-			{/* Sidebar and Backdrop */}
-			<AppSidebar />
-			<Backdrop />
-			{/* Main Content Area */}
-			<div
-				className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
-			>
-				{/* Header */}
-				<AppHeader />
-				{/* Page Content */}
-				<div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
-					{children}
-				</div>
-			</div>
-		</div>
-	)
+	return <AdminLayoutClient>{children}</AdminLayoutClient>
 }
