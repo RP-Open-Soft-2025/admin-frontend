@@ -26,4 +26,5 @@ export interface EscalatedChain {
 	employee_id: string;
 	escalation_reason: string;
 	escalated_at: string;
+	meet: string | null;
 } 
