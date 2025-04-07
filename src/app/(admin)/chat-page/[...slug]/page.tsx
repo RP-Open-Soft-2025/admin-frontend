@@ -140,7 +140,7 @@ const ChainItem = ({
 	return (
 		<div className="border-b dark:border-gray-700 border-gray-300">
 			{/* Chain header - clickable to expand/collapse */}
-			<div
+			<div 
 				className="p-3 cursor-pointer flex justify-between items-center dark:hover:bg-[#1E293B] hover:bg-gray-100"
 				onClick={onToggle}
 			>
@@ -152,7 +152,10 @@ const ChainItem = ({
 						Status: {chain.status}
 					</p>
 				</div>
-				<div>
+				<div className="flex items-center">
+					<span className="text-xs mr-2 dark:text-gray-400 text-gray-600">
+						{chain.sessions.length} {chain.sessions.length === 1 ? 'session' : 'sessions'}
+					</span>
 					{isExpanded ? (
 						<ChevronUp className="h-4 w-4 dark:text-gray-400 text-gray-600" />
 					) : (
@@ -160,37 +163,45 @@ const ChainItem = ({
 					)}
 				</div>
 			</div>
-
+			
 			{/* Sessions dropdown */}
 			{isExpanded && chain.sessions.length > 0 && (
 				<div className="pl-4 pr-2 pb-2">
-					{chain.sessions.map(session => (
-						<div
+					{chain.sessions.map((session) => (
+						<div 
 							key={session.session_id}
 							className={`p-2 cursor-pointer rounded-md my-1 text-sm
-								${
-									selectedSessionId === session.session_id
-										? 'dark:bg-[#1E293B] bg-gray-200'
-										: 'dark:hover:bg-[#1E293B] hover:bg-gray-100'
-								}`}
+								${selectedSessionId === session.session_id 
+									? 'dark:bg-[#1E293B] bg-gray-200' 
+									: 'dark:hover:bg-[#1E293B] hover:bg-gray-100'}`}
 							onClick={() => onSelectSession(chain, session)}
 						>
 							<div className="flex flex-col">
-								<span className="font-medium dark:text-white text-gray-900">
-									Session {session.session_id}
-								</span>
-								<span className="text-xs dark:text-gray-400 text-gray-600">
+								<div className="flex justify-between">
+									<span className="font-medium dark:text-white text-gray-900">
+										Session {session.session_id}
+									</span>
+									<span className={`text-xs px-1.5 py-0.5 rounded-full ${
+										session.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+										session.status === 'completed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+										session.status === 'escalated' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' :
+										'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+									}`}>
+										{session.status}
+									</span>
+								</div>
+								<span className="text-xs dark:text-gray-400 text-gray-600 mt-1">
 									{new Date(session.scheduled_at).toLocaleString()}
 								</span>
 								<span className="text-xs dark:text-gray-400 text-gray-600 mt-1">
-									Status: {session.status}
+									Chat ID: {session.chat_id}
 								</span>
 							</div>
 						</div>
 					))}
 				</div>
 			)}
-
+			
 			{/* Empty state for sessions */}
 			{isExpanded && chain.sessions.length === 0 && (
 				<div className="pl-4 pr-2 pb-2">
@@ -198,6 +209,156 @@ const ChainItem = ({
 						No sessions available
 					</p>
 				</div>
+			)}
+		</div>
+	)
+}
+
+// ChatMessages component to handle fetching and displaying messages for a specific chat
+const ChatMessages = ({ 
+	chatId, 
+	accessToken 
+}: { 
+	chatId: string, 
+	accessToken: string 
+}) => {
+	const [messages, setMessages] = useState<MessageResp[]>([])
+	const [isLoading, setIsLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
+	const messagesEndRef = useRef<HTMLDivElement>(null)
+
+	// Scroll to bottom when messages change
+	useEffect(() => {
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+		}
+	}, [messages])
+
+	// Fetch messages when chatId changes
+	useEffect(() => {
+		if (!chatId) {
+			setMessages([])
+			setIsLoading(false)
+			return
+		}
+
+		const fetchMessages = async () => {
+			try {
+				setIsLoading(true)
+				setError(null)
+				
+				// Get messages for this specific chat
+				const messagesUrl = `${API_URL}/llm/chat/messages/${chatId}`
+				console.log("Fetching messages from:", messagesUrl)
+				
+				const messagesResponse = await fetch(messagesUrl, {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+						'Content-Type': 'application/json',
+					},
+				})
+				
+				if (!messagesResponse.ok) {
+					throw new Error(`HTTP error! status: ${messagesResponse.status}`)
+				}
+				
+				const responseData = await messagesResponse.json()
+				console.log(`Received response for chat ${chatId}:`, responseData)
+				
+				// Extract messages from the response - the API returns { chatId, messages: [...] }
+				const chatMessages = responseData.messages || []
+				
+				// Map API response format to our MessageResp format
+				const formattedMessages = chatMessages.map((msg: { 
+					sender: string; 
+					text: string; 
+					timestamp: string 
+				}) => ({
+					sender: msg.sender === 'emp' ? SenderType.EMPLOYEE : 
+						   msg.sender === 'bot' ? SenderType.BOT : 
+						   msg.sender === 'hr' ? SenderType.HR : SenderType.SYSTEM,
+					text: msg.text,
+					timestamp: msg.timestamp
+				}))
+				
+				console.log(`Processed ${formattedMessages.length} messages for display`)
+				setMessages(formattedMessages)
+			} catch (err) {
+				console.error(`Error fetching messages for chat ${chatId}:`, err)
+				setError(`Failed to load messages: ${err instanceof Error ? err.message : 'Unknown error'}`)
+				setMessages([])
+			} finally {
+				setIsLoading(false)
+			}
+		}
+
+		fetchMessages()
+	}, [chatId, accessToken])
+
+	// Set up WebSocket for real-time messages
+	useEffect(() => {
+		if (!chatId) return
+
+		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + chatId)
+
+		ws.onmessage = event => {
+			const data = JSON.parse(event.data)
+			console.log('New message received:', data)
+
+			if (data.type === 'new_message') {
+				setMessages(prev => [
+					...prev,
+					{
+						sender: data.sender === 'emp' ? SenderType.EMPLOYEE : 
+								data.sender === 'bot' ? SenderType.BOT : 
+								data.sender === 'hr' ? SenderType.HR : SenderType.SYSTEM,
+						text: data.message,
+						timestamp: data.timestamp,
+					},
+				])
+			}
+		}
+
+		return () => {
+			ws.close()
+		}
+	}, [chatId])
+
+	return (
+		<div className="h-full overflow-y-auto flex flex-col space-y-2 p-3">
+			{isLoading ? (
+				<div className="flex justify-center items-center h-full">
+					<div className="animate-spin rounded-full h-10 w-10 border-t-3 border-indigo-500"></div>
+				</div>
+			) : error ? (
+				<div className="text-center p-4">
+					<p className="text-red-500 dark:text-red-400">{error}</p>
+					<button 
+						onClick={() => {
+							// Re-fetch by triggering a state update
+							setIsLoading(true)
+						}}
+						className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+					>
+						Retry
+					</button>
+				</div>
+			) : (
+				<>
+					{messages.length > 0 ? (
+						messages.map((message, index) => (
+							<div key={index} data-chat-id={message.text}>
+								<MessageComp message={message} />
+							</div>
+						))
+					) : (
+						<p className="text-center p-2 dark:text-gray-400 text-sm text-gray-700">
+							No messages found for this chat
+						</p>
+					)}
+					<div ref={messagesEndRef} className="h-1" />
+				</>
 			)}
 		</div>
 	)
@@ -217,8 +378,6 @@ const ChatPage = () => {
 	const { auth } = store.getState()
 	const [isLoading, setIsLoading] = useState(true)
 	const [sidebarOpen, setSidebarOpen] = useState(true)
-	const [sessions, setSessions] = useState<SessionHist[]>([])
-	const [historyLoading, setHistoryLoading] = useState(false)
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
 	const [chatid, setChatId] = useState<string>('')
 	const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false)
@@ -243,21 +402,6 @@ const ChatPage = () => {
 	}, [messages])
 
 	// Scroll to selected chat's system message
-	useEffect(() => {
-		if (selectedChatId && messagesContainerRef.current) {
-			const systemMessage = messages.find(
-				msg => msg.sender === SenderType.SYSTEM && msg.text === selectedChatId
-			)
-			if (systemMessage) {
-				const messageElement = document.querySelector(
-					`[data-chat-id="${selectedChatId}"]`
-				)
-				if (messageElement) {
-					messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-				}
-			}
-		}
-	}, [selectedChatId, messages])
 
 	// Get sidebar state from localStorage on component mount
 	useEffect(() => {
@@ -282,7 +426,9 @@ const ChatPage = () => {
 	// Fetch chat history when component mounts or chainId changes
 	useEffect(() => {
 		if (chainId && auth.user?.accessToken) {
-			fetchChatHistory(chainId)
+			// We'll only fetch chain data now, not messages
+			// Message fetching will happen after we select a session
+			fetchChains()
 		}
 	}, [chainId, auth.user?.accessToken])
 
@@ -307,7 +453,7 @@ const ChatPage = () => {
 
 			const data = await response.json()
 			setChains(data)
-
+			
 			// Auto-expand the current chain
 			if (chainId) {
 				const currentChain = data.find(
@@ -319,7 +465,14 @@ const ChatPage = () => {
 
 					// Find the first session of this chain
 					if (currentChain.sessions && currentChain.sessions.length > 0) {
-						setSelectedSession(currentChain.sessions[0])
+						const firstSession = currentChain.sessions[0];
+						setSelectedSession(firstSession)
+						
+						// Set chatId to first session's chat_id for WebSocket connection
+						if (firstSession.chat_id) {
+							setChatId(firstSession.chat_id)
+							
+						}
 					}
 				}
 			}
@@ -341,7 +494,7 @@ const ChatPage = () => {
 			
 			// First get the chain to find all its sessions
 			const chainResponse = await fetch(
-				`${API_URL}/admin/chains/${chainId}`,
+				`${API_URL}/admin/chains/employee/${chainId}`,
 				{
 					method: 'GET',
 					headers: {
@@ -361,7 +514,6 @@ const ChatPage = () => {
 			if (!chainData.sessions || chainData.sessions.length === 0) {
 				setMessages([])
 				setSelectedChatId(chainId)
-				setChatId(chainId)
 				return
 			}
 			
@@ -374,7 +526,7 @@ const ChatPage = () => {
 				
 				try {
 					const historyResponse = await fetch(
-						`${API_URL}/llm/chat/history/${session.chat_id}`,
+						`${API_URL}/chat/history/${session.chat_id}`,
 						{
 							method: 'GET',
 							headers: {
@@ -437,7 +589,6 @@ const ChatPage = () => {
 			
 			setMessages(messagesWithSeparators)
 			setSelectedChatId(chainId)
-			setChatId(chainId)
 		} catch (error) {
 			console.error('Error fetching chain history:', error)
 			toast({
@@ -462,41 +613,26 @@ const ChatPage = () => {
 		})
 	}
 
-	// Handle session selection
+	// Update handleSessionSelect function
 	const handleSessionSelect = (chain: Chain, session: Session) => {
 		setSelectedChain(chain)
 		setSelectedSession(session)
-		fetchChatHistory(chain.chain_id)
+		// Set chatId to the session's chat_id for WebSocket connection
+		setChatId(session.chat_id)
 	}
 
-	useEffect(() => {
-		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + chatid)
-
-		ws.onmessage = event => {
-			const data = JSON.parse(event.data)
-			console.log('New message received:', data)
-
-			if (data.type === 'new_message') {
-				setMessages(prev => [
-					...prev,
-					{
-						sender: data.sender,
-						text: data.message,
-						timestamp: data.timestamp,
-					},
-				])
-			}
-		}
-
-		return () => {
-			ws.close()
-		}
-	}, [chatid])
-
 	const endSession = async () => {
+		if (!selectedSession) {
+			toast({
+				type: 'error',
+				description: 'No session selected',
+			})
+			return
+		}
+		
 		setIsEndingSession(true)
 		try {
-			const endpoint = `/admin/chains/${chainId}/${sessionAction}`
+			const endpoint = `/admin/sessions/${selectedSession.session_id}/${sessionAction}`
 
 			const response = await fetch(`${API_URL}${endpoint}`, {
 				method: 'POST',
@@ -627,28 +763,18 @@ const ChatPage = () => {
 					ref={messagesContainerRef}
 					className="flex-grow overflow-hidden dark:bg-[#0f172a] bg-white"
 				>
-					<div className="h-full overflow-y-auto flex flex-col space-y-2 p-3">
-						{isLoading ? (
-							<div className="flex justify-center items-center h-full">
-								<div className="animate-spin rounded-full h-10 w-10 border-t-3 border-indigo-500"></div>
-							</div>
-						) : (
-							<>
-								{messages.length > 0 ? (
-									messages.map((message, index) => (
-										<div key={index} data-chat-id={message.text}>
-											<MessageComp message={message} />
-										</div>
-									))
-								) : (
-									<p className="text-center p-2 dark:text-gray-400 text-sm text-gray-700">
-										No chat history messages found
-									</p>
-								)}
-								<div ref={chatEndRef} className="h-1" />
-							</>
-						)}
-					</div>
+					{selectedSession?.chat_id ? (
+						<ChatMessages 
+							chatId={selectedSession.chat_id} 
+							accessToken={auth.user?.accessToken || ''}
+						/>
+					) : (
+						<div className="flex justify-center items-center h-full">
+							<p className="text-center p-2 dark:text-gray-400 text-sm text-gray-700">
+								Select a session to view messages
+							</p>
+						</div>
+					)}
 				</div>
 
 				{/* Chat Input */}
