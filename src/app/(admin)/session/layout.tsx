@@ -1,12 +1,12 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Chat | DeloConnect',
-  description: 'Communicate with team members through DeloConnect chat',
-  keywords: ['chat', 'messaging', 'communication', 'DeloConnect', 'admin'],
+  title: 'Session | DeloConnect',
+  description: 'Manage and monitor sessions in DeloConnect',
+  keywords: ['sessions', 'management', 'DeloConnect', 'admin'],
 }
 
-export default function ChatLayout({
+export default function SessionLayout({
   children,
 }: {
   children: React.ReactNode

@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Reports | DeloConnect',
+  title: 'Report | DeloConnect',
   description: 'View and generate reports in DeloConnect',
   keywords: ['reports', 'analytics', 'statistics', 'DeloConnect', 'admin'],
 }
