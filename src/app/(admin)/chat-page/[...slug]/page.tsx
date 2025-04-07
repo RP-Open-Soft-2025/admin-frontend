@@ -1,0 +1,744 @@
+'use client'
+import { useState, useEffect, useRef } from 'react'
+import { useParams } from 'next/navigation'
+import { MessageResp, SenderType } from '@/types/chat'
+import { API_URL, WS_URL } from '@/constants'
+import store from '@/redux/store'
+import { toast } from '@/components/ui/sonner'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+
+// Define session history type
+type SessionHist = {
+	chat_id: string
+	last_message: string
+	last_message_time: string | null // ISO timestamp
+	unread_count: number
+	total_messages: number
+	chat_mode: 'BOT' | 'HUMAN' // Assuming only these two modes
+	is_escalated: boolean
+	created_at: string // ISO timestamp
+}
+
+// Define a Session interface to properly type the session data
+interface Session {
+	session_id: string
+	employee_id: string
+	chat_id: string
+	status: string
+	scheduled_at: string
+}
+
+// Define Chain type based on the API response
+type Chain = {
+	chain_id: string
+	employee_id: string
+	session_ids: string[]
+	sessions: Session[]
+	status: string
+	context: string
+	created_at: string
+	updated_at: string
+	completed_at: string | null
+	escalated_at: string | null
+	cancelled_at: string | null
+	notes: string
+}
+
+// Define an extended message response type that includes session_id
+type ExtendedMessageResp = MessageResp & {
+	session_id?: string
+}
+
+const MessageComp = ({ message }: { message: MessageResp }) => {
+	const { sender, text, timestamp } = message
+
+	// Dynamic styling based on sender
+	const messageStyles = {
+		[SenderType.EMPLOYEE]: {
+			container: 'justify-start',
+			bg: 'bg-blue-200 dark:bg-blue-800',
+			textColor: 'text-gray-900 dark:text-blue-100',
+		},
+		[SenderType.BOT]: {
+			container: 'justify-end',
+			bg: 'bg-green-200 dark:bg-green-800',
+			textColor: 'text-gray-900 dark:text-green-100',
+		},
+		[SenderType.HR]: {
+			container: 'justify-end',
+			bg: 'bg-purple-200 dark:bg-purple-800',
+			textColor: 'text-gray-900 dark:text-purple-100',
+		},
+		[SenderType.SYSTEM]: {
+			container: 'justify-center',
+			bg: 'bg-gray-300 dark:bg-gray-700', // Improved contrast
+			textColor: 'text-gray-900 dark:text-gray-100',
+		},
+	}
+
+	const { container, bg, textColor } = messageStyles[sender]
+
+	return (
+		<div className={`flex ${container} w-full`}>
+			<div
+				className={`${
+					sender === SenderType.SYSTEM
+						? 'max-w-max px-4 py-2 rounded-lg text-sm font-semibold'
+						: 'max-w-[70%] p-3 rounded-xl shadow-sm'
+				} ${bg} ${textColor}`}
+			>
+				{sender !== SenderType.SYSTEM && (
+					<div className="flex justify-between items-center mb-1">
+						<span className="text-xs font-semibold opacity-70">
+							{sender === SenderType.EMPLOYEE
+								? 'Employee'
+								: sender === SenderType.BOT
+									? 'Bot'
+									: sender === SenderType.HR
+										? 'HR'
+										: ''}
+						</span>
+						<span className="text-xs opacity-50 ml-2">
+							{new Date(timestamp).toLocaleTimeString([], {
+								hour: '2-digit',
+								minute: '2-digit',
+							})}
+						</span>
+					</div>
+				)}
+				<p className="text-sm font-medium text-left">
+					{sender == SenderType.SYSTEM ? `Chat ID: ${text}` : text}
+				</p>
+			</div>
+		</div>
+	)
+}
+
+// Chain item component with dropdown for sessions
+const ChainItem = ({
+	chain,
+	isExpanded,
+	onToggle,
+	onSelectSession,
+	selectedSessionId,
+}: {
+	chain: Chain
+	isExpanded: boolean
+	onToggle: () => void
+	onSelectSession: (chain: Chain, session: Session) => void
+	selectedSessionId: string | null
+}) => {
+	return (
+		<div className="border-b dark:border-gray-700 border-gray-300">
+			{/* Chain header - clickable to expand/collapse */}
+			<div
+				className="p-3 cursor-pointer flex justify-between items-center dark:hover:bg-[#1E293B] hover:bg-gray-100"
+				onClick={onToggle}
+			>
+				<div>
+					<h3 className="font-medium dark:text-white text-gray-900 text-sm">
+						Chain: {chain.chain_id}
+					</h3>
+					<p className="text-xs dark:text-gray-400 text-gray-600">
+						Status: {chain.status}
+					</p>
+				</div>
+				<div>
+					{isExpanded ? (
+						<ChevronUp className="h-4 w-4 dark:text-gray-400 text-gray-600" />
+					) : (
+						<ChevronDown className="h-4 w-4 dark:text-gray-400 text-gray-600" />
+					)}
+				</div>
+			</div>
+
+			{/* Sessions dropdown */}
+			{isExpanded && chain.sessions.length > 0 && (
+				<div className="pl-4 pr-2 pb-2">
+					{chain.sessions.map(session => (
+						<div
+							key={session.session_id}
+							className={`p-2 cursor-pointer rounded-md my-1 text-sm
+								${
+									selectedSessionId === session.session_id
+										? 'dark:bg-[#1E293B] bg-gray-200'
+										: 'dark:hover:bg-[#1E293B] hover:bg-gray-100'
+								}`}
+							onClick={() => onSelectSession(chain, session)}
+						>
+							<div className="flex flex-col">
+								<span className="font-medium dark:text-white text-gray-900">
+									Session {session.session_id}
+								</span>
+								<span className="text-xs dark:text-gray-400 text-gray-600">
+									{new Date(session.scheduled_at).toLocaleString()}
+								</span>
+								<span className="text-xs dark:text-gray-400 text-gray-600 mt-1">
+									Status: {session.status}
+								</span>
+							</div>
+						</div>
+					))}
+				</div>
+			)}
+
+			{/* Empty state for sessions */}
+			{isExpanded && chain.sessions.length === 0 && (
+				<div className="pl-4 pr-2 pb-2">
+					<p className="text-xs dark:text-gray-400 text-gray-600 italic p-2">
+						No sessions available
+					</p>
+				</div>
+			)}
+		</div>
+	)
+}
+
+const ChatPage = () => {
+	const params = useParams()
+	const paramsArray: string[] = params.slug as string[]
+
+	// Extract employee ID and chain ID from the URL
+	const employeeId = paramsArray[0] // First part is employee ID (e.g., EMP2001)
+	const chainId = paramsArray[1] // Second part is chain ID (e.g., CHAIN18925A)
+
+	const [messages, setMessages] = useState<MessageResp[]>([])
+	const chatEndRef = useRef<HTMLDivElement>(null)
+	const messagesContainerRef = useRef<HTMLDivElement>(null)
+	const { auth } = store.getState()
+	const [isLoading, setIsLoading] = useState(true)
+	const [sidebarOpen, setSidebarOpen] = useState(true)
+	const [sessions, setSessions] = useState<SessionHist[]>([])
+	const [historyLoading, setHistoryLoading] = useState(false)
+	const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
+	const [chatid, setChatId] = useState<string>('')
+	const [isEndSessionModalOpen, setIsEndSessionModalOpen] = useState(false)
+	const [endSessionNotes, setEndSessionNotes] = useState('')
+	const [isEndingSession, setIsEndingSession] = useState(false)
+	const [sessionAction, setSessionAction] = useState<string>('escalate')
+
+	// New state for chains and expanded chains
+	const [chains, setChains] = useState<Chain[]>([])
+	const [expandedChainIds, setExpandedChainIds] = useState<Set<string>>(
+		new Set()
+	)
+	const [selectedChain, setSelectedChain] = useState<Chain | null>(null)
+	const [selectedSession, setSelectedSession] = useState<Session | null>(null)
+	const [chainsLoading, setChainsLoading] = useState(false)
+
+	// Scroll to latest message
+	useEffect(() => {
+		if (chatEndRef.current) {
+			chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
+		}
+	}, [messages])
+
+	// Scroll to selected chat's system message
+	useEffect(() => {
+		if (selectedChatId && messagesContainerRef.current) {
+			const systemMessage = messages.find(
+				msg => msg.sender === SenderType.SYSTEM && msg.text === selectedChatId
+			)
+			if (systemMessage) {
+				const messageElement = document.querySelector(
+					`[data-chat-id="${selectedChatId}"]`
+				)
+				if (messageElement) {
+					messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+				}
+			}
+		}
+	}, [selectedChatId, messages])
+
+	// Get sidebar state from localStorage on component mount
+	useEffect(() => {
+		const savedSidebarState = localStorage.getItem('chatSidebarOpen')
+		if (savedSidebarState !== null) {
+			setSidebarOpen(savedSidebarState === 'true')
+		}
+	}, [])
+
+	// Save sidebar state to localStorage when it changes
+	useEffect(() => {
+		localStorage.setItem('chatSidebarOpen', sidebarOpen.toString())
+	}, [sidebarOpen])
+
+	// Fetch chains data when component mounts
+	useEffect(() => {
+		if (employeeId && auth.user?.accessToken) {
+			fetchChains()
+		}
+	}, [employeeId, auth.user?.accessToken])
+
+	// Fetch chat history when component mounts or chainId changes
+	useEffect(() => {
+		if (chainId && auth.user?.accessToken) {
+			fetchChatHistory(chainId)
+		}
+	}, [chainId, auth.user?.accessToken])
+
+	// Fetch chains for the employee
+	const fetchChains = async () => {
+		try {
+			setChainsLoading(true)
+			const response = await fetch(
+				`${API_URL}/admin/chains/employee/${employeeId}`,
+				{
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+						'Content-Type': 'application/json',
+					},
+				}
+			)
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`)
+			}
+
+			const data = await response.json()
+			setChains(data)
+
+			// Auto-expand the current chain
+			if (chainId) {
+				const currentChain = data.find(
+					(chain: Chain) => chain.chain_id === chainId
+				)
+				if (currentChain) {
+					setExpandedChainIds(new Set([chainId]))
+					setSelectedChain(currentChain)
+
+					// Find the first session of this chain
+					if (currentChain.sessions && currentChain.sessions.length > 0) {
+						setSelectedSession(currentChain.sessions[0])
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching chains:', error)
+			toast({
+				type: 'error',
+				description: 'Failed to load chains',
+			})
+		} finally {
+			setChainsLoading(false)
+		}
+	}
+
+	// Update fetchChatHistory function
+	const fetchChatHistory = async (chainId: string) => {
+		try {
+			setIsLoading(true)
+			
+			// First get the chain to find all its sessions
+			const chainResponse = await fetch(
+				`${API_URL}/admin/chains/${chainId}`,
+				{
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${auth.user?.accessToken}`,
+						'Content-Type': 'application/json',
+					},
+				}
+			)
+
+			if (!chainResponse.ok) {
+				throw new Error(`HTTP error! status: ${chainResponse.status}`)
+			}
+
+			const chainData = await chainResponse.json()
+			
+			// No sessions in this chain
+			if (!chainData.sessions || chainData.sessions.length === 0) {
+				setMessages([])
+				setSelectedChatId(chainId)
+				setChatId(chainId)
+				return
+			}
+			
+			const allMessages: ExtendedMessageResp[] = []
+			const messagesWithSeparators: ExtendedMessageResp[] = []
+			
+			// Use Promise.all to fetch chat history for all sessions concurrently
+			const historyPromises = chainData.sessions.map(async (session: Session) => {
+				if (!session.chat_id) return null
+				
+				try {
+					const historyResponse = await fetch(
+						`${API_URL}/llm/chat/history/${session.chat_id}`,
+						{
+							method: 'GET',
+							headers: {
+								Authorization: `Bearer ${auth.user?.accessToken}`,
+								'Content-Type': 'application/json',
+							},
+						}
+					)
+					
+					if (historyResponse.ok) {
+						const sessionMessages = await historyResponse.json()
+						
+						// Add session info to each message
+						return {
+							session,
+							messages: sessionMessages.map((msg: MessageResp) => ({
+								...msg,
+								session_id: session.session_id,
+							})),
+						}
+					}
+					return null
+				} catch (error) {
+					console.error(`Error fetching history for chat ${session.chat_id}:`, error)
+					return null
+				}
+			})
+			
+			const results = await Promise.all(historyPromises)
+			
+			// Process results to add session separators and merge messages
+			results.filter(Boolean).forEach(result => {
+				if (!result) return // Skip null results
+				
+				const { session, messages } = result
+				
+				if (messages && messages.length > 0) {
+					// Add a system message to mark the beginning of a session
+					messagesWithSeparators.push({
+						sender: SenderType.SYSTEM,
+						text: `Session: ${session.session_id} - Started at: ${new Date(session.scheduled_at).toLocaleString()} - Status: ${session.status}`,
+						timestamp: messages[0].timestamp, // Use the timestamp of the first message
+						session_id: session.session_id
+					})
+					
+					// Add all messages from this session
+					messagesWithSeparators.push(...messages)
+					
+					// Add all messages to the combined array for sorting
+					allMessages.push(...messages)
+				}
+			})
+			
+			// Sort all messages by timestamp
+			messagesWithSeparators.sort((a, b) => {
+				const dateA = new Date(a.timestamp).getTime()
+				const dateB = new Date(b.timestamp).getTime()
+				return dateA - dateB
+			})
+			
+			setMessages(messagesWithSeparators)
+			setSelectedChatId(chainId)
+			setChatId(chainId)
+		} catch (error) {
+			console.error('Error fetching chain history:', error)
+			toast({
+				type: 'error',
+				description: 'Failed to load chat history',
+			})
+		} finally {
+			setIsLoading(false)
+		}
+	}
+
+	// Toggle chain expansion
+	const toggleChainExpansion = (chainId: string) => {
+		setExpandedChainIds(prev => {
+			const newSet = new Set(prev)
+			if (newSet.has(chainId)) {
+				newSet.delete(chainId)
+			} else {
+				newSet.add(chainId)
+			}
+			return newSet
+		})
+	}
+
+	// Handle session selection
+	const handleSessionSelect = (chain: Chain, session: Session) => {
+		setSelectedChain(chain)
+		setSelectedSession(session)
+		fetchChatHistory(chain.chain_id)
+	}
+
+	useEffect(() => {
+		const ws = new WebSocket(WS_URL + '/llm/chat/ws/llm/' + chatid)
+
+		ws.onmessage = event => {
+			const data = JSON.parse(event.data)
+			console.log('New message received:', data)
+
+			if (data.type === 'new_message') {
+				setMessages(prev => [
+					...prev,
+					{
+						sender: data.sender,
+						text: data.message,
+						timestamp: data.timestamp,
+					},
+				])
+			}
+		}
+
+		return () => {
+			ws.close()
+		}
+	}, [chatid])
+
+	const endSession = async () => {
+		setIsEndingSession(true)
+		try {
+			const endpoint = `/admin/chains/${chainId}/${sessionAction}`
+
+			const response = await fetch(`${API_URL}${endpoint}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${auth.user?.accessToken}`,
+				},
+				body: JSON.stringify({
+					notes: endSessionNotes,
+				}),
+			})
+
+			if (!response.ok) {
+				throw new Error(`Error: ${response.status}`)
+			}
+
+			// Show success message with appropriate action
+			const actionText =
+				sessionAction === 'complete'
+					? 'completed'
+					: sessionAction === 'escalate'
+						? 'escalated'
+						: 'cancelled'
+
+			toast({
+				description: `Session ${actionText} successfully`,
+				type: 'success',
+			})
+
+			// Close modal and reset state
+			setIsEndSessionModalOpen(false)
+			setEndSessionNotes('')
+			setSessionAction('complete')
+
+			// Refresh chains data
+			fetchChains()
+		} catch (error) {
+			console.error(`Error ${sessionAction}ing session:`, error)
+			toast({
+				description: `Failed to ${sessionAction} session`,
+				type: 'error',
+			})
+		} finally {
+			setIsEndingSession(false)
+		}
+	}
+
+	const toggleSidebar = () => {
+		setSidebarOpen(!sidebarOpen)
+	}
+
+	return (
+		<div className="flex h-[80vh] w-full dark:bg-[#0f172a] bg-white">
+			{/* Left Sidebar - Always present but may be collapsed */}
+			<div
+				className={`transition-all duration-300 ease-in-out border-r border-gray-700 ${
+					sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'
+				}`}
+			>
+				{/* Sidebar Content */}
+				<div className="h-full dark:bg-[#0f172a] text-white flex flex-col bg-white">
+					<div className="p-2 border-b border-gray-700 flex items-center">
+						<h2 className="text-lg font-bold dark:text-white text-gray-900 items-center flex justify-center">
+							Chat History
+						</h2>
+					</div>
+
+					<div className="overflow-y-auto flex-grow">
+						{chainsLoading ? (
+							<div className="flex justify-center items-center h-24">
+								<div className="animate-spin rounded-full h-6 w-6 border-t-2 border-indigo-500"></div>
+							</div>
+						) : (
+							<>
+								{chains.length === 0 ? (
+									<p className="text-center p-2 dark:text-gray-400 text-sm text-gray-700">
+										No chains found
+									</p>
+								) : (
+									chains.map(chain => (
+										<ChainItem
+											key={chain.chain_id}
+											chain={chain}
+											isExpanded={expandedChainIds.has(chain.chain_id)}
+											onToggle={() => toggleChainExpansion(chain.chain_id)}
+											onSelectSession={handleSessionSelect}
+											selectedSessionId={selectedSession?.session_id || null}
+										/>
+									))
+								)}
+							</>
+						)}
+					</div>
+				</div>
+			</div>
+
+			{/* Main Chat Area */}
+			<div className="flex flex-col flex-grow overflow-hidden">
+				{/* Chat Header with Toggle Button */}
+				<div className="flex items-center p-2 dark:bg-[#0f172a] border-b border-gray-700 dark:text-white bg-white text-gray-dark">
+					<button
+						className="mr-3 dark:text-gray-300 hover:text-white focus:outline-none text-gray-900"
+						onClick={toggleSidebar}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M4 6h16M4 12h16M4 18h16"
+							/>
+						</svg>
+					</button>
+					<h2 className="text-lg font-bold text-center flex-grow">
+						{selectedChain ? `Chain: ${selectedChain.chain_id}` : 'Chat Window'}
+						{selectedSession && ` - Session: ${selectedSession.session_id}`}
+					</h2>
+				</div>
+
+				{/* Chat Messages Container */}
+				<div
+					ref={messagesContainerRef}
+					className="flex-grow overflow-hidden dark:bg-[#0f172a] bg-white"
+				>
+					<div className="h-full overflow-y-auto flex flex-col space-y-2 p-3">
+						{isLoading ? (
+							<div className="flex justify-center items-center h-full">
+								<div className="animate-spin rounded-full h-10 w-10 border-t-3 border-indigo-500"></div>
+							</div>
+						) : (
+							<>
+								{messages.length > 0 ? (
+									messages.map((message, index) => (
+										<div key={index} data-chat-id={message.text}>
+											<MessageComp message={message} />
+										</div>
+									))
+								) : (
+									<p className="text-center p-2 dark:text-gray-400 text-sm text-gray-700">
+										No chat history messages found
+									</p>
+								)}
+								<div ref={chatEndRef} className="h-1" />
+							</>
+						)}
+					</div>
+				</div>
+
+				{/* Chat Input */}
+				{selectedChain && (
+					<div className="dark:bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700 bg-white">
+						<button
+							className="px-4 py-2 dark:bg-[#1e293b] dark:text-white rounded-md shadow-md text-sm bg-blue-200 text-black
+							dark:hover:bg-[#334155] transition-colors hover:bg-blue-light-500"
+							onClick={() => setIsEndSessionModalOpen(true)}
+						>
+							End Session
+						</button>
+					</div>
+				)}
+
+				{/* End Session Modal */}
+				<Dialog
+					open={isEndSessionModalOpen}
+					onOpenChange={setIsEndSessionModalOpen}
+				>
+					<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
+						<DialogHeader>
+							<DialogTitle className="dark:text-white">
+								Escalate Session
+							</DialogTitle>
+						</DialogHeader>
+						<form
+							onSubmit={e => {
+								e.preventDefault()
+								endSession()
+							}}
+							className="space-y-4"
+						>
+							<div className="grid w-full items-center gap-2">
+								<label
+									htmlFor="end_session_notes"
+									className="text-sm font-medium text-gray-700 dark:text-gray-300"
+								>
+									Notes
+								</label>
+								<Textarea
+									id="end_session_notes"
+									value={endSessionNotes}
+									onChange={e => setEndSessionNotes(e.target.value)}
+									placeholder="Enter any notes about this action..."
+									className="resize-none min-h-[100px] dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:placeholder-gray-500"
+								/>
+							</div>
+
+							<DialogFooter className="gap-2 sm:gap-0">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setIsEndSessionModalOpen(false)}
+									className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+								>
+									Cancel
+								</Button>
+								<Button
+									type="submit"
+									disabled={isEndingSession}
+									className={`relative ${
+										sessionAction === 'complete'
+											? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
+											: sessionAction === 'escalate'
+												? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-800'
+												: 'bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800'
+									}`}
+								>
+									{isEndingSession && (
+										<div className="absolute inset-0 flex items-center justify-center">
+											<div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white dark:border-gray-300"></div>
+										</div>
+									)}
+									<span className={isEndingSession ? 'opacity-0' : ''}>
+										{sessionAction === 'complete'
+											? 'Complete'
+											: sessionAction === 'escalate'
+												? 'Escalate'
+												: 'Cancel'}{' '}
+										Session
+									</span>
+								</Button>
+							</DialogFooter>
+						</form>
+					</DialogContent>
+				</Dialog>
+			</div>
+		</div>
+	)
+}
+
+export default ChatPage

@@ -869,7 +869,9 @@ export default function UserSessionsCard({
 																		<div
 																			key={sessionId}
 																			onClick={() =>
-																				router.push(`/chat-page/${sessionId}`)
+																				router.push(
+																					`/chat-page/${employeeId}/${chain.chain_id}`
+																				)
 																			}
 																			className="p-2.5 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow"
 																		>
@@ -899,7 +901,7 @@ export default function UserSessionsCard({
 																					onClick={e => {
 																						e.stopPropagation()
 																						router.push(
-																							`/chat-page/${sessionId}`
+																							`/chat-page/${employeeId}/${chain.chain_id}`
 																						)
 																					}}
 																					className="h-8 w-8 p-0 rounded-full hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
