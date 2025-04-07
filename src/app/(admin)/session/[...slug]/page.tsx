@@ -534,7 +534,7 @@ const ChatPage = () => {
 
 		setIsEndingSession(true)
 		try {
-			const endpoint = `/admin/sessions/${selectedSession.session_id}/${sessionAction}`
+			const endpoint = `/admin/chains/${selectedChain?.chain_id}/escalate`
 
 			const response = await fetch(`${API_URL}${endpoint}`, {
 				method: 'POST',
@@ -680,7 +680,7 @@ const ChatPage = () => {
 				</div>
 
 				{/* Chat Input */}
-				{selectedSession && (
+				{selectedSession && selectedChain && selectedChain.status === "active" && selectedSession === selectedChain.sessions[selectedChain.sessions.length - 1] && (
 					<div className="dark:bg-[#162040] flex justify-center items-center py-2 border-t border-gray-700 bg-white">
 						<button
 							className="px-4 py-2 dark:bg-[#1e293b] dark:text-white rounded-md shadow-md text-sm bg-blue-200 text-black
