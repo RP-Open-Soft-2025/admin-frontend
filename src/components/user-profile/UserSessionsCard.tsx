@@ -84,7 +84,6 @@ const getSessionStatusFromChain = (chain: ChainType) => {
 
 export default function UserSessionsCard({
 	employeeId,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	role,
 }: UserSessionsCardProps) {
 	const [chainsData, setChainsData] = useState<ChainType[] | null>(null)
@@ -100,15 +99,10 @@ export default function UserSessionsCard({
 			hour12: false,
 		}),
 	})
-	const [completeSessionId, setCompleteSessionId] = useState<string | null>(
-		null
-	)
-	const [completeSessionNotes, setCompleteSessionNotes] = useState('')
-	const [isCompletingSession, setIsCompletingSession] = useState(false)
-	const [completeChainId, setCompleteChainId] = useState<string | null>(null)
+	const [escalateChainId, setEscalateChainId] = useState<string | null>(null)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [completeChainNotes, setCompleteChainNotes] = useState('')
-	const [isCompletingChain, setIsCompletingChain] = useState(false)
+	const [escalateChainNotes, setEscalateChainNotes] = useState('')
+	const [isEscalatingChain, setIsEscalatingChain] = useState(false)
 	const router = useRouter()
 	const { auth } = store.getState()
 
@@ -233,55 +227,10 @@ export default function UserSessionsCard({
 		}
 	}
 
-	const completeSession = async (sessionId: string) => {
-		if (!sessionId) return
-
-		setIsCompletingSession(true)
-		try {
-			const response = await fetch(`${API_URL}/admin/session/complete`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${auth.user?.accessToken}`,
-				},
-				body: JSON.stringify({
-					session_id: sessionId,
-					notes: completeSessionNotes,
-				}),
-			})
-
-			if (!response.ok) {
-				throw new Error(`Error: ${response.status}`)
-			}
-
-			// Show success message
-			toast({
-				description: 'Session completed successfully',
-				type: 'success',
-			})
-
-			// Refresh the chains data
-			const updatedChains = await getEmployeeChains(employeeId)
-			setChainsData(updatedChains)
-
-			// Reset state
-			setCompleteSessionId(null)
-			setCompleteSessionNotes('')
-		} catch (error) {
-			console.error('Error completing session:', error)
-			toast({
-				description: 'Failed to complete session',
-				type: 'error',
-			})
-		} finally {
-			setIsCompletingSession(false)
-		}
-	}
-
-	const completeChain = async (chainId: string) => {
+	const escalateChain = async (chainId: string) => {
 		if (!chainId) return
 
-		setIsCompletingChain(true)
+		setIsEscalatingChain(true)
 		try {
 			const response = await fetch(
 				`${API_URL}/admin/chains/${chainId}/escalate`,
@@ -310,8 +259,8 @@ export default function UserSessionsCard({
 			setChainsData(updatedChains)
 
 			// Reset state
-			setCompleteChainId(null)
-			setCompleteChainNotes('')
+			setEscalateChainId(null)
+			setEscalateChainNotes('')
 		} catch (error) {
 			console.error('Error completing chain:', error)
 			toast({
@@ -319,7 +268,7 @@ export default function UserSessionsCard({
 				type: 'error',
 			})
 		} finally {
-			setIsCompletingChain(false)
+			setIsEscalatingChain(false)
 		}
 	}
 
@@ -896,7 +845,7 @@ export default function UserSessionsCard({
 																	className="h-8 px-3 text-xs bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800 shadow-sm hover:shadow transition-all"
 																	onClick={e => {
 																		e.stopPropagation()
-																		setCompleteChainId(chain.chain_id)
+																		setEscalateChainId(chain.chain_id)
 																	}}
 																>
 																	<CheckCircle className="h-3.5 w-3.5 mr-1.5" />
@@ -974,10 +923,10 @@ export default function UserSessionsCard({
 				</div>
 			</div>
 
-			{/* Complete Chain Modal */}
+			{/* Escalate Chain Modal */}
 			<Dialog
-				open={!!completeChainId}
-				onOpenChange={open => !open && setCompleteChainId(null)}
+				open={!!escalateChainId}
+				onOpenChange={open => !open && setEscalateChainId(null)}
 			>
 				<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white">
 					<DialogHeader>
@@ -991,7 +940,7 @@ export default function UserSessionsCard({
 								Chain ID
 							</label>
 							<div className="mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200">
-								{completeChainId}
+								{escalateChainId}
 							</div>
 						</div>
 
@@ -1005,105 +954,26 @@ export default function UserSessionsCard({
 						<Button
 							type="button"
 							variant="outline"
-							onClick={() => setCompleteChainId(null)}
+							onClick={() => setEscalateChainId(null)}
 							className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
 						>
 							Cancel
 						</Button>
 						<Button
-							onClick={() => completeChainId && completeChain(completeChainId)}
-							disabled={isCompletingChain}
+							onClick={() => escalateChainId && escalateChain(escalateChainId)}
+							disabled={isEscalatingChain}
 							className="relative bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white"
 						>
-							{isCompletingChain && (
+							{isEscalatingChain && (
 								<div className="absolute inset-0 flex items-center justify-center">
 									<div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white dark:border-gray-300"></div>
 								</div>
 							)}
-							<span className={isCompletingChain ? 'opacity-0' : ''}>
+							<span className={isEscalatingChain ? 'opacity-0' : ''}>
 								Complete Chain
 							</span>
 						</Button>
 					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-
-			{/* Complete Session Modal */}
-			<Dialog
-				open={!!completeSessionId}
-				onOpenChange={open => !open && setCompleteSessionId(null)}
-			>
-				<DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-900 dark:border-gray-700">
-					<DialogHeader>
-						<DialogTitle className="dark:text-white">
-							Complete Session
-						</DialogTitle>
-					</DialogHeader>
-					<form
-						onSubmit={e => {
-							e.preventDefault()
-							if (completeSessionId) {
-								completeSession(completeSessionId)
-							}
-						}}
-						className="space-y-4"
-					>
-						<div className="grid w-full items-center gap-2">
-							<label
-								htmlFor="session_id"
-								className="text-sm font-medium text-gray-700 dark:text-gray-300"
-							>
-								Session ID
-							</label>
-							<Input
-								id="session_id"
-								value={completeSessionId || ''}
-								disabled
-								className="bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
-							/>
-						</div>
-
-						<div className="grid w-full items-center gap-2">
-							<label
-								htmlFor="completion_notes"
-								className="text-sm font-medium text-gray-700 dark:text-gray-300"
-							>
-								Completion Notes
-							</label>
-							<Textarea
-								id="completion_notes"
-								value={completeSessionNotes}
-								onChange={e => setCompleteSessionNotes(e.target.value)}
-								placeholder="Enter completion notes here..."
-								className="resize-none min-h-[100px] dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:placeholder-gray-500"
-							/>
-						</div>
-
-						<DialogFooter className="gap-2 sm:gap-0">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setCompleteSessionId(null)}
-								className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
-							>
-								Cancel
-							</Button>
-							<Button
-								type="submit"
-								disabled={isCompletingSession}
-								className="relative bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
-							>
-								{isCompletingSession && (
-									<div className="absolute inset-0 flex items-center justify-center">
-										<div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white dark:border-gray-300"></div>
-									</div>
-								)}
-								<span className={isCompletingSession ? 'opacity-0' : ''}>
-									Complete Session
-								</span>
-							</Button>
-						</DialogFooter>
-					</form>
 				</DialogContent>
 			</Dialog>
 		</div>
