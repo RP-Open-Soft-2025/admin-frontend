@@ -2,8 +2,6 @@
 
 A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Tailwind CSS. This project serves as the administrative interface for DeloConnect platform.
 
-🌐 **Live Demo**: [https://opensoft-gc-admin.vercel.app/](https://opensoft-gc-admin.vercel.app/)
-
 ## 📑 Table of Contents
 
 - [Features](#-features)
@@ -20,6 +18,7 @@ A modern, feature-rich admin dashboard built with Next.js 15, TypeScript, and Ta
 ## 🚀 Features
 
 - **Modern Tech Stack**
+
   - Next.js 15 with App Router
   - TypeScript for type safety
   - Tailwind CSS 4 for styling
